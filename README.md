@@ -13,7 +13,7 @@ Claude builds a renderer for each new painting instead of reusing one scene.
 
 ## Install
 ```bash
-git clone https://github.com/hasanator3000/ink-wash-painting-skill ~/.claude/skills/ink-wash-painting
+git clone https://github.com/23ag1/ink-wash-painting-skill ~/.claude/skills/ink-wash-painting
 ```
 Then ask Claude for a painting, e.g. "нарисуй город у канала в тумане в стиле китайской туши".
 
