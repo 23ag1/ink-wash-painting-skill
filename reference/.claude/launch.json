@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "ink", "runtimeExecutable": "python3", "runtimeArgs": ["serve.py", "8770"], "port": 8770 }
+  ]
+}

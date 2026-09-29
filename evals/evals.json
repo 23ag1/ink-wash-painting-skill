@@ -1,0 +1,11 @@
+{
+  "skill_name": "ink-wash-painting",
+  "evals": [
+    {"id": 1, "prompt": "Нарисуй в стиле китайской туши большую пагоду крупным планом, чтобы выглядело как настоящая картина, а не компьютерная графика.",
+     "expected_output": "Vertical 高远 composition, multi-tier pagoda as host with bracket/tile/eave rhythm, base lost in mist, near-plane accent, material pipeline (diffusion, filter, paper); no mountains-and-moon template.", "files": []},
+    {"id": 2, "prompt": "Сделай город в стилистике китайской туши — старый город у канала утром в тумане.",
+     "expected_output": "Rooftop rhythm (black tile bands on white-wall paper), host cluster, canal as void, mist erasing bases, depth-based tone; not the reference river scene.", "files": []},
+    {"id": 3, "prompt": "Кот сидит на подоконнике, за окном дождь — в стиле китайской туши.",
+     "expected_output": "Album-leaf format, 没骨 cat, ruled window, rain washes; no landscape machinery.", "files": []}
+  ]
+}
