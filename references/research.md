@@ -45,6 +45,8 @@ English** — Chinese queries find far better painting material.
 - Photographs of the real subject for structure (architecture photos, street markets in rain, animals) — never
   for rendering style.
 
+Also read `motif-studies.md` (how an open-source generator simplifies common motifs) before inventing a construction.
+
 ## 3. The study note (write one per master work you look at)
 Look at the image (view it, don't just read the caption) and write:
 1. **Skeleton** — the main lines of the composition (diagonal, S-curve, triangle, one corner); where the host is.
