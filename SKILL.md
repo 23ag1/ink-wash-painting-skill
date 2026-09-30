@@ -83,6 +83,8 @@ moves, how to run it, and honestly what is still weak, ordered by level.
 ## References
 - `references/research.md` — how to study: queries, open-access sources, masters by problem solved, study and structure notes.
 - `references/motif-studies.md` — study notes on how shan-shui-inf (MIT) reduces pavilions/pagodas, boats, figures, trees, rocks, mountain texture, water and repeats to a few marks. Read when a motif is new; derive your own construction, don't copy numbers. (No bridge, umbrella, crowd or market there.)
+- `references/painting-howto.md` — how painters simplify roofs, white walls, umbrellas, crowds, stalls, bridges, figures, town/street composition, rain and mist. Each claim is tagged OPENED / SNIPPET / MEMORY / DERIVED; umbrellas, crowds and stalls are hypotheses to test against a render.
+- `references/technique-sources.md` — ranked technical sources worth borrowing (layered-polygon watercolor, anisotropic Kuwahara, curl noise, open-access museum APIs for reference images), with verification status and a skip list.
 - `references/seeing.md` — translation method, mark vocabulary, subject families, worked translations.
 - `references/judgement.md` — the dials (void, darkness, wetness, density), jobs of sheet regions, structure, anti-CG laws, hierarchy of finish.
 - `references/composition.md` — the canon (six principles, three distances, host/guest, 虚实, 留白, 藏露, 墨分五色, 界画, writing and seals, colour) and formats.

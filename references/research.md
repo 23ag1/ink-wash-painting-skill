@@ -47,6 +47,9 @@ English** — Chinese queries find far better painting material.
 
 Also read `motif-studies.md` (how an open-source generator simplifies common motifs) before inventing a construction.
 
+Motif recipes researched in advance: `painting-howto.md`. Measurable reference data (bare-paper %, tone histograms) and open-access
+image APIs: `technique-sources.md` (Met, Cleveland, Art Institute of Chicago — CC0, reference only, never ship).
+
 ## 3. The study note (write one per master work you look at)
 Look at the image (view it, don't just read the caption) and write:
 1. **Skeleton** — the main lines of the composition (diagonal, S-curve, triangle, one corner); where the host is.
