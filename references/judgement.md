@@ -48,6 +48,16 @@ void/distance, edge. A region with no job is dead — it reads as "empty" (not a
   4. *Something talks to it:* the eye is led into it and back (a road, a line of birds, a branch, a banner, a
      boat, the title placed to balance it), and its size is in proportion — not one flat shape taking 40% with
      nothing in it.
+- **Void, practical rules** (from the rain-market test):
+  - The void follows the logic of the world, not a mask shape. Where the world continues at the same distance as
+    neighbouring masses there is no void — only mist eating fragments. Ask: "what stands here in the world, and
+    why can't I see it?" If the answer is "nothing, it's just empty", it is a hole.
+  - Dissolution is *directional*: an object stays crisp on the mass side and melts toward the void (gradient
+    erase + blur) — never uniformly pale (a "ghost slab"). Lost edges apply to ALL layers: contour lines melt
+    too, or the ink outline keeps the rectangle.
+  - Fragments in the void are few, large enough and connected to the mass; lone crumbs read as errors.
+  - Atmospheric veils (rain, blotchy glazes) are switched off inside the void: paper + at most one graded wash.
+  - One void function shared by JS and shader (single source), or they drift apart.
 - **Edges**: near elements are cropped by the edge (the world continues); far elements fade before the edge;
   a picture where everything sits in a central column looks like a sticker on a sheet.
 - **Diagonals and curves**: rivers, streets, branches, ridges run on diagonals or S-curves, never straight down
@@ -77,6 +87,22 @@ geometry, symmetry, no hierarchy**. So:
    assembled rather than painted.
 8. **Seed test:** change the random seed. If the picture still reads the same and still looks designed, the
    structure is good; if it becomes a new random arrangement with the same flaw, the flaw is in the rules.
+
+## 5b. Structure and motifs: failures that parameters don't fix
+- **False-word test** for every motif at thumbnail size: "what else does this look like?" Seen in tests: umbrella
+  with spokes = pie/wheel; straw hat with radial strokes = flower/cog/button; umbrella + stroke below = mushroom;
+  carrying pole with baskets = dumbbell; soft umbrella = pompom; top-down roofs with ridge along the street =
+  stacked boxes/books; a thin evenly-tiered pagoda = antenna. If it reads as an everyday object, change the
+  *construction*, not the numbers.
+- Build motifs from how the thing really behaves: an umbrella in rain is tilted (rotated ellipse) with a dark
+  underside along the lower rim and a dry brush arc on the near edge; a roof shows a horizontal ridge, a slope
+  facing the viewer, tile rows, eave ends, upturned corners.
+- A white wall on white paper exists only through its dark openings (doors, windows of different sizes) and 1-2
+  broken lines (corner, base) — Wu Guanzhong: narrow black roof, big white wall, black window squares.
+- Projected flat details (openings, awnings in oblique projection) can read as flying black diamonds or cards —
+  check each at thumbnail size.
+- Ink splashes/blots (破墨) are irregular and follow structure; regular ellipses read as holes or puddles.
+- A landmark in mist needs unequal tiers, a mist belt (藏露), and enough tone to survive stacked veils.
 
 ## 6. Hierarchy of finish
 The host and the focal point get the most considered marks; everything else is progressively summarised.

@@ -57,6 +57,12 @@ Improving details never fixes a broken composition.
 ### 6. Motion
 - Only what moves in the painting's world, slow and few, painted; nothing flickers.
 
+## Process notes
+- Keep the level order strict: in the rain-market test, four detail rounds missed a ladder composition that the
+  first top-down pass caught.
+- Time-box research; mark honestly what was actually seen vs recalled from memory.
+- Give the user a short status every few steps, especially during research — long silent chains look like a hang.
+
 ## When to stop
 Stop when a full top-down pass finds nothing at levels 1-4 and only minor items at 5-6. Report remaining
 weaknesses honestly, ordered by level.

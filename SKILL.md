@@ -26,7 +26,8 @@ say so and work from the master list by memory.
 Five questions: spirit (神) in one phrase; what is painted (实) and what stays paper (虚); structure and the mark
 family for each part; depth planes; format and viewpoint. Then set the dials with a reason each: void %, ink
 darkness, wetness, mark density, colour accents, motion. A lonely lake may be 85% paper, a rain market 25% —
-decide, don't default. Don't reach for mountains, moon and water unless the subject calls for them.
+decide, don't default. A **photo** reference is a brief in picture form: recompose freely, never trace or filter it (`seeing.md` D).
+Don't reach for mountains, moon and water unless the subject calls for them.
 
 ### 3. Compose — `references/composition.md`
 One host, supporting groups, a designed void on one side, a diagonal or curve that leads the eye, every region
@@ -73,6 +74,8 @@ moves, how to run it, and honestly what is still weak, ordered by level.
   belongs to 工笔 / 青绿). Offer the painterly equivalent.
 - Close-up faces, hands and complex anatomy are hard to make convincing procedurally; keep figures small or in
   a sketchy 减笔 manner unless the user accepts the risk.
+- Motifs up close (figures, tiles) stay weaker than the composition: procedural brushwork is limited by the
+  motif's construction, not by parameters. Keep them small, summarised or hidden in mist when possible.
 - Quality depends on your visual judgement in the study and critique steps; without image viewing or web
   access, say that the result could not be checked against references.
 - Needs WebGL2 + `EXT_color_buffer_float` (half-float diffusion).

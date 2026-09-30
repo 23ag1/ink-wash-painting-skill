@@ -117,6 +117,18 @@ choose a mark from this table instead.
 - 册页 near-square; cat as 没骨 (2-3 wet strokes, dark back, dry whisker and eye accents); sill in 界画;
   rain as slanted pale washes + a few dry vertical lines; window frame ruled; the room behind left as paper.
 
+### D. From a photo — inspiration, not a copy
+A user's photo is a *brief in picture form*: what they love about a place or moment. Not a layout to trace, and
+never an image to filter (the photo's pixels through a watercolor shader = a phone-app effect, not a painting).
+1. **Read it as a painter:** subject and spirit (what moved the person to take it); mood (time, weather, season,
+   temperature, sound); the 1-3 motifs that make it *this* place; light as tone (darkest/lightest); clutter
+   (cars, wires, signs, tourists, cast shadows).
+2. **Put it aside and paint the brief.** Recompose freely by the canon: own format; move, enlarge or drop things;
+   mist over what does not serve; cast shadows → tone by depth; perspective → oblique; colour → ink + 1-3
+   accents; sky and highlights → paper.
+3. **Use it only as a structure reference** for the characteristic motifs, so they are believable.
+4. **Success test:** someone who knows the place recognises its feeling; nobody calls it a filtered photo.
+
 ## 5. What does not translate — tell the user
 - Photographic detail, specular highlights, cast shadows from a light source, exact perspective — the style
   deliberately does not have them. Offer the painterly equivalent instead.

@@ -61,6 +61,28 @@ petals, lamplight as a breathing pre-painted wash). Slow, few, in the painting's
 5. Motion last.
 Commit after each step; screenshot and critique (`critique.md`) at each.
 
+## 8b. Placement and order rules (from the rain-market test)
+- Key accents and required masses are placed deterministically, never left to the RNG (an accent landed in an
+  alley and vanished). If a region has a job, put an explicit cluster there — random placement does not
+  guarantee coverage.
+- Paint order accounts for height: things hanging above a crowd are drawn after it; the near plane gets explicit
+  late order keys (y-sorting let an off-sheet far house cover a near umbrella).
+- All effect masks are soft (radial/gradient); a rectangular mask (e.g. a no-mist box around the title) shows as
+  a frame.
+- Blur and wetness grow with depth for every object, not only for ones tagged "far"; far/back objects only
+  glaze (no opaque paper underlay — it cuts hard edges into the background washes).
+- Every drawing helper wraps its work in `save()/restore()`; a leaked `globalCompositeOperation =
+  'destination-out'` erased all fills once.
+
+## 8c. Inspection tooling
+- Zoom: CSS `transform` on the stage may not show in screenshots. Reliable: create the WebGL context with
+  `preserveDrawingBuffer: true`, crop the canvas via `drawImage` into an overlay `<img>`, hide the scene
+  (`visibility:hidden`); plus a `?s=3` debug param to render at high resolution.
+- Screenshots can be stale right after reload and under viewport emulation: don't emulate sizes; if a frame
+  looks unchanged, take a second screenshot before concluding.
+- Before first run, grep shaders for `smoothstep(a, b, …)` with a > b.
+- Batched text patches: use independent anchors and verify each replacement.
+
 ## 9. GLSL/WebGL gotchas
 `smoothstep` with e0 > e1 is undefined (write `1.-smoothstep(e1,e0,x)`). Float readback needs
 `EXT_color_buffer_float`. MRT needs `gl.drawBuffers`. The WebGL canvas can be read only in the frame it was
