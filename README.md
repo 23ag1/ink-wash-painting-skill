@@ -54,6 +54,13 @@ scripts/new-painting.sh scaffold a new painting from the generic core
 evals/evals.json        test prompts: a pagoda, a canal city in mist, a cat in the rain
 ```
 
+## Example: 雨市 (Rain Market)
+`examples/rain-market/` — a vertical scroll made by the skill on a subject unrelated to the reference scene
+(a market street in rain, built with the research → notan → motif study → top-down critique workflow).
+Run it: `cd examples/rain-market && python3 serve.py 8770` → http://localhost:8770/index.html
+It is an honest test result, not a showcase: composition and void work; motifs up close (tiles, figures) are
+still weaker than the composition.
+
 ## Honest limits
 
 - No photographic detail, cast shadows or full colour — by design.
