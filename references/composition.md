@@ -37,7 +37,8 @@ The other four (spirit resonance, likeness, colour by type, copying) follow if t
 Choose one as the governing mode; mixing is allowed but one must lead.
 
 ## 3. Host and guests (主宾)
-One **host** massif dominates (tallest, broadest, most brushwork). **Guests** are lower, grouped, and answer it
+This is the "no fence" rule, and it holds for EVERY subject: houses, trees, umbrellas, figures, boats — any row
+of similar units at even spacing reads as a pattern (see `judgement.md` §5). One **host** massif dominates (tallest, broadest, most brushwork). **Guests** are lower, grouped, and answer it
 from the other side. Never a row of equal peaks — "the fence" is the #1 composition failure.
 Engine: `scene.masses`. Give the host range (depth ~.6) the tallest mass (≈200-230) with half-widths ≥ 200;
 guests ≈100-165 on the opposite side; near shoulders lower. Keep half-width ≳ 0.8 × height or peaks become spikes.

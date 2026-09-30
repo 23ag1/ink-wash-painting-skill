@@ -2,7 +2,7 @@
 
 The style is not a set of motifs (mountains, moon, pavilion). It is a *way of seeing* plus a *material*.
 Any subject — a city, a close-up pagoda, a cat, a train station, a storm — can be painted if you first translate
-it the way a painter would. Do this translation in writing before any code. Copying the reference implementation's
+it the way a painter would. Do this translation in writing before any code, after studying real paintings of the subject (`research.md`). Copying the reference implementation's
 scene instead of translating is the #1 cause of "template" pictures.
 
 ## Contents
@@ -99,16 +99,18 @@ choose a mark from this table instead.
 - Motion: mist drifting through the gaps, a few birds around the top, bells swaying (1-2 px), nothing else.
 
 ### B. "A city in this style"
-- 神: *rooftops emerging from morning mist along a canal.*
-- Format: wide handscroll-like 16:9 or 21:9, 平远 or slight bird's-eye (深远).
-- Structure: roofs are the vocabulary — rows of dark tile bands (ink) over white walls (paper), stepped gables
-  (马头墙) as small black steps, windows as dots, a bridge arch, a landmark (gate tower, pagoda) as host.
-- Composition: dense cluster (host) on one side, thinning into mist; the canal/street as the open void leading
-  in; far roofs as pale grey blocks with no detail; mist bands erase every building's base (never draw 300
-  complete houses — draw 40 roofs and let mist imply the rest).
-- Generate roof blocks procedurally along curves (street, canal, contour), vary width/height/gable type by hash,
-  sort far→near, apply tone by depth. Figures: dots and tiny strokes on the bridge.
-- Near plane: willow branches or the edge of a roof in charred ink, big scale jump.
+- 神: *a living town breathing in the rain/mist* — decide the mood first (market = dense, 25% void; dawn canal =
+  sparse, 60% void) and study Wu Guanzhong's Jiangnan towns, Feng Zikai's streets and 清明上河图 (`research.md`).
+- Structure (what makes it believable): each house = **white wall (paper) + dark roof band + dark openings**.
+  Show facades, not just roofs: in oblique projection you see the wall under every roof. Houses differ in height,
+  width, orientation and roof type (gables 马头墙, hips, sheds); they overlap, lean, have gaps and alleys.
+- Composition: the street or canal runs on a **diagonal or S-curve**, never straight down the middle; houses
+  crowd one side more than the other; a landmark (gate tower, bridge, big tree) is the host; vertical accents
+  (shop banners 幌子, lanterns, poles, a tree) break the horizontal rhythm; the far end dissolves into mist.
+- The city is a rhythm of blacks on white: vary the dark shapes' sizes, cluster them, leave paper gaps. If the
+  thumbnail reads as rows or a grid, the composition is wrong — no amount of detail fixes it.
+- Crowds: clusters of marks of unequal size with gaps; a few legible figures near, the rest dots; see
+  `judgement.md` §5 for the anti-repetition laws.
 
 ### C. A subject with no mountains and no water (e.g. "a cat on a windowsill in the rain")
 - The whole landscape machinery disappears; the material pipeline stays.

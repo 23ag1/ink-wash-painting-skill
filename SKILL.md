@@ -1,93 +1,90 @@
 ---
 name: ink-wash-painting
-description: Create high-quality Chinese ink-wash paintings (水墨 / 山水 / guohua / sumi-e style) of ANY subject as live browser art — landscapes, but also cities, architecture close-ups (pagodas, temples), figures, animals, plants, weather, even modern subjects — rendered procedurally (WebGL2 shaders + Canvas brushwork) so it reads as hand-painted with brush and ink on xuan paper, with light animation. Use this skill whenever the user wants something "in Chinese ink style", "水墨风", sumi-e, a shanshui landscape, a Mid-Autumn / Spring Festival / Qingming scene, or asks to recreate an ink-style image or video frame in code — from a text description OR a reference image — or asks for a shader / generative / canvas version of a Chinese painting.
+description: Create high-quality Chinese ink-wash paintings (水墨 / 山水 / guohua / sumi-e style) of ANY subject as live browser art — landscapes, but also cities, markets, architecture close-ups (pagodas, temples), figures, animals, plants, weather, even modern subjects — rendered procedurally (WebGL2 shaders + Canvas brushwork) so it reads as hand-painted with brush and ink on xuan paper, with light animation. Use this skill whenever the user wants something "in Chinese ink style", "水墨风", sumi-e, a shanshui landscape, a Mid-Autumn / Spring Festival / Qingming scene, or asks to recreate an ink-style image or video frame in code — from a text description OR a reference image — or asks for a shader / generative / canvas version of a Chinese painting.
 ---
 
 # Ink-wash painting (水墨) of any subject, in the browser
 
-You are the painter. This skill gives you **principles** — how an ink painter sees a subject, how ink, water and
-paper behave, how a brush makes marks — so you can build the right renderer for *whatever* is asked: a misty
-river, a city at dawn, a towering pagoda, a cat in the rain. It is not a scene generator. A working reference
-implementation (`reference/`, one Mid-Autumn river scene) shows every principle realised in code; reuse its
-generic material core, never its scene.
+You are the painter. No skill can contain a recipe for every subject, so this one teaches you to work the way a
+painter works: **study** real paintings and the real thing, **translate** the subject into the language of brush
+and ink, **decide** the picture's dials (void, density, darkness, wetness) from its mood, **sketch** the
+composition in tone before any detail, **try out** each motif alone before multiplying it, and **criticise
+top-down** until a painter would not object. The material (paper, ink, water, brush) is rendered by principles
+in `references/materials.md` and `brush.md`; a complete worked example lives in `reference/` (one Mid-Autumn
+river scene) — reuse its generic material core, never its scene.
 
-Quality comes from four things, in this order: **translating the subject into the painter's language**,
-**composition by the canon**, **material and brush that hide the computer**, and **inspection at zoom**.
-The history of mistakes behind these rules is in `references/pitfalls.md`.
+## Workflow (each step is a gate: don't go on while it fails)
 
-## Workflow
+### 1. Study — `references/research.md`
+Search the web (Chinese and English queries; museum open-access collections) for 2-4 master works close to the
+subject and mood, look at the images, and write a study note for each: skeleton, void, tone map, mark inventory,
+**how the hard part is simplified**, edges, what to take. For every unfamiliar motif also look at the real thing
+(structure note). This replaces recipes: you derive the recipe from real paintings each time. No web access →
+say so and work from the master list by memory.
 
-### 1. Translate the subject (before any code) — `references/seeing.md`
-Answer the five questions in writing: its spirit (神) in one phrase; what is painted (实) and what stays paper
-(虚); its structure and which line family carries each part (界画 / 描 / 没骨 / 皴 / 点 / wash); its depth planes
-and how tone falls with depth; format and viewpoint (vertical scroll 高远, handscroll 平远, album leaf, fan).
-For a reference image, read its composition, motifs, mood and accents, then translate the same way.
-Resist defaulting to mountains + moon + water: use them only if the subject calls for them.
+### 2. Translate and decide — `references/seeing.md`, `references/judgement.md`
+Five questions: spirit (神) in one phrase; what is painted (实) and what stays paper (虚); structure and the mark
+family for each part; depth planes; format and viewpoint. Then set the dials with a reason each: void %, ink
+darkness, wetness, mark density, colour accents, motion. A lonely lake may be 85% paper, a rain market 25% —
+decide, don't default. Don't reach for mountains, moon and water unless the subject calls for them.
 
-### 2. Compose — `references/composition.md`
-One host (main mass or object), guests answering it, a void that leads the eye, 留白, 藏露 (mist hides bases and
-whatever you cannot or should not paint), one focal point, red only for 1-3 accents, at most one text + one seal.
-Sketch the layout as coordinates in the chosen design space.
+### 3. Compose — `references/composition.md`
+One host, supporting groups, a designed void on one side, a diagonal or curve that leads the eye, every region
+of the sheet with a job, edges treated (near things cropped, far things fading). No central axis, no symmetry,
+no rows of equal units.
 
-### 3. Build the renderer for this painting — `references/renderer.md`
+### 4. Build the pipeline and gate on a notan sketch — `references/renderer.md`
 ```bash
-bash <skill>/scripts/new-painting.sh <target-folder>   # copies only the generic core: brush lib, text, diffusion, filter, server
+bash <skill>/scripts/new-painting.sh <target-folder>   # generic core: brush lib, text, diffusion, filter, server
 ```
-Work in a permanent folder the user agreed to, `git init`, commit per step. Then write your own pipeline:
-shader fields for continuous things (background washes, masses, mist, water), Canvas brushwork for marks,
-wetness map → fibre diffusion → watercolor filter → ink layer on top → a per-frame pass only for what moves.
-Organise everything by **depth** (tone, haze, detail, wetness all derive from it), not by fixed screen bands.
-Read `reference/gl.js` and `reference/shaders/` for plumbing; `references/materials.md` explains every effect.
+Permanent folder the user agreed to, `git init`, commit per step. First render the planned masses as 3-4 flat
+tones only (notan mode) and pass the composition checks at thumbnail size. Then the material sheet (paper,
+diffusion, filter, test strokes) at zoom. Organise everything by **depth**, not by screen bands.
 
-### 4. Paint the motifs: structure → strokes — `references/brush.md`
-Build each object's skeleton geometrically (tiers of a tower, planes of roofs, a street curve, a pose curve), then
-decorate it with strokes of the right family. Strokes carry tone inside (dark tip, pale belly), a pressed entry and
-a thinning exit, drying along the length, rare irregular breaks. Level of detail by size on screen. Anything in
-front erases the ink behind it. Every object ends in ground, water, mist or the sheet edge.
+### 5. Motif studies, then assemble — `references/brush.md`
+Draw each new motif large and alone (study mode), from correct structure, compare with the references, iterate
+until it looks painted; then give it variation (size, tone, angle, completeness) and only then multiply it into
+the scene in clusters with gaps. Paint in the painter's order: washes → structure strokes → texture → dots →
+accents.
 
-### 5. Render, inspect, criticise — at least two rounds — `references/critique.md`
-Build order: material on a blank sheet first (check at zoom), then masses and voids (full frame), then the host
-object, then the rest, motion last. After every step: reload, check the console, look at the full frame and at
-3-6× zoomed crops. Run the checklist as a harsh critic, fix the top issues, repeat until a round finds nothing a
-painter would object to.
+### 6. Critique top-down, at least two full rounds — `references/critique.md`
+Composition → tone/void → structure → anti-CG → marks → motion. Thumbnail, blur, one-second and side-by-side
+tests; zoom for marks. Never polish details while a higher level fails. If an element fails twice, go back to
+research instead of tweaking numbers.
 
-### 6. Deliver
-Explain what was painted and why in painting terms, what moves, how to run it, and honestly what is still weak.
+### 7. Deliver
+What was painted and why (in painting terms, citing what you took from which master), the dials you chose, what
+moves, how to run it, and honestly what is still weak, ordered by level.
 
 ## Principles that decide quality
-- **Translate, don't illustrate.** A city is a rhythm of black roofs on white paper; a pagoda is a stack of dark
-  eave bands rising into cloud. Paint the spirit with few marks; omit what does not serve it.
-- **Paper is the light.** Sky, water, snow, white walls, mist and lit sides are unpainted paper. Nothing glows.
-- **Tone follows depth, systemically.** Near = charred ink, sharp, detailed; far = pale, bluish, soft, silhouette.
-  One rule for everything, never tune one object by hand; stacked veils make grey mush.
-- **Sharp and soft together (干湿).** Dry strokes keep hard edges; wet washes spread along fibres. Uniform softness
-  or a global blur is the fastest way to look fake.
-- **A brush, not a pen or a fill.** No flat single-colour shapes, no uniform vector outlines — except 界画 ruled
-  lines for man-made structure, which are even but still veiled by depth.
-- **Suggest, don't enumerate.** 40 tile strokes read as a roof; 400 read as a texture map. Mist does the rest.
-- **Nothing floats; nothing stands out.** Every object is grounded or dissolved; no element is drawn sharper,
-  darker, more saturated or more detailed than its neighbours at the same depth.
-- **Animation obeys the painting.** Slow, few, painted marks (mist, water, birds, petals, lamplight). No glows,
-  specks, vignettes, camera moves, or UI unless asked.
+- **Study before inventing.** Every good decision in an unfamiliar subject comes from a real painting or the real thing.
+- **Translate, don't illustrate.** Paint the spirit with few, right marks; omit what does not serve it.
+- **Decide the dials from the mood.** Void, density, darkness, wetness are choices, not constants.
+- **Composition first, detail last.** A bad thumbnail cannot be saved by good brushwork.
+- **Structure right, rendering loose.** "Unnatural" usually means wrong construction, not loose brushwork.
+- **Nothing identical, nothing evenly spaced, nothing symmetric** — repetition and regularity are what reveal
+  the computer (`judgement.md` §5).
+- **Paper is the light; tone follows depth; sharp and soft together; a brush, not a pen or a fill.**
+- **Nothing floats, nothing stands out; the host gets the most considered marks, the rest is summarised.**
+- **Animation obeys the painting.** Slow, few, painted; no glows, specks, vignettes, camera moves or UI unless asked.
 
 ## Honest limits — tell the user when they apply
 - Photographic detail, cast shadows, exact perspective and heavy full colour are outside the style (full colour
-  belongs to 工笔 / 青绿 — a different recipe). Offer the painterly equivalent.
-- Close-up faces, hands and complex anatomy are hard to make convincing procedurally; keep figures small or
-  hidden in cloth, unless the user accepts a sketchier 减笔 look.
-- New subjects have no ready motif code: quality depends on the translation and on critique rounds at zoom.
+  belongs to 工笔 / 青绿). Offer the painterly equivalent.
+- Close-up faces, hands and complex anatomy are hard to make convincing procedurally; keep figures small or in
+  a sketchy 减笔 manner unless the user accepts the risk.
+- Quality depends on your visual judgement in the study and critique steps; without image viewing or web
+  access, say that the result could not be checked against references.
 - Needs WebGL2 + `EXT_color_buffer_float` (half-float diffusion).
 
 ## References
-- `references/seeing.md` — the translation method, the mark vocabulary, subject families (architecture, cities,
-  figures, animals, plants, weather, modern subjects), worked translations (large pagoda, city, cat in rain).
-- `references/composition.md` — the canon (six principles, three distances, host/guest, 虚实, 留白, 藏露, 墨分五色,
-  界画, writing and seals, colour) and formats.
+- `references/research.md` — how to study: queries, open-access sources, masters by problem solved, study and structure notes.
+- `references/seeing.md` — translation method, mark vocabulary, subject families, worked translations.
+- `references/judgement.md` — the dials (void, darkness, wetness, density), jobs of sheet regions, structure, anti-CG laws, hierarchy of finish.
+- `references/composition.md` — the canon (six principles, three distances, host/guest, 虚实, 留白, 藏露, 墨分五色, 界画, writing and seals, colour) and formats.
 - `references/materials.md` — paper, water, ink, pigment → shader techniques with code and working ranges.
 - `references/brush.md` — the stroke atom and stroke families as algorithms; structure → strokes.
-- `references/renderer.md` — designing the pipeline for a new painting; depth organisation; layers and
-  occlusion; reusable vs scene-specific files; build order; GLSL gotchas.
-- `references/critique.md` — critic's checklist and zoom protocol.
-- `references/pitfalls.md` — every mistake made building the reference, symptom → cause → fix.
-- `references/reference-implementation.md`, `references/reference-internals.md` — how `reference/` paints its one
-  scene (read for technique; don't copy the scene).
+- `references/renderer.md` — pipeline design, depth organisation, layers/occlusion, reusable files, gated build order (notan, material sheet, motif studies), GLSL gotchas.
+- `references/critique.md` — top-down critique with gates and concrete questions.
+- `references/pitfalls.md` — mistakes made building the reference, symptom → cause → fix.
+- `references/reference-implementation.md`, `reference-internals.md` — how `reference/` paints its one scene.

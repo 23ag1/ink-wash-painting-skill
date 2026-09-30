@@ -101,6 +101,13 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   (branch reshaped). Emulated viewport screenshots cropping the page (use the real pane size). Float readback
   needs `EXT_color_buffer_float`. A Python patch that fails halfway writes nothing — re-run it complete.
 
+## 7b. From the first test on a new subject (rain market, weaker model)
+- **Ladder composition** — street straight down the middle, two mirrored rows of equal roof blocks, empty grey
+  margins. *Cause:* the skill suggested "generate roof blocks procedurally"; the no-fence rule was written for
+  mountains only; critique polished details. *Fix:* anti-CG laws for every subject, notan gate, top-down critique.
+- **Roofs without houses** — barcode hatching on rectangles, no walls. *Fix:* structure note; wall + roof + openings.
+- **Crowd as pebbles, umbrellas as pies** — one motif multiplied before it worked. *Fix:* motif study first.
+
 ## 8. Process lessons
 - **Research the canon before inventing.** Composition (Guo Xi, Xie He) and technique (MoXi, Curtis, Bousseau,
   Lingdong Huang's shan-shui-inf) answered questions that trial-and-error kept getting wrong.

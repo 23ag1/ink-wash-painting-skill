@@ -1,49 +1,60 @@
-# Critic's checklist and zoom protocol
+# Critique: top-down, with gates
 
-Run this after every meaningful change, as a harsh critic, not as the author. Fix the top issues, re-render,
-run it again. Stop only when a round finds nothing a painter would object to.
+Self-critique fails in a typical way: rounds are spent on hats and umbrellas while the composition is a
+ladder. So critique **top-down** and **gate**: do not work on a lower level while a higher one fails.
+Improving details never fixes a broken composition.
 
-## Zoom protocol
-Full-frame screenshots hide almost every execution flaw. Each round, look at:
-1. Full frame (composition, tone, focal hierarchy).
-2. Host massif at 3× (contour, fibre strokes, glaze edges, mist at the foot).
-3. Main building + waterline at 3-5× (grounding, stilts, reflection, seam, facade density).
-4. Focal object at 5-6× (boat: hull/reflection contact, canopy, figure; or whatever the focus is).
-5. Branch / near ground at 3× (stroke tone, blossoms, reeds).
-6. Title + seal at 3× (brush texture, placement on clean paper).
-In a browser pane: `stage.style.transformOrigin = 'X% Y%'; stage.style.transform = 'scale(k)'` then screenshot.
-Also read the console for shader compile errors after every reload.
+## Levels (in this order)
+1. **Composition** (judge at thumbnail size)
+2. **Tone and void**
+3. **Structure and believability**
+4. **Anti-CG laws** (repetition, spacing, symmetry)
+5. **Material and marks** (judge at 3-6× zoom)
+6. **Motion**
 
-## Composition
-- [ ] One host massif, guests lower and grouped, a void — not a fence of equal peaks.
-- [ ] No spiky peaks (half-width ≥ ~0.8 × height).
-- [ ] Exactly one focal point; everything else quieter. The subject of the occasion is not the weakest spot.
-- [ ] Diagonals: near-ground ↔ branch, building ↔ focal object. Nothing important dead centre.
-- [ ] Three planes present; the near plane has the darkest ink and the biggest scale.
-- [ ] The void reads as distance (pale far ranges, distant trees, a sail), not as a hole.
-- [ ] Writing: at most one text + one seal, on clean paper, no punctuation, not a subtitle.
+## How to look
+- **Thumbnail test:** view the whole picture at ~120-200 px (downscale a screenshot, or shrink the stage). At that
+  size only composition and tone exist. Answer the level-1 and level-2 questions from the thumbnail.
+- **Squint / blur test:** blur it heavily. Do you see 3-4 clear tone blocks with one darkest dark and a shaped void?
+- **One-second test:** glance at it: painting or render? If "render", name why in one line.
+- **Side by side:** put your render next to the master references from `research.md` at the same size. List the
+  three biggest differences. They are your next tasks.
+- **Zoom protocol:** full frame, then crops of the host, the focal point, the near plane, the text — at 3-6×.
+- Read the console after every reload.
 
-## Tone and colour
-- [ ] Full range: charred accents near, paper-white moon/void, pale far. Not a grey haze over everything.
-- [ ] Red only on the accents; the rest muted and warm; paper warm ivory, aged at the edges.
-- [ ] Every object at the same depth has the same veil (shoreline objects as hazy as the near ranges).
+## Questions per level (answer each in writing; any ✗ answered "yes" must be fixed before going lower)
+### 1. Composition
+- ✗ Is there a central vertical axis or mirror symmetry (street/river straight down the middle, equal sides)?
+- ✗ Does it read as a pattern or grid (rows of equal units, a ladder, a fence) at thumbnail size?
+- ✗ Is there no single host / focal point, or two competing ones?
+- ✗ Is any third of the sheet without a job (neither host, support, transition nor designed void)?
+- ✗ Does everything sit in a central column, with edges empty on both sides?
+- Does a diagonal or curve lead the eye in and to the focal point?
+### 2. Tone and void
+- Does the void match the brief's decision (`judgement.md`), with a shape, on one side?
+- ✗ Grey mush — no darkest dark, no paper-white light?
+- Is the darkest dark near the focal point or in the near plane, and the palest in the distance?
+- Colour limited to the planned accents?
+### 3. Structure
+- Is every object built correctly (roofs have walls under them, things have weight and stand on something,
+  one consistent projection)? Compare with the structure note.
+- ✗ Anything floating, pasted on, or cut off unnaturally?
+- Does the scale jump between planes read as depth?
+### 4. Anti-CG
+- ✗ Any repeated element identical in size, tone, angle or finish? ✗ Evenly spaced? ✗ Perfect circles/rectangles?
+- Clusters and gaps? Hierarchy few-large / some-medium / many-small?
+- ✗ Every element at the same level of finish?
+- Seed test passed?
+### 5. Material and marks (at zoom)
+- Strokes have tone inside, pressed entry, thinning exit; no flat fills, no uniform vector outlines, no beads,
+  no stitched dashes, no uniform hatching ("barcode").
+- Wet washes have fibrous edges and pooled rims; dry strokes stay sharp; not uniformly soft or blurred.
+- Lost-and-found edges along contours.
+- ✗ Radial glows, specks, vignettes, striped skies, scan-line water, motion-blur smears.
+- Paper visible (fibres, warm tone); writing on clean paper; seal small.
+### 6. Motion
+- Only what moves in the painting's world, slow and few, painted; nothing flickers.
 
-## Execution (digital tells)
-- [ ] No striped sky, no banded / scan-line water, no ruler-straight waterline.
-- [ ] No radial glows, specks, vignettes, neon rims, UI.
-- [ ] Strokes have tone inside (tip/belly), pressed entry, thinning exit — no flat single-colour polygons.
-- [ ] No "beads" (pulsing width) and no "stitching" (regular dashes) along lines.
-- [ ] Wet washes have fibrous edges and pooled rims; dry strokes stay sharp. Not uniformly soft.
-- [ ] No element drawn more carefully than its neighbours (sharper, darker, more saturated, more detailed).
-
-## Grounding and physics
-- [ ] Every object ends in ground, water (with reflection), mist, or the sheet edge — nothing floats.
-- [ ] Trees stand on ground, not on water.
-- [ ] Objects on water: reflection starts at their foot, no paper gap.
-- [ ] Objects in the shallows sink into the water gradually; the seam is soft and ragged.
-- [ ] Nothing behind shows through anything in front (ink-layer occlusion).
-- [ ] The moon's glitter path is under the moon; reflections are under their objects.
-
-## Motion
-- [ ] Only water, mist, geese, petals, lamplight move — slowly, few, painted.
-- [ ] Nothing flickers or shimmers (no per-frame noise on the static painting).
+## When to stop
+Stop when a full top-down pass finds nothing at levels 1-4 and only minor items at 5-6. Report remaining
+weaknesses honestly, ordered by level.

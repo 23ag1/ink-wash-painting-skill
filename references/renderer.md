@@ -50,11 +50,14 @@ Choose the design space from the format (landscape 1280×720, vertical 720×1280
 Render the painting once; animate only a final pass (water wobble, mist drift) and an overlay canvas (birds,
 petals, lamplight as a breathing pre-painted wash). Slow, few, in the painting's own marks.
 
-## 8. Build order that avoids rework
-1. Paper + filter + diffusion on a blank sheet with a few test strokes and a wash → check the material at zoom.
-2. Big masses and voids (washes only) → check composition full-frame, squint test.
-3. Host object structure → strokes → at zoom.
-4. Secondary objects, then near plane, then text/seal.
+## 8. Build order that avoids rework (each step is a gate — see `critique.md`)
+1. **Notan sketch**: a debug mode (e.g. `?mode=notan`) that paints only the planned masses as 3-4 flat tones
+   on paper — no detail. Pass composition and tone at thumbnail size before anything else.
+2. **Material sheet**: paper + filter + diffusion with a few test strokes and washes → check at zoom.
+3. **Motif studies**: a mode (e.g. `?study=roof`) that draws one instance of each new motif large and alone.
+   Iterate it against the references until it looks painted, then add variation (anti-CG laws) and only then
+   multiply it into the scene.
+4. Assemble: host → supporting groups → near plane → text/seal, re-running the thumbnail test.
 5. Motion last.
 Commit after each step; screenshot and critique (`critique.md`) at each.
 
