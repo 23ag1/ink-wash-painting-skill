@@ -2,7 +2,7 @@
 
 **A Claude skill that paints Chinese ink-wash (水墨) of any subject as live browser art — WebGL2 shaders for paper, water and ink, Canvas brushwork, no images and no libraries.**
 
-<img src="docs/moon.gif" width="100%" alt="The reference scene 月满中秋, live: a pavilion by a misty river, geese crossing the full moon, a plum branch, a boat">
+<img src="docs/scene-live.gif" width="100%" alt="The reference scene 月满中秋, live: a pavilion by a misty river, geese crossing the full moon, a plum branch, a boat">
 
 <sub>The reference scene, 月满中秋 (<i>full moon, mid-autumn</i>) — geese, petals and lamplight are drawn with the same brush code every frame. **[See it running live →](https://research.23ag.one/ink-wash)**</sub>
 
