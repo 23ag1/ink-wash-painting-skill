@@ -37,6 +37,17 @@ Divide the sheet into rough thirds both ways and name each region's job: host, s
 void/distance, edge. A region with no job is dead — it reads as "empty" (not as void) or as "filler".
 - **Void is designed**: it has a shape, it is on one side (rarely both), and it leads the eye somewhere.
   Symmetric empty margins on both sides read as "the picture did not reach the edges".
+- **A void must be earned — four conditions** (a void that fails them reads as "unfinished" or "dirty fog"):
+  1. *It has a reason in the world:* sky, water, a square, rising mist, snow, distance. If the world logically
+     continues there (more town, more forest), mist must visibly swallow it — show a few dissolving fragments.
+  2. *It is light:* paper or near-paper, lighter than the masses around it, maybe with one soft graded wash.
+     A flat mid-grey veil over a large area is not void, it is a dull wash.
+  3. *Its boundary interlocks* (犬牙交错, 虚实相生): masses push tongues into the void and the void pushes into the
+     masses; elements dissolve into it gradually (half-lost roofs, a tree fading, mist entering the mass). A
+     straight or stepped boundary (two triangles, a mask edge) looks cut out.
+  4. *Something talks to it:* the eye is led into it and back (a road, a line of birds, a branch, a banner, a
+     boat, the title placed to balance it), and its size is in proportion — not one flat shape taking 40% with
+     nothing in it.
 - **Edges**: near elements are cropped by the edge (the world continues); far elements fade before the edge;
   a picture where everything sits in a central column looks like a sticker on a sheet.
 - **Diagonals and curves**: rivers, streets, branches, ridges run on diagonals or S-curves, never straight down

@@ -32,6 +32,8 @@ Improving details never fixes a broken composition.
 - Does a diagonal or curve lead the eye in and to the focal point?
 ### 2. Tone and void
 - Does the void match the brief's decision (`judgement.md`), with a shape, on one side?
+- ✗ Is the void grey rather than light, without a reason in the world, cut by a straight/stepped edge, or with
+  nothing leading into it? (`judgement.md` §3, four conditions)
 - ✗ Grey mush — no darkest dark, no paper-white light?
 - Is the darkest dark near the focal point or in the near plane, and the palest in the distance?
 - Colour limited to the planned accents?
