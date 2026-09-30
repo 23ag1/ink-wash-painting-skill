@@ -2,17 +2,15 @@
 
 **A Claude skill that paints Chinese ink-wash (水墨) of any subject as live browser art — WebGL2 shaders for paper, water and ink, Canvas brushwork, no images and no libraries.**
 
-<p align="center"><img src="docs/moon.gif" width="560" alt="Geese crossing the full moon past a plum branch and the inscription 月满中秋 — a fragment of the reference scene, rendered live"></p>
+<img src="docs/moon.gif" width="100%" alt="The reference scene 月满中秋, live: a pavilion by a misty river, geese crossing the full moon, a plum branch, a boat">
 
-<sub>A fragment of the reference scene, 月满中秋 (<i>full moon, mid-autumn</i>) — geese, petals and lamplight are drawn with the same brush code every frame. **[See it running live →](https://research.23ag.one/ink-wash)**</sub>
+<sub>The reference scene, 月满中秋 (<i>full moon, mid-autumn</i>) — geese, petals and lamplight are drawn with the same brush code every frame. **[See it running live →](https://research.23ag.one/ink-wash)**</sub>
 
 ---
 
 It is not a scene generator. The skill teaches Claude how an ink painter *sees* a subject, how paper, water and brush behave, and how to criticise its own picture — then Claude writes a new renderer for every request, reusing only the generic material core.
 
 > Quality comes from four things, in this order: **translating the subject into the painter's language**, **composition by the canon**, **material and brush that hide the computer**, and **inspection at zoom**.
-
-![The whole reference scene: a pavilion by a misty river, the full moon, a plum branch, a boat](docs/scene.jpg)
 
 ## How a painting gets made
 
