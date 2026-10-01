@@ -1,3 +1,4 @@
+#include "common.glsl"
 // Pass C (every frame): the finished painting + living water that reflects it.
 uniform vec2 uRes;
 uniform float uTime;

@@ -1,8 +1,8 @@
 // The crowd: umbrellas seen from above, each one wet 没骨 blob (dark back, pale belly) with a few ribs, the
 // person reduced to one slanted stroke from under the rim to the feet (legs hidden in cloth and rain), and a
 // soft reflection on the wet street. Near: big, dark, crisp. Far: pale dots dissolving in the rain.
-import { rng } from '../lib/brush.js';
-import { stroke, div, noise } from '../lib/ink.js';
+import { rng } from '../../../kit/brush/brush.js';
+import { stroke, div, noise } from '../../../kit/brush/ink.js';
 import { depthAt, scaleAt, up, edgeL, edgeR, mix, clamp, inkRGB, inkRgbStr, HV } from './layout.js';
 import { glaze, occlude } from './layers.js';
 import { robe, pole, hatFigure } from './figures.js';

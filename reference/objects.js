@@ -1,16 +1,16 @@
 // Object layers, painted from the SCENE description: c.w goes through the watercolor pass (soft, bleeding),
 // c.l is brush ink laid on top. Paint order matters — whatever is drawn later occludes what is behind it.
-import { rng } from './brush.js';
+import { rng } from '../kit/brush/brush.js';
 import { drawBroadleaf, drawPine, drawReeds } from './flora.js';
 import { drawPlumBranch } from './plum.js';
 import { drawHouse, HOUSE_LANTERNS } from './house.js';
 import { drawBoat, BOAT_LANTERN } from './boat.js';
-import { drawInscription } from './text.js';
+import { drawInscription } from '../kit/brush/text.js';
 import { drawForeground } from './foreground.js';
 import { drawMountainInk } from './mountains.js';
 import { drawDistance } from './distance.js';
 import { drawShore } from './shore.js';
-import { blob } from './ink.js';
+import { blob } from '../kit/brush/ink.js';
 import { SCENE } from './scene.js';
 
 const TREES = { pine: drawPine, broadleaf: drawBroadleaf };

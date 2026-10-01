@@ -6,7 +6,7 @@ import { makeHouses, makeNearEave } from './houses.js';
 import { paintHouse } from './roofs.js';
 import { makeStalls, paintStall, paintLantern } from './stalls.js';
 import { makeCrowd, paintUmbrella } from './crowd.js';
-import { drawInscription } from '../lib/text.js';
+import { drawInscription } from '../../../kit/brush/text.js';
 import { paintDistance } from './distance.js';
 
 const TITLE = { text: '雨市', x: 560, y: 110, size: 46, step: 54, seal: { x: 545, y: 192, size: 25, chars: ['烟', '雨', '人', '家'] } };

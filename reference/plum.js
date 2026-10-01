@@ -1,8 +1,8 @@
 // Plum branch in the 红梅 manner: slim angular wood that forks again and again, every twig lined with
 // coral blossoms and round buds with black sepals, black moss dots along the wood.
 // c.l = ink layer (wood, sepals, stamens, dots), c.w = wash layer (petals, softened by the watercolor pass).
-import { rng } from './brush.js';
-import { stroke, blob, div } from './ink.js';
+import { rng } from '../kit/brush/brush.js';
+import { stroke, blob, div } from '../kit/brush/ink.js';
 
 const lerp = (a, b, t) => a + (b - a) * t;
 // The branch keeps inside spec.bounds and out of the title box spec.avoid (set by drawPlumBranch)

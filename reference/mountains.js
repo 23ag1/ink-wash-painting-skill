@@ -1,8 +1,8 @@
 // Brushwork of the mountain ranges, painted on the ink layer exactly on the ridges the shader computed.
 // Order of a painter: 勾 contour along the crests, 皴 hemp-fibre strokes down the fall lines, 点 moss dots on the
 // peaks; the washes (染) come from the scene shader. Each range erases the ink of the ranges behind it.
-import { rng } from './brush.js';
-import { stroke, div, blob, press, quad } from './ink.js';
+import { rng } from '../kit/brush/brush.js';
+import { stroke, div, blob, press, quad } from '../kit/brush/ink.js';
 
 function sampler({ y, h, step }) {
   const at = (arr, x) => {

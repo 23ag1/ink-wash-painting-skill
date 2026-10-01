@@ -1,6 +1,6 @@
 // Trees and reeds built from noisy strokes and blobs (ink.js). c.w = wash layer (watercolor-softened), c.l = crisp ink.
-import { rng } from './brush.js';
-import { stroke, blob, div, walk } from './ink.js';
+import { rng } from '../kit/brush/brush.js';
+import { stroke, blob, div, walk } from '../kit/brush/ink.js';
 
 const taper = t => 1 - t * .6;
 

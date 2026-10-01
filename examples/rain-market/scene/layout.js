@@ -1,6 +1,6 @@
 // Geometry of the painting: design space, depth, the oblique projection and the street.
 // Everything (tone, scale, detail, wetness) derives from depth d ∈ [0 near .. 1 far] of an object's ground point.
-import { smooth } from '../lib/brush.js';
+import { smooth } from '../../../kit/brush/brush.js';
 
 export const DW = 640, DH = 1280;
 export const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));

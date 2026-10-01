@@ -3,7 +3,7 @@
 // an open lamplit bay with a hanging lamp, screen and figures, bamboo blinds, lacquered columns on plinths,
 // a painted lintel (彩画) with 挂落 fretwork below it, red couplets, and side-wall windows.
 // 界画: ruled lines for all carpentry — `bl` here is the ruled line
-import { blob, ruledLine as bl, polyPath, looseWash, lantern } from './ink.js';
+import { blob, ruledLine as bl, polyPath, looseWash, lantern } from '../kit/brush/ink.js';
 
 const LIGHT = 'rgba(244,184,120,.6)';
 // facade carpentry is suggested, not enumerated: lighter than the structural lines of the building

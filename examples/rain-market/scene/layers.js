@@ -4,7 +4,7 @@
 //   l   ink: crisp brush layer, source-over on transparent
 //   d   depth: grey = depth of the nearest thing painted there
 import { DW, DH } from './layout.js';
-import { noise } from '../lib/ink.js';
+import { noise } from '../../../kit/brush/ink.js';
 
 function ctx2d(W, H, S) {
   const cv = document.createElement('canvas');

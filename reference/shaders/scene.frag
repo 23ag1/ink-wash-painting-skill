@@ -1,3 +1,5 @@
+#include "common.glsl"
+#include "terrain.glsl"
 // Pass A (rendered once): the washes (染) of the painting — sky around the moon, mountain ranges, mist, and the
 // wash layer of the objects. Contours, texture strokes and moss dots of the mountains are brushwork, painted
 // in JS on the ink layer from the ridge lines this shader computes (terrain.glsl). Water is left as bare paper.

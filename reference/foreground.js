@@ -1,8 +1,8 @@
 // Near ground (近景) of a level-distance (平远) composition, painted in the scene's own airy manner:
 // a reed shallow (芦汀) — a low sandbar in soft washes only, no contour, dissolving into the water,
 // with reeds in several ink tones (near ones darker and taller) and feathery plumes (芦花) leaning in the breeze.
-import { rng } from './brush.js';
-import { blob, inkLine as ln, polyPath, looseWash, stroke, div, quad } from './ink.js';
+import { rng } from '../kit/brush/brush.js';
+import { blob, inkLine as ln, polyPath, looseWash, stroke, div, quad } from '../kit/brush/ink.js';
 
 // Sandbar: three overlapping washes, the lowest and darkest at the waterline, plus a few wet-mud drags
 function sandbar(c, r) {

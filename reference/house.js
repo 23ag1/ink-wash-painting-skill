@@ -2,7 +2,7 @@
 // architecture: broken contours, washes that don't quite register with the lines, a base lost in mist.
 // c.w = wash layer (watercolor pass), c.l = brush-ink layer.
 // 界画: architecture is drawn with ruled lines (even, unbroken) — `bl` here is the ruled line
-import { blob, ruledLine as bl, quad, polyPath, lantern, looseWash } from './ink.js';
+import { blob, ruledLine as bl, quad, polyPath, lantern, looseWash } from '../kit/brush/ink.js';
 import { facade, moonWindow } from './facade.js';
 
 // Eave-corner lantern positions (local coords), used for the animated glows

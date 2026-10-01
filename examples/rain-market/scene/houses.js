@@ -2,7 +2,7 @@
 // Every ridge runs ACROSS the street (horizontal on the sheet): the slope facing us shows its tile rows, the eaves
 // turn up at the corners, gable ends face the street. Stacked up the scroll they make the rhythm of black roof
 // bands and white walls. Row 0 lines the street; rows 1-2 stand behind and fade into mist.
-import { rng } from '../lib/brush.js';
+import { rng } from '../../../kit/brush/brush.js';
 import { depthAt, scaleAt, up, edgeL, edgeR, mix, DW, voidness } from './layout.js';
 
 const lerp2 = (a, b, t) => [mix(a[0], b[0], t), mix(a[1], b[1], t)];

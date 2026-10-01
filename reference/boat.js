@@ -2,7 +2,7 @@
 // Seen slightly from above: near gunwale, far gunwale and a sliver of the interior between them;
 // planked hull with a blunt transom stern, woven canopy with ribs and a dark mouth, sculling oar astern.
 // Paint order: water marks -> interior -> fisherman -> near hull side -> canopy -> ink lines.
-import { blob, inkLine as ln, brokenLine as bl, quad, polyPath, lantern, looseWash } from './ink.js';
+import { blob, inkLine as ln, brokenLine as bl, quad, polyPath, lantern, looseWash } from '../kit/brush/ink.js';
 
 export const BOAT_LANTERN = [636, 588, .75];
 

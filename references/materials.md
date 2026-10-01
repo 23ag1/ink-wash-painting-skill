@@ -1,7 +1,7 @@
 # Materials → shader: why ink on xuan looks the way it does, and how to render it
 
 These effects are subject-agnostic: every painting needs them, whatever is painted. Implement them in your own
-pipeline (or adapt `reference/shaders/diffuse.frag` and `paint.frag`, which do exactly this). Each effect is
+pipeline from the kit modules (`kit/passes/diffuse.frag`, `kit/glsl/wash.glsl`, `ink.glsl`, `paper.glsl` — catalogue in `renderer.md` §1). Each effect is
 listed with the physics, the visual signature, the rendering technique, and the failure if you skip or overdo it.
 
 ## Contents

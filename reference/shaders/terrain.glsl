@@ -1,3 +1,4 @@
+#include "common.glsl"
 // Shared mountain geometry (scene pass + ridge readback pass), so washes and brush strokes agree exactly.
 uniform vec4 uLayer[7];   // x: base y, y: depth (0 near .. 1 far), z: seed, w: unused
 uniform vec4 uMass[28];   // 4 per layer: x: center, y: height, z: half-width left, w: half-width right

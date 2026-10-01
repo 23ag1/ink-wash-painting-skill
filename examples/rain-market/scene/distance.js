@@ -1,7 +1,7 @@
 // The void's job: distance. Where the street turns away, a pagoda rises out of the rain — only pale wet eave
 // bands, no lines, its base swallowed by mist — with a few far roofs at its foot. It gives the empty paper a
 // meaning (the town continues, far away) without filling it.
-import { rng } from '../lib/brush.js';
+import { rng } from '../../../kit/brush/brush.js';
 import { inkRGB, mix } from './layout.js';
 import { glaze, occlude, roughPoly } from './layers.js';
 

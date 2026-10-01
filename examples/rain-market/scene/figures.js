@@ -1,7 +1,7 @@
 // What of a person shows around an umbrella seen from above: the hem of a robe flaring down to two feet,
 // a porter's shoulder pole with baskets, or — without an umbrella — a bamboo hat over a straw rain cape (蓑衣).
 // Never a face, never legs: cloth, hat and pole carry the figure (减笔).
-import { stroke, div, blob } from '../lib/ink.js';
+import { stroke, div, blob } from '../../../kit/brush/ink.js';
 import { up, mix, HV } from './layout.js';
 import { glaze, occlude } from './layers.js';
 

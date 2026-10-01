@@ -1,6 +1,6 @@
 # Brush grammar → stroke algorithms
 
-Every visible mark is made by a brush. Model the brush, not the shape. `reference/ink.js` implements the core
+Every visible mark is made by a brush. Model the brush, not the shape. `kit/brush/ink.js` implements the core
 primitives (≈170 lines, subject-agnostic) — copy it or reimplement the same ideas.
 
 ## 1. One stroke (the atom)

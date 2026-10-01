@@ -1,7 +1,7 @@
 // Painting one house: wet black tiles as 没骨 washes with bare-paper sheen, tile rows as 皴 strokes down the
 // slope, ruled ridge / eave / verge (界画) with curled ridge ends, white walls left as paper, shop openings.
-import { rng } from '../lib/brush.js';
-import { stroke, div, blob } from '../lib/ink.js';
+import { rng } from '../../../kit/brush/brush.js';
+import { stroke, div, blob } from '../../../kit/brush/ink.js';
 import { mix, inkRGB, inkRgbStr } from './layout.js';
 import { glaze, glazeVia, occlude, poly, roughPoly, wetMark } from './layers.js';
 

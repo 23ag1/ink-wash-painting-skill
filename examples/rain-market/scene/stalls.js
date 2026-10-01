@@ -1,8 +1,8 @@
 // Market stalls along both street edges: a sloping cloth awning (pale wash, ruled hem), two poles, a table with
 // bowls and baskets as dots (点), a seller under a bamboo hat. Some cook: they are the sources of the steam.
 // One awning on the right carries the yellow lantern — the second colour accent.
-import { rng } from '../lib/brush.js';
-import { stroke, div, blob } from '../lib/ink.js';
+import { rng } from '../../../kit/brush/brush.js';
+import { stroke, div, blob } from '../../../kit/brush/ink.js';
 import { depthAt, scaleAt, up, edgeL, edgeR, mix, inkRGB, inkRgbStr, HV } from './layout.js';
 import { glaze, occlude, poly } from './layers.js';
 

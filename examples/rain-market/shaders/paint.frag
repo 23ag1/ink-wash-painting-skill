@@ -1,16 +1,16 @@
-// Pass B (once): watercolor filter over the diffused washes, brush ink on top, depth haze, mist between
-// the planes, one palette, xuan paper fibres and ageing. Adapted from the skill's generic paint filter:
-// the reference's y-band haze and river mist are replaced by haze read from this painting's depth layer.
-// Colour model: C' = C - (C - C^2)(d - 1)  (Bousseau et al., "Interactive watercolor rendering")
+// Pass B (once), assembled from kit modules: watercolor filter over the diffused washes, brush ink on top,
+// haze read from this painting's depth layer, mist between the planes, one palette, xuan paper.
+#include "common.glsl"
+#include "kit/wash.glsl"
+#include "kit/ink.glsl"
+#include "kit/paper.glsl"
+#include "kit/palette.glsl"
 uniform vec2 uRes;
-uniform sampler2D uScene;
 uniform sampler2D uDiffused;
 uniform sampler2D uWet;
 uniform sampler2D uLines;   // crisp brush ink (straight alpha)
 uniform sampler2D uDepth;   // r: depth 0 near .. 1 far
 out vec4 fragColor;
-
-vec3 S(vec2 uv) { return texture(uDiffused, uv).rgb; }
 
 // torn mist bands between the planes (藏露): one hides the bases of the far roofs and the middle of the far
 // crowd, a thinner one drifts through the middle distance
@@ -30,66 +30,28 @@ void main() {
   vec2 dp = fc / sc;                               // design units, y up (noise only)
   vec2 p = designPos(fc, uRes);                    // design units, y down
   float dep = texture(uDepth, uv).r;
-
-  vec2 wob = (vec2(fbm2(dp * .03), fbm2(dp * .03 + 7.)) - .5) * 2.2 * sc * px;
-  vec3 c0 = S(uv + wob);
-  vec3 near = vec3(0.), far = vec3(0.);
-  float farWet = 0.;
   float rot = hash(fc) * 6.2832;
-  for (int i = 0; i < 16; i++) {
-    float a = float(i) * 2.39996 + rot, r = sqrt((float(i) + .5) / 16.);
-    vec2 o = vec2(cos(a), sin(a)) * r * sc * px;
-    near += S(uv + wob + o * 1.8);
-    far  += S(uv + wob + o * 8.);
-    farWet += texture(uWet, uv + o * 8.).r;
-  }
-  near /= 16.; far /= 16.; farWet /= 16.;
-  // far plane is softer: it was painted wetter and is seen through rain
-  vec3 c = mix(c0, near, .25 + .35 * smoothstep(.5, 1., dep));
 
+  vec2 wob = handWobble(dp, .03, 2.2, sc, px);
+  WashSample w = gatherWash(uDiffused, uWet, uv + wob, uv, px, sc, rot, 1.8, 8.);
+  // far plane is softer: it was painted wetter and is seen through rain
+  vec3 c = mix(w.c0, w.near, .25 + .35 * smoothstep(.5, 1., dep));
   float lc = lum(c);
-  float dens = 1. + 1.8 * max(0., lum(far) - lc);
-  dens *= 1. + .2 * (fbm(dp * .007) - .5);
-  float grain = fbm(dp * .38);
-  dens *= 1. + .3 * (grain - .5) * (1. - lc);
-  c = c - (c - c * c) * (dens - 1.);
-  float yun = clamp((lc - lum(far)) * 3., 0., 1.) * smoothstep(.35, .8, farWet);
-  c = mix(c, c * vec3(.94, .945, .955), yun * .6);
+  c = edgeDarken(c, w.far, dp, 1.8, .2, .007, .3, .38);
+  c = washHalo(c, lc, w.far, w.farWet, vec3(.94, .945, .955), .6);
 
   // brush ink on top: sharper than the washes, feathered, veiled by depth like everything at that depth
-  vec2 luv = uv + wob * .4;
-  vec4 L = texture(uLines, luv), Ls = vec4(0.), halo = vec4(0.);
-  for (int i = 0; i < 6; i++) {
-    float a = float(i) * 1.0472 + rot;
-    vec2 o = vec2(cos(a), sin(a)) * sc * px;
-    Ls += texture(uLines, luv + o * .8);
-    halo += texture(uLines, luv + o * 2.6);
-  }
-  Ls /= 6.; halo /= 6.;
+  InkSample s = gatherInk(uLines, uv + wob * .4, px, sc, rot, .8, 2.6);
   float haze = .45 * smoothstep(.35, 1., dep);
-  c = mix(c, vec3(.4), halo.a * .24 * (1. - haze));
-  L = mix(L, Ls, .62);
-  L.rgb = mix(L.rgb, MIST, haze * .6);
-  L.a *= 1. - haze * .7;
-  c = mix(c, L.rgb, L.a * .92);
+  c = inkBleed(c, s, vec3(.4), .24 * (1. - haze));
+  c = inkOver(c, inkVeil(inkFeather(s, .62), MIST, haze * .6, haze * .7), .92);
 
   c = mix(c, MIST, mistAt(p) * smoothstep(.02, .25, dep));   // near plane and the inscription stay clear
 
-  // one palette: mute every colour except the red accents
-  float red = smoothstep(.1, .28, c.r - max(c.g, c.b));
-  c = mix(vec3(lum(c)), c, mix(.85, 1., red));
-
-  c *= .984 + .032 * fbm(dp * vec2(.03, .12));
-  float ang = fbm(dp * .018) * 9.42;
-  vec2 fdir = vec2(cos(ang), sin(ang));
-  vec2 q = vec2(dot(dp, fdir), dot(dp, vec2(-fdir.y, fdir.x)));
-  float fib = pow(1. - abs(2. * noise(vec2(q.x * .05, q.y * 1.6)) - 1.), 18.);
-  float fib2 = pow(1. - abs(2. * noise(vec2(q.x * .04 + 7., q.y * 1.4)) - 1.), 16.);
-  c = mix(c, min(vec3(1.), c * 1.035 + .012), fib * .55);
-  c *= 1. - fib2 * .07 * (1. - lum(c));
-  c *= 1. - .03 * smoothstep(.55, .8, fbm(dp * .005 + 9.));
-  vec2 e = abs(uv - .5) * 2.;
-  float age = smoothstep(.55, 1.15, max(e.x, e.y)) * .6 + smoothstep(.5, .8, fbm(dp * .003 + 31.)) * .4;
-  c *= mix(vec3(1.), vec3(.985, .962, .915), age);
+  c = muteExceptReds(c, .85);
+  c = paperMottle(c, dp, .032);
+  c = paperFibres(c, dp, .018, .55, .07);
+  c = paperBlotch(c, dp, .03);
+  c = paperAge(c, uv, dp, vec3(.985, .962, .915), .6, .4);
   fragColor = vec4(clamp(c, 0., 1.), 1.);
 }

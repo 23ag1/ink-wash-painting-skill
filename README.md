@@ -35,37 +35,51 @@ git clone https://github.com/23ag1/ink-wash-painting-skill ~/.claude/skills/ink-
 
 Then ask Claude for a painting — *“a canal city in mist, in Chinese ink style”*, *“a pagoda at dusk, 水墨”*, *“a cat on a windowsill in the rain, sumi-e”*.
 
-## Run the reference scene
+## Run the examples
 
 ```bash
-cd reference && python3 serve.py 8770
-# → http://localhost:8770/index.html
+python3 kit/serve.py 8770          # from the repo root
+# → http://localhost:8770/reference/index.html               月满中秋, the Mid-Autumn river scene
+# → http://localhost:8770/examples/rain-market/index.html     雨市, a market street in rain (vertical scroll)
+# → http://localhost:8770/examples/minimal-bamboo/index.html  清风, the smallest complete build (album leaf)
 ```
 
-`scripts/new-painting.sh` starts a new painting with the generic core only (brush library, fibre diffusion, watercolour filter) — never with the reference scene.
+## The kit — modules, not a pipeline
+
+`kit/` holds the materials as small, composable, scene-agnostic modules: a WebGL runtime (programs with
+`#include`, targets, ping-pong, read-back), GLSL modules (noise and glazes, watercolour wash behaviour, brush ink
+over washes, the paper sheet, palette, rain / steam / drifting mist), the fibre-diffusion pass, and the brush
+library. There is no fixed pass order, no scene and no default look: every parameter that changes the picture is
+an argument the painting must give, and the runtime refuses to draw if a uniform was left unset.
+
+The three examples are three different assemblies of the same modules. The two larger ones were ported onto the
+kit and checked against their original code pixel by pixel: the rain market is identical, the Mid-Autumn scene
+differs by 1/255 on 0.0005% of values (float rounding).
+
+`scripts/new-painting.sh <folder>` starts a new painting with the kit only — never with an example's scene.
 
 ## What's inside
 
 ```
-SKILL.md                workflow and principles
-references/             seeing · composition · materials · brush · renderer · critique · pitfalls
-reference/              the worked example: 1,999 lines of JS + GLSL, WebGL2 + Canvas
-scripts/new-painting.sh scaffold a new painting from the generic core
-evals/evals.json        test prompts: a pagoda, a canal city in mist, a cat in the rain
+SKILL.md                 workflow and principles
+references/              research · seeing · judgement · composition · materials · brush · renderer (kit catalogue)
+                         · critique · pitfalls · motif studies · painting how-to · technique sources
+kit/                     runtime.js · glsl/ · passes/diffuse.frag · brush/ · serve.py
+reference/               月满中秋 — landscape build (mountains read back from a shader, river, reflection)
+examples/rain-market/    雨市 — vertical scroll with a depth layer, rain and steam
+examples/minimal-bamboo/ 清风 — smallest build
+scripts/new-painting.sh  scaffold a new painting with the kit
+evals/evals.json         test prompts: a pagoda, a canal city in mist, a cat in the rain
 ```
 
-## Example: 雨市 (Rain Market)
-`examples/rain-market/` — a vertical scroll made by the skill on a subject unrelated to the reference scene
-(a market street in rain, built with the research → notan → motif study → top-down critique workflow).
-Run it: `cd examples/rain-market && python3 serve.py 8770` → http://localhost:8770/index.html
-It is an honest test result, not a showcase: composition and void work; motifs up close (tiles, figures) are
-still weaker than the composition.
+Rain market is an honest test result, not a showcase: composition and void work; motifs up close (tiles,
+figures) are still weaker than the composition.
 
 ## Honest limits
 
 - No photographic detail, cast shadows or full colour — by design.
 - Faces, hands and anatomy are weak.
-- New subjects start without motif code; only one reference scene exists so far.
+- New subjects start without motif code; the examples show technique, not reusable scenes.
 - Needs WebGL2 with `EXT_color_buffer_float`.
 
 ## Prior work

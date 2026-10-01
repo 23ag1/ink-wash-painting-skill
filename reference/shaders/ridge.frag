@@ -1,3 +1,5 @@
+#include "common.glsl"
+#include "terrain.glsl"
 // Ridge readback: one texel per (x sample, layer) -> ridge screen y and ridge height, read back to JS so the
 // brush-stroke pass (contours, texture strokes, moss dots) can paint exactly on the shader's mountains.
 uniform float uStep;   // design units between x samples

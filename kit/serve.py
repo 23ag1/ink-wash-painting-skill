@@ -1,7 +1,7 @@
 """Static dev server with caching disabled, so edited ES modules and shaders always reload.
 
-Serves the folder this script lives in, regardless of the current working directory.
-Usage: python3 serve.py [port]   (default 8770), then open http://localhost:<port>/index.html
+Serves the current working directory (or the folder given as the second argument), so a project and its kit/
+are both reachable. Usage: python3 kit/serve.py [port] [root]   (default 8770, cwd)
 """
 import functools
 import http.server
@@ -17,6 +17,6 @@ class NoCache(http.server.SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8770
-    root = os.path.dirname(os.path.abspath(__file__))
+    root = os.path.abspath(sys.argv[2]) if len(sys.argv) > 2 else os.getcwd()
     handler = functools.partial(NoCache, directory=root)
     http.server.ThreadingHTTPServer(("127.0.0.1", port), handler).serve_forever()

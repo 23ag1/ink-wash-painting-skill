@@ -1,7 +1,7 @@
 // The wet street: bare paper under a pale wash, with a few darker puddle pools. It is the ground every
 // umbrella, stall and wall stands on, so it is painted first.
-import { rng } from '../lib/brush.js';
-import { noise } from '../lib/ink.js';
+import { rng } from '../../../kit/brush/brush.js';
+import { noise } from '../../../kit/brush/ink.js';
 import { edgeL, edgeR, depthAt, scaleAt, mix, inkRGB } from './layout.js';
 import { glaze } from './layers.js';
 

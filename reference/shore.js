@@ -1,8 +1,8 @@
 // River banks beside the pavilion, so the building, the pine and the trees stand on ground instead of floating:
 // an earth wash, a darker wet strip at the waterline, stones along the edge, grass and moss dots,
 // and a faint broken reflection. The bank also runs behind the pavilion (hidden by it).
-import { rng } from './brush.js';
-import { blob, polyPath, looseWash, inkLine as ln, brokenLine as bl, stroke, div } from './ink.js';
+import { rng } from '../kit/brush/brush.js';
+import { blob, polyPath, looseWash, inkLine as ln, brokenLine as bl, stroke, div } from '../kit/brush/ink.js';
 
 
 function bank(c, r, { top, water }) {

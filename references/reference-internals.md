@@ -1,5 +1,9 @@
 # Engine internals of the reference implementation
 
+> Since the kit refactor, `reference/` is assembled from `kit/` modules (runtime, diffusion pass, wash/ink/paper/
+> palette modules, brush library); its scene field, terrain, ridge readback, objectHaze, river mist and water
+> pass remain its own. Paths below that say `ink.js` mean `kit/brush/ink.js`.
+
 > How `reference/` implements the material and brush principles (`materials.md`, `brush.md`). Coordinates, the
 > waterline and `objectHaze` bands here are specific to that scene.
 

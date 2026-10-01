@@ -1,5 +1,5 @@
-import { rng } from './brush.js';
-import { stroke, blob, quad } from './ink.js';
+import { rng } from '../kit/brush/brush.js';
+import { stroke, blob, quad } from '../kit/brush/ink.js';
 import { buildObjects, LANTERNS } from './objects.js';
 import { createPainting } from './gl.js';
 import { SCENE } from './scene.js';

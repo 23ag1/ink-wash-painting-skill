@@ -1,8 +1,8 @@
 // The far plane that gives a level-distance (平远) painting its fullness: rows of distant trees (远树) along the
 // far shore, a small pagoda on the ridge of the guest mountains, a distant sail, and a few ripple strokes.
 // Everything here is small and pale; the object haze in the shaders veils it further.
-import { rng } from './brush.js';
-import { stroke, div, blob, quad, polyPath, looseWash, inkLine as ln } from './ink.js';
+import { rng } from '../kit/brush/brush.js';
+import { stroke, div, blob, quad, polyPath, looseWash, inkLine as ln } from '../kit/brush/ink.js';
 
 // 远树: groups of distant trees in three manners — Mi-style dot clusters (米点, no trunk), flat umbrella pines,
 // and a trunk with a dab of crown — with gaps between the groups

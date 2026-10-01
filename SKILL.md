@@ -10,8 +10,9 @@ painter works: **study** real paintings and the real thing, **translate** the su
 and ink, **decide** the picture's dials (void, density, darkness, wetness) from its mood, **sketch** the
 composition in tone before any detail, **try out** each motif alone before multiplying it, and **criticise
 top-down** until a painter would not object. The material (paper, ink, water, brush) is rendered by principles
-in `references/materials.md` and `brush.md`; a complete worked example lives in `reference/` (one Mid-Autumn
-river scene) — reuse its generic material core, never its scene.
+in `references/materials.md` and `brush.md` and implemented as a kit of composable modules (`kit/`); three
+examples (`reference/`, `examples/rain-market`, `examples/minimal-bamboo`) are three different assemblies of it —
+read them for technique, never copy their scenes.
 
 ## Workflow (each step is a gate: don't go on while it fails)
 
@@ -34,10 +35,14 @@ One host, supporting groups, a designed void on one side, a diagonal or curve th
 of the sheet with a job, edges treated (near things cropped, far things fading). No central axis, no symmetry,
 no rows of equal units.
 
-### 4. Build the pipeline and gate on a notan sketch — `references/renderer.md`
+### 4. Assemble the renderer from kit modules, gate on a notan sketch — `references/renderer.md`
 ```bash
-bash <skill>/scripts/new-painting.sh <target-folder>   # generic core: brush lib, text, diffusion, filter, server
+bash <skill>/scripts/new-painting.sh <target-folder>   # copies kit/: runtime, GLSL modules, diffusion pass, brush lib, server
 ```
+The kit is mechanics and materials only — no pipeline, no scene, no default look: every look parameter is an
+argument you choose, and the runtime refuses to draw with a forgotten uniform. You write the scene field, the
+layers and their wetness, the depth model, and the paint pass as your own composition of modules. Read
+`examples/minimal-bamboo` (smallest build) and the module catalogue in `renderer.md` §1.
 Permanent folder the user agreed to, `git init`, commit per step. First render the planned masses as 3-4 flat
 tones only (notan mode) and pass the composition checks at thumbnail size. Then the material sheet (paper,
 diffusion, filter, test strokes) at zoom. Organise everything by **depth**, not by screen bands.
@@ -94,3 +99,4 @@ moves, how to run it, and honestly what is still weak, ordered by level.
 - `references/critique.md` — top-down critique with gates and concrete questions.
 - `references/pitfalls.md` — mistakes made building the reference, symptom → cause → fix.
 - `references/reference-implementation.md`, `reference-internals.md` — how `reference/` paints its one scene.
+- `kit/` — runtime, GLSL modules, diffusion pass, brush library (catalogue: `renderer.md` §1).
