@@ -1,6 +1,6 @@
 // Small things that carry the story: palace roofs half lost in the mist (界画), the path along the paddy ridge,
 // the dancing peasants, the emperor's poem and the seal.
-import { rng } from '../../../kit/brush/brush.js';
+import { rng, smooth } from '../../../kit/brush/brush.js';
 import { stroke, blob, div, quad, ruledLine, brokenLine } from '../../../kit/brush/ink.js';
 import { hairyStroke } from '../../../kit/brush/hairy.js';
 import { drawInscription } from '../../../kit/brush/text.js';
@@ -129,16 +129,21 @@ export function figure(c, x, y, s, pose, seed) {
   const neck = [x + L * 9 * s, y - 27 * s];
   const hem = [[x - 9 * s + sw, y - 4 * s], [x - 2 * s + sw * .5, y - 1 * s], [x + 6 * s + sw, y - 3 * s], [x + 11 * s + sw * 1.4, y - 6 * s]];
   const left = quad([neck[0] - 3 * s, neck[1] + 2 * s], [x - 5 * s, y - 16 * s], hem[0], 6), right = quad([neck[0] + 3 * s, neck[1] + 2 * s], [x + 5 * s, y - 15 * s], hem[3], 6);
-  const robe = poly([...left, ...hem.slice(1, 3), ...right.slice().reverse()]);
+  const robe = poly(smooth([...left, ...hem.slice(1, 3), ...right.slice().reverse(), left[0]], 4));   // a soft bell, no facets
   c.w.save(); c.w.fillStyle = 'rgba(236,228,208,.92)'; c.w.fill(robe); c.w.restore();
   c.d.save(); c.d.fillStyle = grey(.05); c.d.fill(robe); c.d.restore();
   const line = (pts, w, a, sd) => stroke(c.l, pts, { wid: w * s, fun: t => .35 + .65 * Math.sin(t * Math.PI), noi: .5, col: ink(a), seed: seed + sd, tip: .6, dry: .45 });
-  line(left, 1.5, .85, 1); line(right.slice(0, 5), 1.3, .75, 2);
-  line(hem.slice(0, 3), 1, .55, 3);
+  line(smooth(left, 4), 1.5, .85, 1); line(smooth(right.slice(0, 5), 4), 1.3, .75, 2);
+  line(smooth(hem.slice(0, 3), 4), 1, .55, 3);
+  // two folds falling from the sash to the hem: the robe has weight and swings with the step
+  for (const [f0, f1] of [[-.35, .25], [.3, .7]]) {
+    const top = [neck[0] + f0 * 6 * s, neck[1] + 11 * s], bot = [x + (f1 - .5) * 14 * s + sw * .7, y - 4 * s];
+    line(smooth([top, [(top[0] + bot[0]) / 2 + sw * .3, (top[1] + bot[1]) / 2], bot], 4), .8, .45, 20 + f0 * 10);
+  }
   // sleeves: wide light flaps thrown out, an outline on their lower side
   for (const [ax, ay] of pose.arms) {
     const sh = [neck[0] + Math.sign(ax) * 3 * s, neck[1] + 5 * s], hand = [sh[0] + ax * s, sh[1] + ay * s];
-    const flap = poly([sh, [sh[0] + ax * .5 * s, sh[1] + ay * .5 * s - 3 * s], hand, [hand[0] - Math.sign(ax) * 2 * s, hand[1] + 5 * s], [sh[0] + ax * .3 * s, sh[1] + 7 * s]]);
+    const flap = poly(smooth([sh, [sh[0] + ax * .5 * s, sh[1] + ay * .5 * s - 3 * s], hand, [hand[0] - Math.sign(ax) * 2 * s, hand[1] + 5 * s], [sh[0] + ax * .3 * s, sh[1] + 7 * s], sh], 4));
     c.w.save(); c.w.fillStyle = 'rgba(236,228,208,.92)'; c.w.fill(flap); c.w.restore();
     line([[sh[0], sh[1] + 2 * s], [sh[0] + ax * .4 * s, sh[1] + ay * .4 * s + 5 * s], [hand[0] - Math.sign(ax) * 2 * s, hand[1] + 5 * s]], 1.2, .75, 6 + ax);
     line([sh, [sh[0] + ax * .5 * s, sh[1] + ay * .5 * s - 3 * s], hand], 1, .6, 9 + ax);
