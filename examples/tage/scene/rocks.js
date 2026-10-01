@@ -202,6 +202,16 @@ export function facetRock(c, sp, notan) {
       hairyStroke(c.w, pts, wid, sp.seed + 5000 + i * 13, { ...p, rgb: '58,46,34', alpha: (.08 + .18 * f.tone) * (.7 + r() * .6) });
       hairyStroke(c.wet, pts, wid * 1.2, sp.seed + 5000 + i * 13, { ...p, rgb: '255,255,255', alpha: .9 });
     }
+    if (f.tone < .15) {                               // the lit top: a few pale dry rubs along it, a cleft or two
+      c.l.save(); c.l.clip(outline); c.l.clip(P);
+      for (let i = 0; i < 9; i++) {
+        let pt; do { pt = [x0 + r() * (x1 - x0), y0 + r() * (y1 - y0)]; } while (!inPoly(pt, f.poly));
+        const len = 30 + r() * 60, a = f.dir + (r() - .5) * .3;
+        hairyStroke(c.l, quad(pt, [pt[0] + Math.cos(a) * len * .5, pt[1] + Math.sin(a) * len * .5 + 2], [pt[0] + Math.cos(a) * len, pt[1] + Math.sin(a) * len], 10), 6 + r() * 10, sp.seed + 7000 + i,
+          { rgb: '40,34,26', alpha: .08 + r() * .08, bristles: 8, dryFrom: .1, dryness: 1, streak: len, edge: .3, fade: .4, tipSide: .5, close: 0, profile: t => Math.min(1, t * 6) * (1 - t * .4) });
+      }
+      c.l.restore();
+    }
     c.wet.restore(); c.w.restore();
     c.l.restore();
   }

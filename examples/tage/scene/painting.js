@@ -39,7 +39,7 @@ export function paintScene(c, notan) {
   for (const [x, y, h, lean, s] of [[178, 268, 62, .05, 41], [196, 262, 78, -.04, 42], [216, 266, 58, .1, 43], [114, 104, 34, .08, 44], [60, 190, 30, -.1, 45]]) pine(c, { x, y, h, lean, depth: .42, tone: .75, bare: .3, seed: s }, notan);
 
   // the palace roofs in the mist, behind the grove
-  palace(c, [[512, 418, 64, 22, .7], [470, 440, 46, 16, .72], [560, 440, 40, 14, .74]], notan);
+  palace(c, [[520, 410, 84, 30, .66], [462, 436, 58, 22, .7], [578, 444, 50, 18, .74]], notan);
 
   // the grove rising out of the mist band: tall pines in front of the palace, smaller ones to the left
   // the hill the grove stands on: a soft rise whose top meets the trunks, dissolving down into the mist band,
@@ -83,8 +83,9 @@ export function paintScene(c, notan) {
   reeds(c, [[470, 1000, 22], [500, 992, 14], [40, 950, 16]], notan);
   willow(c, {
     trunk: [[572, 1080], [556, 990], [530, 905], [516, 825], [508, 770]],
-    boughs: [[[508, 772], [492, 730], [498, 690], [474, 640], [480, 600], [462, 548]], [[512, 782], [540, 744], [536, 700], [566, 660], [580, 612], [606, 574]], [[522, 862], [560, 846], [584, 816], [618, 806], [640, 790]], [[498, 690], [520, 650], [516, 610]]],
-    strands: 20, masses: [[600, 830, 46, 160], [560, 905, 38, 110], [626, 740, 34, 90], [520, 790, 26, 60]], leaves: [[575, 840, 200], [615, 760, 150], [530, 900, 120], [470, 960, 60], [620, 900, 120]], seed: 91,
+    // old willow boughs spring from below the broken top, rise a little and arch over, twigs hanging from them
+    boughs: [[[504, 790], [490, 772], [474, 762], [458, 762], [446, 772]], [[514, 752], [536, 712], [566, 684], [604, 668], [640, 664], [680, 672]], [[522, 862], [556, 846], [588, 832], [618, 830], [640, 836]], [[510, 740], [504, 704], [512, 674], [528, 652], [548, 644]]],
+    strands: 22, masses: [[600, 830, 46, 160], [560, 905, 38, 110], [626, 740, 34, 90], [520, 790, 26, 60]], leaves: [[575, 840, 200], [615, 760, 150], [530, 900, 120], [470, 960, 60], [620, 900, 120]], seed: 91,
   }, notan);
   if (!notan) {
     figure(c, 300, 1006, 1.6, { lean: .3, arms: [[12, -14], [-9, 4]], kick: .4 }, 101);

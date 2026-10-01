@@ -10,16 +10,31 @@ import { poly, glaze, occlude, grey } from './layers.js';
 export function palace(c, roofs, notan) {
   const r = rng(7);
   for (const [x, y, w, h, depth] of roofs) {
-    const roof = poly([[x - w * .55, y + h * .45], [x - w * .32, y], [x + w * .32, y], [x + w * .55, y + h * .45], [x + w * .5, y + h * .55], [x - w * .5, y + h * .55]]);
-    occlude(c, roof, depth);
-    glaze(c, roof, notan ? '110,100,86' : '120,112,100', notan ? .4 : .7, .5, .6);
-    if (notan) continue;
-    const ink = `rgba(60,52,44,${.5 - depth * .3})`;
-    ruledLine(c.l, r, quad([x - w * .62, y + h * .3], [x, y + h * .62], [x + w * .62, y + h * .3], 10), 1.3, .5 - depth * .25, '60,52,44');
-    ruledLine(c.l, r, [[x - w * .32, y], [x + w * .32, y]], 1.4, .55 - depth * .25, '60,52,44');
-    const wall = poly([[x - w * .38, y + h * .55], [x + w * .38, y + h * .55], [x + w * .38, y + h * 1.05], [x - w * .38, y + h * 1.05]]);
-    glaze(c, wall, '200,190,170', .5, .6, .8);
-    for (let i = 0; i < 3; i++) stroke(c.l, [[x - w * .3 + i * w * .3, y + h * .6], [x - w * .3 + i * w * .3, y + h * .95]], { wid: 1, noi: .2, col: ink, seed: 40 + i });
+    // a hip-and-gable roof seen a little from below the eave line: ridge with raised ends, roof face, eaves
+    // sweeping up at the corners, a dark band under the eave, a pale wall with columns — all veiled by the mist
+    const eaveL = [x - w * .62, y + h * .38], eaveR = [x + w * .62, y + h * .38];
+    const roofPts = [eaveL, [x - w * .3, y + h * .06], [x - w * .26, y], [x + w * .26, y], [x + w * .3, y + h * .06], eaveR,
+      ...quad([x + w * .52, y + h * .52], [x, y + h * .64], [x - w * .52, y + h * .52], 10)];
+    const roof = poly(roofPts);
+    const wall = poly([[x - w * .4, y + h * .58], [x + w * .4, y + h * .58], [x + w * .4, y + h * 1.25], [x - w * .4, y + h * 1.25]]);
+    occlude(c, wall, depth); occlude(c, roof, depth);
+    if (notan) { glaze(c, roof, '110,100,86', .4, 0); continue; }
+    const a = Math.max(.2, .75 - depth * .55);
+    glaze(c, wall, '214,204,184', .5, .5);
+    glaze(c, roof, '96,90,80', .55 + .2 * (1 - depth), .5);
+    for (let i = 0; i < 9; i++) {                                    // tile rows: a few short strokes down the roof face
+      const u = (i + .5) / 9 - .5, x0 = x + u * w * .52;
+      stroke(c.l, [[x0, y + h * .08], [x0 + u * w * .12, y + h * .5]], { wid: .9, noi: .3, col: `rgba(50,44,36,${a * .6})`, seed: 30 + i + x });
+    }
+    ruledLine(c.l, r, quad(eaveL, [x, y + h * .66], eaveR, 12), 1.6, a, '44,38,30');
+    ruledLine(c.l, r, [[x - w * .26, y], [x + w * .26, y]], 2, a, '40,34,28');
+    for (const sgn of [-1, 1]) {                                     // raised ridge ends and upturned eave corners
+      stroke(c.l, quad([x + sgn * w * .26, y], [x + sgn * w * .3, y - h * .02], [x + sgn * w * .32, y - h * .12], 5), { wid: 1.6, noi: .2, col: `rgba(40,34,28,${a})`, seed: 50 + sgn });
+      stroke(c.l, quad([x + sgn * w * .5, y + h * .44], [x + sgn * w * .6, y + h * .4], [x + sgn * w * .66, y + h * .26], 5), { wid: 1.4, noi: .2, col: `rgba(40,34,28,${a})`, seed: 60 + sgn });
+    }
+    const band = poly([[x - w * .44, y + h * .56], [x + w * .44, y + h * .56], [x + w * .4, y + h * .72], [x - w * .4, y + h * .72]]);
+    glaze(c, band, '70,64,56', .5 * (1 - depth * .5), .5);
+    for (let i = 0; i < 4; i++) stroke(c.l, [[x - w * .36 + i * w * .24, y + h * .72], [x - w * .36 + i * w * .24, y + h * 1.2]], { wid: 1.1, noi: .2, col: `rgba(60,52,44,${a * .7})`, seed: 70 + i + x });
   }
 }
 

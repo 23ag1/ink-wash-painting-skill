@@ -81,10 +81,12 @@ export function willow(c, sp, notan) {
     hairyStroke(c.l, pts, 19 - bi * 3, sp.seed + 50 + bi, { rgb: '20,16,12', alpha: .75, bristles: 12, dryFrom: .3, dryness: .7, streak: 50, edge: .8, fade: .4, tipSide: 0, close: 0, profile: t => 1 - t * .85 });
     if (false) stroke(c.l, pts, { wid: 9, fun: t => 1 - t * .85, noi: .55, col: 'rgba(22,18,14,.85)', seed: sp.seed + 50 + bi, tip: .6, dry: .5 });
     for (let k = 0; k < sp.strands; k++) {
-      const [x, y] = pts[Math.floor((.25 + r() * .75) * (pts.length - 1))];
-      const len = 90 + r() * 200, sway = (r() - .3) * 30;
-      depthLine(c, [[x, y], [x + sway + 10, y + len * .35], [x + sway * 1.6, y + len]], 3, .08);
-      stroke(c.l, quad([x, y], [x + sway + 10, y + len * .35], [x + sway * 1.6, y + len], 14), { wid: 1.1 + r() * .7, fun: t => 1 - t * .7, noi: .3, col: `rgba(30,28,22,${.5 + r() * .35})`, seed: sp.seed + 100 + bi * 40 + k, dry: .4 });
+      const [x, y] = pts[Math.floor((.2 + r() * .8) * (pts.length - 1))];
+      // twigs hang in different lengths and drift with the air: an S-curve, never a plumb line
+      const len = 30 + Math.pow(r(), 1.6) * 190, sway = (r() - .5) * 46, kick = (r() - .5) * 20;
+      const tw = [[x, y], [x + kick, y + len * .25], [x + sway * .6 - kick * .5, y + len * .6], [x + sway, y + len]];
+      depthLine(c, tw, 3, .08);
+      stroke(c.l, smooth(tw, 5), { wid: 1.1 + r() * .7, fun: t => 1 - t * .7, noi: .3, col: `rgba(30,28,22,${.5 + r() * .35})`, seed: sp.seed + 100 + bi * 40 + k, dry: .4 });
     }
   });
   // dense foliage masses: many small leaves crowded into a few clumps, darkest at the core, looser at the rim
