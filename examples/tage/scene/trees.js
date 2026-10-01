@@ -78,12 +78,21 @@ export function willow(c, sp, notan) {
       stroke(c.l, quad([x, y], [x + sway + 10, y + len * .35], [x + sway * 1.6, y + len], 14), { wid: 1.1 + r() * .7, fun: t => 1 - t * .7, noi: .3, col: `rgba(30,28,22,${.5 + r() * .35})`, seed: sp.seed + 100 + bi * 40 + k, dry: .4 });
     }
   });
-  // a few leafy sprays low on the right: short dashes in loose clusters
+  // leafy sprays low on the right: hanging twigs, each with small pointed leaves along it (dark near, paler behind)
   for (const [lx, ly, n] of sp.leaves) {
-    for (let i = 0; i < n; i++) {
-      const x = lx + (r() - .5) * 90, y = ly + (r() - .5) * 60, a = .6 + r() * 1.6;
-      depthLine(c, [[x, y], [x + Math.cos(a) * 9, y + Math.sin(a) * 9]], 4, .08);
-      stroke(c.l, [[x, y], [x + Math.cos(a) * 9, y + Math.sin(a) * 9]], { wid: 2.4, fun: t => Math.sin(t * Math.PI), noi: .2, col: `rgba(30,32,22,${.45 + r() * .35})`, seed: sp.seed + 500 + i });
+    for (let i = 0; i < n / 6; i++) {
+      const x = lx + (r() - .5) * 110, y = ly + (r() - .5) * 70, len = 30 + r() * 40, sway = (r() - .5) * 20;
+      const twig = quad([x, y], [x + sway, y + len * .5], [x + sway * 1.5 + 6, y + len], 10);
+      depthLine(c, twig, 14, .08);
+      stroke(c.l, twig, { wid: .9, noi: .3, col: 'rgba(30,28,22,.6)', seed: sp.seed + 500 + i });
+      const tone = .45 + r() * .45;
+      // willow leaves hang close along the twig, at irregular places, sides and lengths (never in pairs)
+      for (let j = 1; j < twig.length; j++) {
+        if (r() < .4) continue;
+        const [px, py] = twig[j], side = r() < .5 ? -1 : 1, a = Math.PI / 2 + side * (.15 + r() * .45);
+        const l = 8 + r() * 8;
+        blob(c.l, px + Math.cos(a) * l * .45, py + Math.sin(a) * l * .45, { len: l, wid: 2 + r(), ang: a, col: `rgba(28,32,20,${tone * (.7 + r() * .3)})`, noi: .35, seed: sp.seed + 900 + i * 31 + j });
+      }
     }
   }
 }

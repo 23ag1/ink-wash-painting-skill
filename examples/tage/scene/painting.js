@@ -20,15 +20,15 @@ export function paintScene(c, notan) {
   slabPeak(c, { left: [[78, 680], [76, 520], [84, 360], [94, 230], [104, 128], [110, 98]], right: [[192, 680], [186, 500], [172, 340], [152, 210], [134, 116], [122, 96]], shadow: 'right', depth: .45, tone: .8, size: 1.2, seed: 13, base: [520, 680] }, notan);
   slabPeak(c, { left: [[160, 650], [158, 470], [164, 340], [170, 262]], right: [[262, 650], [256, 480], [244, 350], [226, 258], [198, 246]], shadow: 'right', depth: .42, tone: .7, size: 1, seed: 14, base: [480, 640] }, notan);
   // pines on the second slab's top
-  for (const [x, y, h, lean, s] of [[178, 268, 62, .05, 41], [196, 262, 78, -.04, 42], [216, 266, 58, .1, 43]]) pine(c, { x, y, h, lean, depth: .42, tone: .75, bare: .3, seed: s }, notan);
+  for (const [x, y, h, lean, s] of [[178, 268, 62, .05, 41], [196, 262, 78, -.04, 42], [216, 266, 58, .1, 43], [114, 104, 34, .08, 44], [60, 190, 30, -.1, 45]]) pine(c, { x, y, h, lean, depth: .42, tone: .75, bare: .3, seed: s }, notan);
 
   // the palace roofs in the mist, behind the grove
   palace(c, [[512, 418, 64, 22, .7], [470, 440, 46, 16, .72], [560, 440, 40, 14, .74]], notan);
 
   // the grove rising out of the mist band: tall pines in front of the palace, smaller ones to the left
   const grove = [[352, 600, 150, .06, 51, .58], [398, 590, 190, -.03, 52, .55], [440, 600, 160, .08, 53, .56], [470, 610, 120, -.05, 54, .6],
-    [300, 610, 110, .05, 55, .62], [262, 616, 86, -.06, 56, .66], [228, 620, 70, .04, 57, .68], [330, 612, 92, -.02, 58, .64]];
-  for (const [x, y, h, lean, s, d] of grove) pine(c, { x, y, h, lean, depth: d, tone: 1.25 - d, bare: .45, seed: s }, notan);
+    [300, 610, 110, .05, 55, .62], [262, 616, 86, -.06, 56, .66], [228, 620, 70, .04, 57, .68], [330, 612, 92, -.02, 58, .64], [420, 606, 120, .02, 59, .6], [372, 606, 100, -.07, 60, .62], [500, 616, 90, .05, 61, .64]];
+  for (const [x, y, h, lean, s, d] of grove) pine(c, { x, y, h, lean, depth: d, tone: 1.35 - d, bare: .35, seed: s }, notan);
 
   // near ground: the boulders bottom left, a bare tree on them, the path, the willow, the dancers
   boulder(c, {    // a tilted slab: one long straight slope down to the right, a steep chopped face under it
@@ -47,14 +47,14 @@ export function paintScene(c, notan) {
   willow(c, {
     trunk: [[566, 1060], [552, 980], [528, 900], [514, 820], [508, 770]],
     boughs: [[[508, 772], [492, 730], [498, 690], [474, 640], [480, 600], [462, 548]], [[512, 782], [540, 744], [536, 700], [566, 660], [580, 612], [606, 574]], [[522, 862], [560, 846], [584, 816], [618, 806], [640, 790]], [[498, 690], [520, 650], [516, 610]]],
-    strands: 14, leaves: [[560, 860, 46], [600, 760, 30], [470, 940, 20]], seed: 91,
+    strands: 16, leaves: [[575, 840, 110], [615, 760, 80], [520, 910, 60], [470, 960, 30]], seed: 91,
   }, notan);
   if (!notan) {
-    figure(c, 312, 1010, 1.45, { lean: .3, arms: [[10, -16], [-8, 6]], kick: .4 }, 101);
-    figure(c, 350, 1022, 1.38, { lean: -.2, arms: [[-11, -14]], kick: 1 }, 102);
-    figure(c, 392, 1030, 1.45, { lean: .2, arms: [[12, -10], [-9, 7]], kick: .2 }, 103);
-    figure(c, 430, 1034, 1.3, { lean: .4, arms: [[11, -15]], kick: .8 }, 104);
-    figure(c, 40, 975, 1.23, { lean: .5, arms: [[12, -6]], kick: .3 }, 105);
+    figure(c, 312, 1010, 1.74, { lean: .3, arms: [[10, -16], [-8, 6]], kick: .4 }, 101);
+    figure(c, 350, 1022, 1.66, { lean: -.2, arms: [[-11, -14]], kick: 1 }, 102);
+    figure(c, 392, 1030, 1.74, { lean: .2, arms: [[12, -10], [-9, 7]], kick: .2 }, 103);
+    figure(c, 430, 1034, 1.56, { lean: .4, arms: [[11, -15]], kick: .8 }, 104);
+    figure(c, 40, 975, 1.48, { lean: .5, arms: [[12, -6]], kick: .3 }, 105);
     poem(c, [
       { text: '宿雨清畿甸', x: 604, y: 46 }, { text: '朝阳丽帝城', x: 566, y: 46 },
       { text: '丰年人乐业', x: 528, y: 46 }, { text: '垅上踏歌行', x: 490, y: 46 },

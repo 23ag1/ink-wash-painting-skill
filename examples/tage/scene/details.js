@@ -42,6 +42,17 @@ export function path(c, upper, lower, notan) {
       stroke(c.l, [[x + b * 2, y], [x + b * 2 + Math.cos(a) * (7 + r() * 9), y + Math.sin(a) * (7 + r() * 9)]], { wid: 1.4, fun: t => 1 - t, noi: .2, col: 'rgba(28,30,20,.7)', seed: 600 + i * 4 + b });
     }
   }
+  // a stream running down from under the path, crossed by a plank bridge
+  const stream = poly([[372, 1060], [404, 1064], [430, 1090], [452, 1120], [380, 1120], [376, 1096], [360, 1074]]);
+  occlude(c, stream, .04);
+  glaze(c, stream, '150,140,120', .55, .8, 2);
+  for (let i = 0; i < 6; i++) {
+    const y = 1072 + i * 8 + r() * 4, x = 372 + (y - 1060) * .55;
+    stroke(c.l, [[x + 4, y], [x + 18 + r() * 14, y + 2]], { wid: 1.2, fun: t => Math.sin(t * Math.PI), noi: .3, col: 'rgba(60,54,44,.5)', seed: 700 + i });
+  }
+  for (const dy of [0, 7]) ruledLine(c.l, r, [[352, 1058 + dy], [412, 1066 + dy]], 2.2, .75, '34,28,22');
+  for (const x of [358, 404]) stroke(c.l, [[x, 1066], [x + 1, 1084]], { wid: 2, noi: .3, col: 'rgba(30,26,20,.8)', seed: 710 + x });
+
   // the ground below: clumps of grass and reeds in dark ink, thicker toward the left corner
   for (let i = 0; i < 40; i++) {
     const x = Math.pow(r(), 1.4) * 640, y = 1075 + r() * 45;

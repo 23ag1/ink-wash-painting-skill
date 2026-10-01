@@ -34,18 +34,28 @@ export function boulder(c, sp, notan) {
   occlude(c, path, sp.depth);
   if (notan) { glaze(c, path, '60,52,44', .85, 0); return; }
   const r = rng(sp.seed);
-  glaze(c, path, '200,184,160', .9, .35, 1);
-  glaze(c, poly(sp.face), '92,80,64', .9, .3, 1.5);
-  // axe strokes on the front face, slanting down to the right, heavier near the clefts
-  c.l.save(); c.l.clip(poly(sp.face));
-  const xs = sp.face.map(p => p[0]), ys = sp.face.map(p => p[1]);
+  glaze(c, path, '206,190,164', .9, .3, 1);
+  // the front face: a deep gradient from the ridge (near black) down to a warm dark brown
+  const face = poly(sp.face), xs = sp.face.map(p => p[0]), ys = sp.face.map(p => p[1]);
   const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  c.w.save(); c.w.globalCompositeOperation = 'multiply'; c.w.clip(path);
+  const gr = c.w.createLinearGradient(x0, y0, x0 + (x1 - x0) * .3, y1);
+  gr.addColorStop(0, 'rgba(40,33,26,.95)'); gr.addColorStop(.5, 'rgba(70,60,46,.85)'); gr.addColorStop(1, 'rgba(110,96,76,.7)');
+  c.w.fillStyle = gr; c.w.fill(face); c.w.restore();
+  // ...then written over in wide dry strokes along the slope: their bristle gaps are the light streaks
+  c.l.save(); c.l.clip(face);
   for (let i = 0; i < sp.strokes; i++) {
-    const x = x0 + r() * (x1 - x0), y = y0 + r() * (y1 - y0) * .8;
-    bigAxe(c.l, x, y, (r() < .55 ? sp.slope : Math.PI / 2 - .15) + (r() - .5) * .25, (40 + r() * 110) * sp.size * (r() < .3 ? .4 : 1), (12 + r() * 24) * sp.size, .18 + r() * .3, sp.seed + i * 11);
+    const x = x0 + r() * (x1 - x0), y = y0 + r() * (y1 - y0) * .85;
+    bigAxe(c.l, x, y, sp.slope + (r() - .5) * .3, (60 + r() * 120) * sp.size, (18 + r() * 26) * sp.size, .3 + r() * .35, sp.seed + i * 11);
   }
   c.l.restore();
-  // the contour: very dark, pressed, broken where the light catches the top plane
+  // the top plane: a few pale dry strokes along the slope, most of it left light
+  c.l.save(); c.l.clip(path);
+  for (let i = 0; i < 6; i++) {
+    const p = sp.outline[Math.floor(r() * sp.outline.length * .3)];
+    bigAxe(c.l, p[0] + 6, p[1] + 8, sp.slope + (r() - .5) * .2, (40 + r() * 80) * sp.size, (6 + r() * 10) * sp.size, .12 + r() * .12, sp.seed + 700 + i);
+  }
+  c.l.restore();
   // contour: edge by edge, each its own stroke — top-plane edges light and sometimes left out, face edges heavy
   for (let i = 0; i < sp.outline.length; i++) {
     const a = sp.outline[i], b = sp.outline[(i + 1) % sp.outline.length], top = i < sp.outline.length * .35;

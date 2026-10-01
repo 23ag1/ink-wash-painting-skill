@@ -129,6 +129,16 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   segment are solid, the 飞白 lives in the middle; twigs leave from the culm's EDGE at a node, with a knot, thick at
   the base, tapering — they never cross the culm.
 
+- **Ma Yuan study (tage): forms as cut-out cardboard** — slabs filled with one flat glaze + outline + texture
+  stamps read as illustration. *Fix:* model the form with tone (渲染): a gradient from a near-black shadow edge into
+  the lit face, laid in soft overlapping bands (hard bands show seams), and write the shadow face DENSELY in dry
+  brush so the bristle gaps become the rock's light streaks. Value range matters more than detail.
+- **Near things veiled as if far** — branches, strands and leaves outside the trunk's depth stroke got the air's
+  depth, so the shader hazed and misted them away; too-wide depth strokes then made halos. *Fix:* record depth
+  for every near mark at about its own width.
+- **Base dissolved but depth kept** — the mist drew rectangles under the peaks. *Fix:* dissolving a form also
+  fades its depth back to air.
+
 ## 8. Process lessons
 - **Research the canon before inventing.** Composition (Guo Xi, Xie He) and technique (MoXi, Curtis, Bousseau,
   Lingdong Huang's shan-shui-inf) answered questions that trial-and-error kept getting wrong.
