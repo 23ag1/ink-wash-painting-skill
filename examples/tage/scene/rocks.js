@@ -202,7 +202,7 @@ export function facetRock(c, sp, notan) {
       hairyStroke(c.w, pts, wid, sp.seed + 5000 + i * 13, { ...p, rgb: '58,46,34', alpha: (.08 + .18 * f.tone) * (.7 + r() * .6) });
       hairyStroke(c.wet, pts, wid * 1.2, sp.seed + 5000 + i * 13, { ...p, rgb: '255,255,255', alpha: .9 });
     }
-    if (f.tone < .15) {                               // the lit top: a few pale dry rubs along it, a cleft or two
+    if (f.tone < .25) {                               // the lit top: a few pale dry rubs along it, a cleft or two
       c.l.save(); c.l.clip(outline); c.l.clip(P);
       for (let i = 0; i < 9; i++) {
         let pt; do { pt = [x0 + r() * (x1 - x0), y0 + r() * (y1 - y0)]; } while (!inPoly(pt, f.poly));

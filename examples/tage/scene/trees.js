@@ -136,5 +136,5 @@ export function bareTree(c, sp, notan) {
       grow(p[0], p[1], ang + (r() < .5 ? 1 : -1) * (.4 + r() * .6), len * (.45 + r() * .25), w * .55, depth + 1);
     }
   };
-  grow(sp.x, sp.y, sp.ang, sp.len, 9, 0);
+  grow(sp.x, sp.y, sp.ang, sp.len, 5.5, 0);
 }
