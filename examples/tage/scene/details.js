@@ -101,10 +101,10 @@ export function ground(c, upper, lower, notan) {
   };
   for (let i = 0; i < 34; i++) { const k = Math.floor(r() * (lower.length - 1)); tuft(lower[k][0] + r() * 50, lower[k][1] + 8 + r() * 10, 3 + Math.floor(r() * 5), 12 + r() * 16, .85); }
   for (let i = 0; i < 22; i++) { const k = Math.floor(r() * (upper.length - 1)); tuft(upper[k][0] + r() * 50, upper[k][1] + 2, 2 + Math.floor(r() * 4), 8 + r() * 12, .7); }
-  for (let i = 0; i < 30; i++) tuft(Math.pow(r(), 1.3) * 640, 1080 + r() * 40, 2 + Math.floor(r() * 5), 14 + r() * 20, .9);
-  for (let i = 0; i < 60; i++) {
-    const x = r() * 640, y = 930 + r() * 190;
-    blob(c.l, x, y, { len: 4 + r() * 7, wid: 2.5 + r() * 3, ang: (r() - .5) * .6, col: `rgba(30,30,20,${.25 + r() * .35})`, noi: .6, seed: 1200 + i });
+  // the near ground: grass in a few clumps of very different size, bare ground between them (never an even sprinkle)
+  for (const [cx, cy, n, spread] of [[30, 1096, 16, 40], [150, 1110, 7, 26], [250, 1090, 4, 14], [520, 1100, 12, 34], [600, 1085, 9, 24], [420, 1112, 3, 10]]) {
+    for (let i = 0; i < n; i++) tuft(cx + (r() - .5) * spread * 2, cy + (r() - .5) * spread * .5, 3 + Math.floor(r() * 5), 14 + r() * 24, .95);
+    for (let i = 0; i < n * .8; i++) blob(c.l, cx + (r() - .5) * spread * 2.2, cy + 4 + (r() - .5) * spread * .4, { len: 5 + r() * 8, wid: 3 + r() * 3, ang: (r() - .5) * .6, col: `rgba(28,28,18,${.3 + r() * .35})`, noi: .6, seed: 1200 + cx + i });
   }
 }
 
