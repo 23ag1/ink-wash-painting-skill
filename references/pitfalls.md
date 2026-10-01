@@ -114,6 +114,10 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   dark ink; groups of 3-4 splayed like fingers (~.5 rad apart) leaving the twig at slightly different points,
   many groups along the twigs; culms as wide grey side-brush segments with pooled edges, 飞白 and paper gaps at
   the nodes. Looking at three real paintings fixed in one round what parameter tweaking did not.
+  Second round (user: "still not bamboo"): **scale** was the real error — thin culms and short leaves in an empty
+  sheet. Real 墨竹 fills the leaf: culm ≈ 8-10% of the sheet width, leaves ≈ ¼ of it, culms cropped by the edges.
+  Also: a strong side-brush core made culms look like striped pipes (keep culms nearly flat grey, dry streaks),
+  and leaves starting from one point merged into a black hub (start them a short stalk apart, thin entry).
 
 ## 8. Process lessons
 - **Research the canon before inventing.** Composition (Guo Xi, Xie He) and technique (MoXi, Curtis, Bousseau,
