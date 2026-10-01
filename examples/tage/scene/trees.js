@@ -68,7 +68,7 @@ export function willow(c, sp, notan) {
   // boughs reaching up, thinning; strands hanging from them
   sp.boughs.forEach((b, bi) => {
     const pts = smooth(b, 6);
-    depthLine(c, pts, 8, .08);
+    depthLine(c, pts, 5, .08);
     hairyStroke(c.l, pts, 13 - bi * 2, sp.seed + 50 + bi, { rgb: '20,16,12', alpha: .75, bristles: 12, dryFrom: .3, dryness: .7, streak: 50, edge: .8, fade: .4, close: 0, profile: t => 1 - t * .85 });
     if (false) stroke(c.l, pts, { wid: 9, fun: t => 1 - t * .85, noi: .55, col: 'rgba(22,18,14,.85)', seed: sp.seed + 50 + bi, tip: .6, dry: .5 });
     for (let k = 0; k < sp.strands; k++) {
@@ -112,7 +112,7 @@ export function bareTree(c, sp, notan) {
   const r = rng(sp.seed);
   const grow = (x, y, ang, len, w, depth) => {
     const pts = walk(r, x, y, ang, len, 5, .35);
-    depthLine(c, pts, 8, .1);
+    depthLine(c, pts, 2.5, .1);
     stroke(c.l, pts, { wid: w, fun: t => 1 - t * .6, noi: .5, col: 'rgba(24,20,16,.8)', seed: sp.seed + depth * 7 + x, dry: .5 });
     if (depth < 3) for (let i = 0; i < 2 + (depth < 1 ? 1 : 0); i++) {
       const p = pts[2 + Math.floor(r() * 3)];

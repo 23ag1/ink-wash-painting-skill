@@ -101,7 +101,7 @@ export function massRock(c, sp, notan) {
   const H = Math.max(...ring.map(p => p[1])) - Math.min(...ring.map(p => p[1]));
   c.l.save(); c.l.clip(path);
   for (let i = 0; i < sp.sweeps; i++) {
-    const j = Math.floor(r() * (top.length - 2)) + 1, inner = r() < .35 ? .25 + r() * .3 : 0;   // some start lower on the face
+    const j = Math.floor(r() * (top.length - 2)) + 1, inner = 0;   // some start lower on the face
     const [x0, y0] = top[j];
     const [ax, ay] = top[j - 1], [bx, by] = top[j + 1], tl = Math.hypot(bx - ax, by - ay) || 1;
     const tx = (bx - ax) / tl, ty = (by - ay) / tl, nx = -ty, ny = tx;          // tangent, inward normal
@@ -111,7 +111,7 @@ export function massRock(c, sp, notan) {
     const cx = x + dx * len * .5 - dy * len * .06, cy = y + dy * len * .5 + dx * len * .06;
     hairyStroke(c.l, quad([x - nx * 3, y - ny * 3], [cx, cy], [ex, ey], 20), (18 + r() * 22) * sp.size, sp.seed + i * 13, {
       rgb: '28,23,18', alpha: .3 + r() * .25, bristles: Math.round((18 + r() * 12) * sp.size), dryFrom: .2, dryness: .7,
-      streak: len * 1.4, edge: .5, fade: .75, close: 0, profile: t => Math.max(.08, 1 - Math.pow(t, 1.5) * .85),
+      streak: len * 1.4, edge: .5, fade: .75, close: 0, profile: t => Math.max(.08, Math.min(1, .35 + t * 6) * (1 - Math.pow(t, 1.5) * .85)),
     });
   }
   c.l.restore();

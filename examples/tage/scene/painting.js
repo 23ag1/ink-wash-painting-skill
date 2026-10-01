@@ -36,11 +36,9 @@ export function paintScene(c, notan) {
   glaze(c, hill, notan ? '110,100,86' : '168,152,126', notan ? .4 : .6, .8, 3);
   if (!notan) {
     const r = rng(33);
-    for (const [bx, by] of [[232, 622], [268, 614], [306, 608], [338, 610], [360, 600], [404, 598], [446, 602], [478, 610], [508, 614]]) {
-      for (let i = 0; i < 14; i++) {
-        const x = bx + (r() - .5) * 34, y = by + 4 - r() * 14;
-        blob(c.l, x, y, { len: 8 + r() * 10, wid: 5 + r() * 5, ang: (r() - .5) * .8, col: `rgba(34,36,26,${.3 + r() * .35})`, noi: .7, seed: 3300 + bx + i });
-      }
+    for (const [bx, by] of [[232, 624], [300, 610], [360, 602], [430, 600], [500, 612]]) {
+      const p = new Path2D(); p.ellipse(bx, by + 2, 34 + r() * 20, 9 + r() * 5, (r() - .5) * .2, 0, 7);
+      glaze(c, p, '96,96,76', .45 + r() * .2, .8, 4);
     }
   }
   dissolve(c, hill, 612, 668);
@@ -50,17 +48,13 @@ export function paintScene(c, notan) {
 
   // near ground: the boulders bottom left, a bare tree on them, the path, the willow, the dancers
   // the near rocks: two great rounded boulders with a dark cleft between them, sunk in their ground shadow
-  massRock(c, { outline: [[0, 598], [70, 588], [160, 616], [236, 682], [292, 766], [306, 846], [276, 912], [180, 934], [0, 944]],
-    topFrac: .5, sweeps: 62, size: 1.2, depth: .12, seed: 69, flow: 1.0, clefts: [], base: [150, 940, 190] }, notan);
-  massRock(c, { outline: [[236, 836], [292, 790], [356, 794], [404, 838], [418, 900], [392, 944], [300, 952], [248, 920]],
-    topFrac: .45, sweeps: 28, size: .9, depth: .1, seed: 72, flow: 1.35, clefts: [[[236, 838], [258, 880], [262, 930]]], base: [330, 950, 110] }, notan);
-  bareTree(c, { x: 120, y: 600, ang: -1.75, len: 90, seed: 81 }, notan);
-  bareTree(c, { x: 196, y: 652, ang: -1.1, len: 80, seed: 82 }, notan);
-  // the bank between the rocks and the path: ground the reeds grow from
-  const bank = poly([[250, 944], [330, 936], [430, 930], [500, 944], [520, 972], [470, 1000], [360, 1008], [250, 984]]);
-  occlude(c, bank, .07);
-  glaze(c, bank, notan ? '60,52,44' : '150,134,106', notan ? .6 : .7, .6, 3);
-  reeds(c, [[360, 978, 36], [430, 970, 26], [300, 974, 18], [480, 968, 16]], notan);
+  massRock(c, { outline: [[0, 700], [56, 690], [130, 708], [196, 752], [244, 812], [258, 870], [236, 916], [150, 932], [0, 942]],
+    topFrac: .5, sweeps: 46, size: 1, depth: .12, seed: 69, flow: 1.0, clefts: [], base: [130, 940, 160] }, notan);
+  massRock(c, { outline: [[214, 870], [256, 840], [304, 842], [338, 874], [346, 914], [324, 944], [254, 950], [222, 926]],
+    topFrac: .45, sweeps: 20, size: .75, depth: .1, seed: 72, flow: 1.35, clefts: [[[216, 872], [234, 906], [238, 940]]], base: [280, 950, 80] }, notan);
+  bareTree(c, { x: 90, y: 696, ang: -1.75, len: 80, seed: 81 }, notan);
+  bareTree(c, { x: 168, y: 728, ang: -1.2, len: 64, seed: 82 }, notan);
+  reeds(c, [[470, 1000, 22], [500, 992, 14], [40, 950, 16]], notan);
   path(c, [[0, 962], [60, 958], [120, 950], [190, 962], [250, 978], [300, 994], [360, 1012], [420, 1022], [470, 1026], [560, 1018], [640, 1012]], [[0, 1004], [70, 998], [140, 994], [200, 1006], [262, 1022], [310, 1044], [362, 1062], [420, 1072], [480, 1078], [560, 1070], [640, 1064]], notan);
   willow(c, {
     trunk: [[572, 1080], [556, 990], [530, 905], [516, 825], [508, 770]],

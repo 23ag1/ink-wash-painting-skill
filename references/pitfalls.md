@@ -148,6 +148,12 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
 - **Floating trees and grass** — a grove whose trunks end in mist, reeds growing out of bare paper. *Fix:* a hill
   under the grove dissolving into the mist with undergrowth at the roots; a bank from the rocks to the path.
 
+- **"It got worse"** — fixing one element by enlarging it overran the composition (rocks to half the sheet), a new
+  element placed on top of the figures turned their hats into peeking "eyes", and depth strokes wider than the
+  twig made black silhouettes of the pines behind. *Rule:* after every local fix, re-check the full frame at
+  thumbnail size and the user's own viewport; never place a new element over the focal figures; depth marks
+  exactly as wide as the mark.
+
 ## 8. Process lessons
 - **Research the canon before inventing.** Composition (Guo Xi, Xie He) and technique (MoXi, Curtis, Bousseau,
   Lingdong Huang's shan-shui-inf) answered questions that trial-and-error kept getting wrong.
