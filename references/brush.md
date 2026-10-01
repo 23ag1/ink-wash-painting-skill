@@ -12,8 +12,10 @@ A stroke is a path + a width profile + an ink profile:
 - **Ink inside the stroke (点墨):** pale full-width body + darker half-width core, offset sideways by `tip`
   (-1..1). `|tip| ≈ .8` = 侧锋 side brush (one hard dark edge, one soft pale edge); 0 = 中锋 centred.
 - **Drying:** alpha falls along the length (`dry` 0..1), heaviest just after entry.
-- **飞白:** for dry fast strokes cut streaks of paper along the stroke direction (destination-out thin lines, or
-  a noise mask along the stroke's local v coordinate).
+- **飞白:** model the brush as many bristles, not the mark as a shape (`kit/brush/hairy.js`): each hair has its own
+  ink load, weak hairs run dry first, each skips along its own slow noise — so streaks are long, parallel, open
+  toward the exit, with torn tapered ends. Cutting a few random white lines out of a flat fill looks like
+  scratches; per-segment drawing gives blocky ends; splitting hairs at the same length gives bands across.
 - **Breaks:** a contour breaks 0-2 times per stroke at random places (probability per stroke, not per point —
   per-point gaps look like stitching).
 - Hairlines (< 1.2 wide) can be flat; everything else gets the tone treatment.

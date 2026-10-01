@@ -10,7 +10,8 @@
 // in one stroke of nearly flat dark ink and hung in fanned 个/介 groups; far leaves and culms are pale and wet.
 import { createRuntime } from '../../kit/runtime.js';
 import { rng } from '../../kit/brush/brush.js';
-import { stroke, quad, walk } from '../../kit/brush/ink.js';
+import { stroke, quad, walk, div } from '../../kit/brush/ink.js';
+import { hairyStroke } from '../../kit/brush/hairy.js';
 import { drawInscription } from '../../kit/brush/text.js';
 
 const D = 800;                                   // design space: 800 × 800, y down
@@ -54,7 +55,7 @@ function group(g, r, x, y, base, step, size, n, col, seed, coats = 1) {
 
 // a culm: segments as wide side-brush strokes (wash layer, fairly dry so the edges pool), paper gaps at the
 // nodes, dark bracket marks and a short ring stroke on the ink layer; returns the node points for the twigs
-function culm(c, pts, seg, wid, col, wetness, nodeInk, seed) {
+function culm(c, pts, seg, wid, ink, dry, wetness, nodeInk, seed) {
   const r = rng(seed), nodes = [0];
   for (let i = 0, acc = 0; i < pts.length - 1; i++) {
     acc += Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
@@ -66,19 +67,14 @@ function culm(c, pts, seg, wid, col, wetness, nodeInk, seed) {
     if (s.length < 2) continue;
     const w = wid * (1 - k * .045);
     const flare = t => .96 + .1 * Math.pow(Math.abs(2 * t - 1), 4);    // segments swell slightly at the nodes
-    washMark(c, wetness, (g, white) => stroke(g, s, { wid: w, fun: flare, noi: .06, col: white || col, seed: seed + k, tip: .2, dry: .4 }));
-    // 飞白: a few dry streaks along the segment where the brush ran out
-    c.w.save(); c.w.globalCompositeOperation = 'destination-out';
-    for (let j = 0; j < 4; j++) {
-      const off = (r() - .5) * w * .75, from = Math.floor(r() * s.length * .5), to = Math.min(s.length, from + 3 + Math.floor(r() * s.length * .6));
-      const run = s.slice(from, to).map(([x, y], i, arr) => {
-        const [nx, ny] = arr[Math.min(i + 1, arr.length - 1)], [px, py] = arr[Math.max(i - 1, 0)];
-        const l = Math.hypot(nx - px, ny - py) || 1;
-        return [x - (ny - py) / l * off, y + (nx - px) / l * off];
-      });
-      if (run.length > 1) stroke(c.w, run, { wid: 1 + r() * 3, noi: .7, col: `rgba(0,0,0,${.25 + r() * .35})`, seed: seed + 40 + j, dry: .75 });
-    }
-    c.w.restore();
+    // one upward stroke of a hairy brush: solid at the entry, 飞白 streaks opening toward the node above
+    hairyStroke(c.w, div(s, 4), w, seed + k * 13, {
+      rgb: ink.rgb, alpha: ink.alpha, bristles: Math.round(w * .45), dryFrom: dry[0], dryness: dry[1],
+      streak: 130, edge: .45, fade: .2, close: .8, profile: flare,
+    });
+    c.wet.save(); c.wet.globalAlpha = wetness;     // fairly dry paper: the streaks must stay crisp
+    stroke(c.wet, s, { wid: w, fun: flare, noi: 0, col: WHITE, seed });
+    c.wet.restore();
     if (!nodeInk || k === nodes.length - 2) continue;
     const [nx, ny] = pts[nodes[k + 1]], [px, py] = pts[nodes[k + 1] - 1];
     const l = Math.hypot(nx - px, ny - py), ux = (nx - px) / l, uy = (ny - py) / l, vx = -uy, vy = ux;
@@ -107,11 +103,11 @@ function paintMarks(S) {
   const DARK = 'rgba(16,15,14,1)', MID = 'rgba(70,70,72,.88)', PALE = 'rgba(112,116,120,.5)';
 
   // far culm: pale and very wet, behind the leaves — depth by tone and softness, not by detail
-  culm(c, quad([585, 860], [590, 420], [625, -60], 90), [230, 260], 24, 'rgba(160,164,168,.4)', .95, null, 300);
+  culm(c, quad([585, 860], [590, 420], [625, -60], 90), [230, 260], 24, { rgb: '160,164,168', alpha: .22 }, [.5, .4], .95, null, 300);
 
   // two near culms, big enough to fill the leaf (≈8% of its width), cropped by the top and bottom edges
-  const nB = culm(c, quad([150, 860], [185, 430], [240, -60], 90), [205, 245, 255], 54, 'rgba(146,146,148,.72)', .45, 'rgba(70,68,66,.85)', 200);
-  const nA = culm(c, quad([330, 860], [345, 420], [400, -60], 90), [235, 250, 260], 64, 'rgba(118,118,120,.8)', .4, 'rgba(40,38,36,.9)', 100);
+  const nB = culm(c, quad([150, 860], [185, 430], [240, -60], 90), [205, 245, 255], 54, { rgb: '138,138,140', alpha: .45 }, [.2, .8], .1, 'rgba(70,68,66,.85)', 200);
+  const nA = culm(c, quad([330, 860], [345, 420], [400, -60], 90), [235, 250, 260], 64, { rgb: '108,108,110', alpha: .55 }, [.15, .9], .1, 'rgba(40,38,36,.9)', 100);
 
   // leaves: long, black, in wide groups; some hang, some reach sideways or up; a wet pale group lower right
   const tA1 = twig(c.l, r, nA[3], -.55, 120, 'rgba(34,32,30,.85)', 390);

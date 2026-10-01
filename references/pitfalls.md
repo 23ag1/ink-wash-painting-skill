@@ -118,6 +118,11 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   sheet. Real 墨竹 fills the leaf: culm ≈ 8-10% of the sheet width, leaves ≈ ¼ of it, culms cropped by the edges.
   Also: a strong side-brush core made culms look like striped pipes (keep culms nearly flat grey, dry streaks),
   and leaves starting from one point merged into a black hub (start them a short stalk apart, thin entry).
+  Third round (user: "the streaks are the main thing"): 飞白 faked by cutting 2-4 white lines out of a flat
+  fill read as scratches. A hairy-brush model fixed it, after three more visible failures at zoom: all hairs
+  breaking at the end = a broom (only weak hairs dry, the turn at the node closes the stroke); hairs drawn in
+  short pieces = pixel-stair ends (draw continuous tapered runs); runs split at equal lengths = horizontal bands
+  (no splits, ink varies by a gradient along each hair).
 
 ## 8. Process lessons
 - **Research the canon before inventing.** Composition (Guo Xi, Xie He) and technique (MoXi, Curtis, Bousseau,
