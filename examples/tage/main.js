@@ -19,8 +19,8 @@ async function start() {
   const rt = await createRuntime(canvas, { preserveDrawingBuffer: true });
   if (!rt.float) throw new Error('EXT_color_buffer_float is not available');
   const size = [canvas.width, canvas.height];
-  const [scene, diffuse, paint, fin] = await Promise.all(
-    ['shaders/scene.frag', '../../kit/passes/diffuse.frag', 'shaders/paint.frag', 'shaders/final.frag'].map(rt.program));
+  const [scene, diffuse, paint, fin, treeP] = await Promise.all(
+    ['shaders/scene.frag', '../../kit/passes/diffuse.frag', 'shaders/paint.frag', 'shaders/final.frag', 'shaders/tree.frag'].map(rt.program));
   const T = c.canvases, tex = { wash: rt.fromCanvas(T.wash), wet: rt.fromCanvas(T.wet), ink: rt.fromCanvas(T.ink), depth: rt.fromCanvas(T.depth) };
 
   const col = rt.texture(...size, { type: 'rgba16f' }), wet = rt.texture(...size, { type: 'rgba16f' });
@@ -30,8 +30,18 @@ async function start() {
     size, type: 'rgba16f', tex: { uWet: wet },
     u: { uStep: S * .8, uDesignW: DW, uRate: .09, uFibreScale: .02, uCross: .4 },
   });
+  // the wood of the willow: its skeleton rendered as one field (kit/limbs.glsl), laid over the painting in paint.frag
+  const tree = rt.texture(...size);
+  const segs = notan ? [] : (c.skeleton || []);
+  if (segs.length) {
+    const data = new Float32Array(segs.length * 8);
+    segs.forEach(([ax, ay, ra, sa, bx, by, rb, sb], i) => data.set([ax, ay, ra, sa, bx, by, rb, sb], i * 8));
+    const xs = segs.flatMap(s => [s[0] - s[2], s[4] - s[6], s[0] + s[2], s[4] + s[6]]), ys = segs.flatMap(s => [s[1] - s[2], s[5] - s[6], s[1] + s[2], s[5] + s[6]]);
+    const box = [Math.min(...xs) - 6, Math.min(...ys) - 6, Math.max(...xs) + 6, Math.max(...ys) + 6];
+    rt.draw(treeP, { to: rt.target([tree]), size, tex: { uSkel: rt.texture(segs.length * 2, 1, { type: 'rgba32f', data }) }, u: { uN: segs.length, uBox: box } });
+  }
   const painted = rt.texture(...size), fb = rt.target([painted]);
-  rt.draw(paint, { to: fb, size, tex: { uDiffused: diffused, uWet: wet, uLines: notan ? rt.fromCanvas(document.createElement('canvas')) : tex.ink, uDepth: tex.depth } });
+  rt.draw(paint, { to: fb, size, tex: { uDiffused: diffused, uWet: wet, uLines: notan ? rt.fromCanvas(document.createElement('canvas')) : tex.ink, uDepth: tex.depth, uTree: tree } });
 
   const t0 = performance.now();
   const frame = now => {

@@ -10,6 +10,7 @@ uniform sampler2D uDiffused;
 uniform sampler2D uWet;
 uniform sampler2D uLines;
 uniform sampler2D uDepth;
+uniform sampler2D uTree;     // the willow's wood, straight alpha (tree.frag)
 out vec4 fragColor;
 
 // silk weave: fine warp and weft threads, slightly irregular, visible only as a faint texture
@@ -34,11 +35,15 @@ void main() {
   c = edgeDarken(c, w.far, dp, 1.2, .25, .006, .2, .5);
   c = washHalo(c, lc, w.far, w.farWet, vec3(.95, .94, .93), .3);
 
+  // the wood lies over the washes; ink behind it is hidden, the strands hanging off it stay in front
+  vec4 T = texture(uTree, uv + wob * .3);
+  c = mix(c, T.rgb, T.a);
   InkSample s = gatherInk(uLines, uv + wob * .3, px, sc, rot, .7, 2.);
   float haze = .55 * smoothstep(.3, .95, dep);
   c = inkBleed(c, s, vec3(.35, .3, .25), .14 * (1. - haze));
   vec4 L = inkVeil(inkFeather(s, .5), MIST, haze * .7, haze * .75);
   L.rgb *= vec3(1., .96, .9);                         // ink on silk reads warm
+  L.a *= 1. - T.a * .85;
   c = inkOver(c, L, .95);
   // mist also passes in front of the ink of what stands in it
   c = mix(c, MIST, mistAt(p) * smoothstep(.3, .8, dep) * .55);

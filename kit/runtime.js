@@ -85,7 +85,7 @@ export async function createRuntime(canvas, glOptions = {}) {
     return { p, url, uniforms };
   }
 
-  function texture(w, h, { type = 'rgba8', source = null } = {}) {
+  function texture(w, h, { type = 'rgba8', source = null, data = null } = {}) {
     if (type !== 'rgba8' && !float) throw new Error(`${type} targets need EXT_color_buffer_float`);
     const [internal, format, kind] = TYPES[type].map(k => gl[k]);
     const t = gl.createTexture();
@@ -99,7 +99,7 @@ export async function createRuntime(canvas, glOptions = {}) {
       gl.texImage2D(gl.TEXTURE_2D, 0, internal, format, kind, source);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     } else {
-      gl.texImage2D(gl.TEXTURE_2D, 0, internal, w, h, 0, format, kind, null);
+      gl.texImage2D(gl.TEXTURE_2D, 0, internal, w, h, 0, format, kind, data);   // data: a typed array (e.g. a skeleton)
     }
     return t;
   }

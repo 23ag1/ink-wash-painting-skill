@@ -211,3 +211,14 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
 - **Forks:** a limb growing out of another must not occlude (paint paper under itself) and must paint only
   *outside* its parent (clip with the parent path, even-odd). Otherwise its end cap lies across the parent as a
   seam or step, and any "knot" dab blurred over the join reads as a smudge. The join is the parent's own edge.
+
+### Branching wood painted piece by piece
+- **Symptom:** however the canvas limbs were stacked or clipped, the fork showed a seam or step and a branch
+  floated beside the stem.
+- **Cause:** each limb was a separate shape painted on its own; a joint between separate shapes is always a seam.
+- **Fix:** describe the tree as a skeleton and render the wood in a shader as one SDF with smooth union
+  (`kit/glsl/limbs.glsl`, used by `examples/tage/shaders/tree.frag`): tone from the cross position (shadow side),
+  bark/dry brush from noise in the limb's own frame (arc length × radii), contour from the field's edge, ragged
+  silhouette from noise on the distance. Fine strands stay brush strokes on the canvas.
+- **Trap:** texture coordinates from `dot(p, dir)` make rings wherever the limb turns (the projection jumps by
+  |p|·Δangle); store arc length in the skeleton and continue it from the parent at each joint.
