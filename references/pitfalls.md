@@ -176,6 +176,14 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   trees come up out of the mist. "Grounding" a thing seen across mist means hiding its base, not adding ground.
   Depth edges must be soft — any hard edge in the depth map shows as a hard edge in the mist.
 
+- **Tree joints** — a trunk ending in a flat cut with boughs starting above it (floating), bough strokes starting
+  at full width (square blocks), a tonal under-layer that did not narrow with the trunk (a pale ghost block).
+  *Fix:* the trunk thins out into its boughs; every bough starts at the trunk's EDGE, narrow, and swells; every
+  layer of a form follows the same profile.
+- **Mid-distance grove cut by one straight line** — fading the lower trunks with a straight gradient made every
+  tree end at the same height. *Fix:* an uneven, soft fade line (each tree a little different) and a faint soft
+  tone under the crowns, not a ground.
+
 ## 8. Process lessons
 - **Research the canon before inventing.** Composition (Guo Xi, Xie He) and technique (MoXi, Curtis, Bousseau,
   Lingdong Huang's shan-shui-inf) answered questions that trial-and-error kept getting wrong.
