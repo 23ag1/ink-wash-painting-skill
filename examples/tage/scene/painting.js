@@ -6,7 +6,7 @@
 import { slabPeak, farPinnacle } from './peaks.js';
 import { boulder, massRock } from './rocks.js';
 import { pine, willow, bareTree } from './trees.js';
-import { palace, path, figure, poem, reeds } from './details.js';
+import { palace, ground, figure, poem, reeds } from './details.js';
 import { poly, glaze, occlude, dissolve } from './layers.js';
 import { rng } from '../../../kit/brush/brush.js';
 import { blob } from '../../../kit/brush/ink.js';
@@ -47,6 +47,7 @@ export function paintScene(c, notan) {
   for (const [x, y, h, lean, s, d] of grove) pine(c, { x, y, h, lean, depth: d, tone: 1.35 - d, bare: .35, seed: s }, notan);
 
   // near ground: the boulders bottom left, a bare tree on them, the path, the willow, the dancers
+  ground(c, [[0, 962], [60, 958], [120, 950], [190, 962], [250, 978], [300, 994], [360, 1012], [420, 1022], [470, 1026], [560, 1018], [640, 1012]], [[0, 1004], [70, 998], [140, 994], [200, 1006], [262, 1022], [310, 1044], [362, 1062], [420, 1072], [480, 1078], [560, 1070], [640, 1064]], notan);
   // the near rocks: two great rounded boulders with a dark cleft between them, sunk in their ground shadow
   massRock(c, { outline: [[0, 700], [56, 690], [130, 708], [196, 752], [244, 812], [258, 870], [236, 916], [150, 932], [0, 942]],
     topFrac: .5, sweeps: 46, size: 1, depth: .12, seed: 69, flow: 1.0, clefts: [], base: [130, 940, 160] }, notan);
@@ -55,18 +56,17 @@ export function paintScene(c, notan) {
   bareTree(c, { x: 90, y: 696, ang: -1.75, len: 80, seed: 81 }, notan);
   bareTree(c, { x: 168, y: 728, ang: -1.2, len: 64, seed: 82 }, notan);
   reeds(c, [[470, 1000, 22], [500, 992, 14], [40, 950, 16]], notan);
-  path(c, [[0, 962], [60, 958], [120, 950], [190, 962], [250, 978], [300, 994], [360, 1012], [420, 1022], [470, 1026], [560, 1018], [640, 1012]], [[0, 1004], [70, 998], [140, 994], [200, 1006], [262, 1022], [310, 1044], [362, 1062], [420, 1072], [480, 1078], [560, 1070], [640, 1064]], notan);
   willow(c, {
     trunk: [[572, 1080], [556, 990], [530, 905], [516, 825], [508, 770]],
     boughs: [[[508, 772], [492, 730], [498, 690], [474, 640], [480, 600], [462, 548]], [[512, 782], [540, 744], [536, 700], [566, 660], [580, 612], [606, 574]], [[522, 862], [560, 846], [584, 816], [618, 806], [640, 790]], [[498, 690], [520, 650], [516, 610]]],
     strands: 20, masses: [[600, 830, 46, 160], [560, 905, 38, 110], [626, 740, 34, 90], [520, 790, 26, 60]], leaves: [[575, 840, 200], [615, 760, 150], [530, 900, 120], [470, 960, 60], [620, 900, 120]], seed: 91,
   }, notan);
   if (!notan) {
-    figure(c, 312, 1010, 1.74, { lean: .3, arms: [[10, -16], [-8, 6]], kick: .4 }, 101);
-    figure(c, 350, 1022, 1.66, { lean: -.2, arms: [[-11, -14]], kick: 1 }, 102);
-    figure(c, 392, 1030, 1.74, { lean: .2, arms: [[12, -10], [-9, 7]], kick: .2 }, 103);
-    figure(c, 430, 1034, 1.56, { lean: .4, arms: [[11, -15]], kick: .8 }, 104);
-    figure(c, 40, 975, 1.48, { lean: .5, arms: [[12, -6]], kick: .3 }, 105);
+    figure(c, 300, 1006, 1.6, { lean: .3, arms: [[12, -14], [-9, 4]], kick: .4 }, 101);
+    figure(c, 344, 1020, 1.55, { lean: -.25, arms: [[-12, -12], [8, 2]], kick: 1 }, 102);
+    figure(c, 394, 1030, 1.6, { lean: .15, arms: [[11, -8], [-10, -6]], kick: .2 }, 103);
+    figure(c, 440, 1034, 1.5, { lean: .4, arms: [[-6, 6]], kick: .1, staff: true }, 104);
+    figure(c, 46, 978, 1.4, { lean: .5, arms: [[-6, 6]], kick: .2, staff: true }, 105);
     poem(c, [
       { text: '宿雨清畿甸', x: 604, y: 46 }, { text: '朝阳丽帝城', x: 566, y: 46 },
       { text: '丰年人乐业', x: 528, y: 46 }, { text: '垅上踏歌行', x: 490, y: 46 },

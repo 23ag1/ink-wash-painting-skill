@@ -122,6 +122,8 @@ export function massRock(c, sp, notan) {
     c.w.strokeStyle = 'rgba(40,32,24,.9)'; c.w.lineWidth = 16; c.w.beginPath(); cl.forEach((p, i) => (i ? c.w.lineTo(...p) : c.w.moveTo(...p))); c.w.stroke(); c.w.restore();
     stroke(c.l, smooth(cl, 6), { wid: 7 * sp.size, fun: t => .5 + .5 * Math.sin(t * Math.PI), noi: .5, col: 'rgba(14,11,8,.9)', seed: sp.seed + 77, tip: .6, dry: .4 });
   }
-  const shadow = new Path2D(); shadow.ellipse(sp.base[0], sp.base[1], sp.base[2], 14, 0, 0, 7);
-  glaze(c, shadow, '70,60,46', .7, .6, 6);
+  // the base is lost in the ground: fade the lowest part of the rock into the ground's tone
+  c.w.save(); c.w.clip(path); c.w.globalCompositeOperation = 'multiply';
+  const gb = c.w.createLinearGradient(0, sp.base[1] - 40, 0, sp.base[1]); gb.addColorStop(0, 'rgba(120,104,80,0)'); gb.addColorStop(1, 'rgba(110,94,72,.7)');
+  c.w.fillStyle = gb; c.w.fillRect(0, sp.base[1] - 40, 640, 60); c.w.restore();
 }
