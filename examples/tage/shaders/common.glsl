@@ -1,8 +1,8 @@
 // This painting's constants: the silk, the mist and where it lies. Noise from the kit.
 #include "kit/noise.glsl"
 const vec2 DESIGN = vec2(640., 1120.);
-const vec3 SILK = vec3(.86, .78, .645);     // aged silk: warm, darker than paper
-const vec3 MIST = vec3(.915, .87, .775);     // mist on old silk: lighter than the silk, still warm
+const vec3 SILK = vec3(.9, .83, .7);     // aged silk: warm, darker than paper
+const vec3 MIST = vec3(.94, .9, .81);     // mist on old silk: lighter than the silk, still warm
 
 // the mist band across the middle with tongues rising between the peaks, plus a thin morning haze in the sky
 float mistAt(vec2 p) {

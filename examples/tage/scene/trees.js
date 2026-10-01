@@ -56,11 +56,11 @@ export function pine(c, sp, notan) {
 export function willow(c, sp, notan) {
   const r = rng(sp.seed);
   const trunk = smooth(sp.trunk, 8);
-  c.d.save(); c.d.strokeStyle = grey(.08); c.d.lineWidth = 34; c.d.beginPath(); trunk.forEach((p, i) => (i ? c.d.lineTo(...p) : c.d.moveTo(...p))); c.d.stroke(); c.d.restore();
+  c.d.save(); c.d.strokeStyle = grey(.08); c.d.lineWidth = 52; c.d.beginPath(); trunk.forEach((p, i) => (i ? c.d.lineTo(...p) : c.d.moveTo(...p))); c.d.stroke(); c.d.restore();
   if (notan) { c.w.save(); c.w.globalCompositeOperation = 'multiply'; c.w.strokeStyle = 'rgb(60,52,44)'; c.w.lineWidth = 22; c.w.beginPath(); trunk.forEach((p, i) => (i ? c.w.lineTo(...p) : c.w.moveTo(...p))); c.w.stroke(); c.w.restore(); return; }
   // the trunk in dry brush, gnarled: two passes, the second narrower and offset
-  hairyStroke(c.l, trunk, 30, sp.seed, { rgb: '22,18,14', alpha: .72, bristles: 34, dryFrom: .2, dryness: .9, streak: 60, edge: 1, fade: .3, close: .3, profile: t => 1.15 - t * .45 + .12 * Math.sin(t * 19) });
-  hairyStroke(c.l, trunk.map(([x, y]) => [x + 7, y]), 14, sp.seed + 1, { rgb: '14,11,8', alpha: .7, bristles: 14, dryFrom: .1, dryness: .8, streak: 40, edge: .5, fade: .2, close: 0, profile: t => 1 - t * .5 });
+  hairyStroke(c.l, trunk, 46, sp.seed, { rgb: '20,16,12', alpha: .82, bristles: 46, dryFrom: .2, dryness: .9, streak: 60, edge: 1, fade: .3, close: .3, profile: t => 1.15 - t * .45 + .12 * Math.sin(t * 19) });
+  hairyStroke(c.l, trunk.map(([x, y]) => [x + 10, y]), 22, sp.seed + 1, { rgb: '12,10,8', alpha: .8, bristles: 14, dryFrom: .1, dryness: .8, streak: 40, edge: .5, fade: .2, close: 0, profile: t => 1 - t * .5 });
   for (let i = 0; i < 6; i++) {                                           // knots
     const p = trunk[Math.floor(r() * trunk.length)];
     blob(c.l, p[0] + (r() - .5) * 14, p[1], { len: 10 + r() * 8, wid: 6 + r() * 4, ang: r() * 3, col: 'rgba(14,11,8,.85)', noi: .6, seed: sp.seed + 20 + i });
@@ -78,6 +78,15 @@ export function willow(c, sp, notan) {
       stroke(c.l, quad([x, y], [x + sway + 10, y + len * .35], [x + sway * 1.6, y + len], 14), { wid: 1.1 + r() * .7, fun: t => 1 - t * .7, noi: .3, col: `rgba(30,28,22,${.5 + r() * .35})`, seed: sp.seed + 100 + bi * 40 + k, dry: .4 });
     }
   });
+  // dense foliage masses: many small leaves crowded into a few clumps, darkest at the core, looser at the rim
+  for (const [fx, fy, rad, n] of sp.masses || []) {
+    depthLine(c, [[fx - rad * .6, fy], [fx + rad * .6, fy]], rad * 1.2, .08);
+    for (let i = 0; i < n; i++) {
+      const a = r() * 6.283, d = rad * Math.sqrt(r()), core = 1 - d / rad;
+      const x = fx + Math.cos(a) * d * 1.2, y = fy + Math.sin(a) * d * .8, la = Math.PI / 2 + (r() - .5) * 1.6;
+      blob(c.l, x, y, { len: 9 + r() * 8, wid: 2.6 + r() * 1.4, ang: la, col: `rgba(24,28,16,${.35 + .55 * core * r() + .1})`, noi: .4, seed: sp.seed + 3000 + i + fx });
+    }
+  }
   // leafy sprays low on the right: hanging twigs, each with small pointed leaves along it (dark near, paler behind)
   for (const [lx, ly, n] of sp.leaves) {
     for (let i = 0; i < n / 6; i++) {
@@ -85,7 +94,7 @@ export function willow(c, sp, notan) {
       const twig = quad([x, y], [x + sway, y + len * .5], [x + sway * 1.5 + 6, y + len], 10);
       depthLine(c, twig, 14, .08);
       stroke(c.l, twig, { wid: .9, noi: .3, col: 'rgba(30,28,22,.6)', seed: sp.seed + 500 + i });
-      const tone = .45 + r() * .45;
+      const tone = .6 + r() * .35;
       // willow leaves hang close along the twig, at irregular places, sides and lengths (never in pairs)
       for (let j = 1; j < twig.length; j++) {
         if (r() < .4) continue;

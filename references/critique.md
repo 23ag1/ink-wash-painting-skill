@@ -17,6 +17,10 @@ Improving details never fixes a broken composition.
   size only composition and tone exist. Answer the level-1 and level-2 questions from the thumbnail.
 - **Squint / blur test:** blur it heavily. Do you see 3-4 clear tone blocks with one darkest dark and a shaped void?
 - **One-second test:** glance at it: painting or render? If "render", name why in one line.
+- **Weight map (measured):** downscale both your render and the reference to ~128 px and compare, per region
+  (top / bottom / quadrants / the host), the mean luminance and the share of dark (<70) and mid-dark (<120)
+  pixels. "Nothing changed" from a viewer often means the biggest region was never touched — in the Ma Yuan study
+  the weight was inverted (heavy top, empty bottom) and only the numbers made it obvious.
 - **Side by side:** put your render next to the master references from `research.md` at the same size. List the
   three biggest differences. They are your next tasks.
 - **Zoom protocol:** full frame, then crops of the host, the focal point, the near plane, the text — at 3-6×.

@@ -45,6 +45,6 @@ void main() {
 
   c = silkWeave(c, dp);
   c = paperBlotch(c, dp, .05);
-  c = paperAge(c, uv, dp, vec3(.9, .82, .7), .7, .45);
+  c = paperAge(c, uv, dp, vec3(.9, .82, .7), .45, .25);
   fragColor = vec4(clamp(c, 0., 1.), 1.);
 }

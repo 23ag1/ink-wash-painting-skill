@@ -6,7 +6,7 @@
 import { slabPeak, farPinnacle } from './peaks.js';
 import { boulder } from './rocks.js';
 import { pine, willow, bareTree } from './trees.js';
-import { palace, path, figure, poem } from './details.js';
+import { palace, path, figure, poem, reeds } from './details.js';
 
 export function paintScene(c, notan) {
   // far pinnacles right, in the sky above the mist
@@ -16,9 +16,9 @@ export function paintScene(c, notan) {
 
   // the host group, back to front: a pale cliff cropped by the left edge, a pale slab behind, the two great slabs
   slabPeak(c, { left: [[-10, 700], [-8, 400], [0, 260], [14, 215]], right: [[72, 700], [70, 470], [62, 330], [40, 228], [20, 212]], shadow: 'right', depth: .62, tone: .25, size: .9, seed: 11, base: [520, 690] }, notan);
-  slabPeak(c, { left: [[40, 660], [44, 420], [52, 260], [62, 180]], right: [[118, 660], [112, 430], [96, 270], [76, 176]], shadow: 'right', depth: .55, tone: .35, size: .8, seed: 12, base: [480, 650] }, notan);
-  slabPeak(c, { left: [[78, 680], [76, 520], [84, 360], [94, 230], [104, 128], [110, 98]], right: [[192, 680], [186, 500], [172, 340], [152, 210], [134, 116], [122, 96]], shadow: 'right', depth: .45, tone: .8, size: 1.2, seed: 13, base: [520, 680] }, notan);
-  slabPeak(c, { left: [[160, 650], [158, 470], [164, 340], [170, 262]], right: [[262, 650], [256, 480], [244, 350], [226, 258], [198, 246]], shadow: 'right', depth: .42, tone: .7, size: 1, seed: 14, base: [480, 640] }, notan);
+  slabPeak(c, { left: [[40, 660], [44, 420], [52, 260], [62, 180]], right: [[118, 660], [112, 430], [96, 270], [76, 176]], shadow: 'right', depth: .55, tone: .25, size: .8, seed: 12, base: [480, 650] }, notan);
+  slabPeak(c, { left: [[78, 680], [76, 520], [84, 360], [94, 230], [104, 128], [110, 98]], right: [[192, 680], [186, 500], [172, 340], [152, 210], [134, 116], [122, 96]], shadow: 'right', depth: .45, tone: .6, size: 1.2, seed: 13, base: [520, 680] }, notan);
+  slabPeak(c, { left: [[160, 650], [158, 470], [164, 340], [170, 262]], right: [[262, 650], [256, 480], [244, 350], [226, 258], [198, 246]], shadow: 'right', depth: .42, tone: .5, size: 1, seed: 14, base: [480, 640] }, notan);
   // pines on the second slab's top
   for (const [x, y, h, lean, s] of [[178, 268, 62, .05, 41], [196, 262, 78, -.04, 42], [216, 266, 58, .1, 43], [114, 104, 34, .08, 44], [60, 190, 30, -.1, 45]]) pine(c, { x, y, h, lean, depth: .42, tone: .75, bare: .3, seed: s }, notan);
 
@@ -31,6 +31,11 @@ export function paintScene(c, notan) {
   for (const [x, y, h, lean, s, d] of grove) pine(c, { x, y, h, lean, depth: d, tone: 1.35 - d, bare: .35, seed: s }, notan);
 
   // near ground: the boulders bottom left, a bare tree on them, the path, the willow, the dancers
+  boulder(c, {    // a big dark mass behind the slab, rising toward the mist — the weight of the lower half
+    outline: [[0, 610], [60, 600], [140, 628], [230, 690], [300, 760], [330, 820], [300, 860], [0, 860]], topN: 3,
+    face: [[0, 660], [80, 652], [170, 690], [250, 740], [320, 800], [330, 820], [300, 860], [0, 860]],
+    clefts: [[80, 655, 70, 800], [170, 694, 160, 840]], strokes: 26, size: 1.1, depth: .14, seed: 69, slope: Math.atan2(160, 230),
+  }, notan);
   boulder(c, {    // a tilted slab: one long straight slope down to the right, a steep chopped face under it
     outline: [[0, 688], [44, 680], [300, 876], [292, 910], [200, 918], [100, 926], [0, 934]], topN: 3,
     face: [[0, 742], [40, 736], [120, 790], [226, 848], [300, 876], [292, 910], [200, 918], [100, 926], [0, 934]],
@@ -41,13 +46,14 @@ export function paintScene(c, notan) {
     face: [[226, 906], [330, 908], [350, 930], [300, 950], [226, 948]],
     clefts: [], strokes: 6, size: .8, depth: .08, seed: 72, slope: .15,
   }, notan);
-  bareTree(c, { x: 66, y: 714, ang: -1.9, len: 70, seed: 81 }, notan);
-  bareTree(c, { x: 130, y: 754, ang: -1.3, len: 58, seed: 82 }, notan);
+  bareTree(c, { x: 70, y: 604, ang: -1.8, len: 80, seed: 81 }, notan);
+  bareTree(c, { x: 150, y: 634, ang: -1.2, len: 70, seed: 82 }, notan);
+  reeds(c, [[350, 960, 40], [420, 948, 30], [300, 975, 24]], notan);
   path(c, [[0, 962], [60, 958], [120, 950], [190, 962], [250, 978], [300, 994], [360, 1012], [420, 1022], [470, 1026], [560, 1018], [640, 1012]], [[0, 1004], [70, 998], [140, 994], [200, 1006], [262, 1022], [310, 1044], [362, 1062], [420, 1072], [480, 1078], [560, 1070], [640, 1064]], notan);
   willow(c, {
-    trunk: [[566, 1060], [552, 980], [528, 900], [514, 820], [508, 770]],
+    trunk: [[572, 1080], [556, 990], [530, 905], [516, 825], [508, 770]],
     boughs: [[[508, 772], [492, 730], [498, 690], [474, 640], [480, 600], [462, 548]], [[512, 782], [540, 744], [536, 700], [566, 660], [580, 612], [606, 574]], [[522, 862], [560, 846], [584, 816], [618, 806], [640, 790]], [[498, 690], [520, 650], [516, 610]]],
-    strands: 16, leaves: [[575, 840, 110], [615, 760, 80], [520, 910, 60], [470, 960, 30]], seed: 91,
+    strands: 20, masses: [[600, 830, 46, 160], [560, 905, 38, 110], [626, 740, 34, 90], [520, 790, 26, 60]], leaves: [[575, 840, 200], [615, 760, 150], [530, 900, 120], [470, 960, 60], [620, 900, 120]], seed: 91,
   }, notan);
   if (!notan) {
     figure(c, 312, 1010, 1.74, { lean: .3, arms: [[10, -16], [-8, 6]], kick: .4 }, 101);

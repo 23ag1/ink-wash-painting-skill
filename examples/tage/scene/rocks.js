@@ -1,14 +1,16 @@
 // Near boulders, Ma Yuan's way: flat top planes left almost as silk, steep front faces chopped with big axe
 // strokes (大斧劈) slanting down, the darkest ink in the picture on the contours and in the clefts.
 import { rng } from '../../../kit/brush/brush.js';
-import { stroke, blob, div, noise } from '../../../kit/brush/ink.js';
+import { stroke, blob, div, noise, quad } from '../../../kit/brush/ink.js';
 import { hairyStroke } from '../../../kit/brush/hairy.js';
 import { poly, glaze, occlude } from './layers.js';
 
 function bigAxe(g, x, y, ang, len, wid, alpha, seed) {
-  hairyStroke(g, div([[x, y], [x + Math.cos(ang) * len, y + Math.sin(ang) * len]], 14), wid, seed, {
+  // an axe chop: the brush laid on its side and dragged in a slight curve, wide at the root, sharp at the tip
+  const bend = ((seed * 7.31) % 1 - .5) * .9, mx = x + Math.cos(ang) * len * .5 - Math.sin(ang) * len * bend * .25, my = y + Math.sin(ang) * len * .5 + Math.cos(ang) * len * bend * .25;
+  hairyStroke(g, quad([x, y], [mx, my], [x + Math.cos(ang + bend * .3) * len, y + Math.sin(ang + bend * .3) * len], 18), wid, seed, {
     rgb: '26,22,18', alpha, bristles: Math.round(wid * 1.3), dryFrom: .15, dryness: .75, streak: len * 1.5,
-    edge: .6, fade: .35, close: 0, profile: t => .9 + .1 * Math.sin(t * Math.PI) - t * .3,
+    edge: .6, fade: .35, close: 0, profile: t => Math.max(.05, (t < .15 ? .8 + t * 1.3 : 1 - Math.pow((t - .15) / .85, 1.3))),
   });
 }
 
@@ -46,7 +48,7 @@ export function boulder(c, sp, notan) {
   c.l.save(); c.l.clip(face);
   for (let i = 0; i < sp.strokes; i++) {
     const x = x0 + r() * (x1 - x0), y = y0 + r() * (y1 - y0) * .85;
-    bigAxe(c.l, x, y, sp.slope + (r() - .5) * .3, (60 + r() * 120) * sp.size, (18 + r() * 26) * sp.size, .3 + r() * .35, sp.seed + i * 11);
+    bigAxe(c.l, x, y, (r() < .6 ? sp.slope : Math.PI / 2 + .2) + (r() - .5) * .5, (35 + r() * 90) * sp.size, (16 + r() * 26) * sp.size, .3 + r() * .35, sp.seed + i * 11);
   }
   c.l.restore();
   // the top plane: a few pale dry strokes along the slope, most of it left light

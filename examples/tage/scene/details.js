@@ -30,7 +30,7 @@ export function path(c, upper, lower, notan) {
   const below = poly([...lower, [640, 1120], [0, 1120]]);
   occlude(c, below, .02);
   if (notan) { glaze(c, below, '60,52,44', .7, 0); return; }
-  glaze(c, below, '150,134,108', .7, .5, 1.5);
+  glaze(c, below, '104,90,70', .85, .5, 1.5);
   glaze(c, band, '226,214,190', .6, .4, 1);
   brokenLine(c.l, r, div(upper, 6), 2.6, .7, '30,26,20', .4);
   brokenLine(c.l, r, div(lower, 6), 3.2, .8, '26,22,18', .4);
@@ -53,6 +53,12 @@ export function path(c, upper, lower, notan) {
   for (const dy of [0, 7]) ruledLine(c.l, r, [[352, 1058 + dy], [412, 1066 + dy]], 2.2, .75, '34,28,22');
   for (const x of [358, 404]) stroke(c.l, [[x, 1066], [x + 1, 1084]], { wid: 2, noi: .3, col: 'rgba(30,26,20,.8)', seed: 710 + x });
 
+  // dark shrubs by the willow's roots and along the right edge
+  for (let i = 0; i < 70; i++) {
+    const x = 470 + r() * 170, y = 985 + r() * 70;
+    blob(c.l, x, y, { len: 8 + r() * 10, wid: 4 + r() * 4, ang: -Math.PI / 2 + (r() - .5) * 1.4, col: `rgba(26,28,18,${.45 + r() * .4})`, noi: .5, seed: 1200 + i });
+  }
+
   // the ground below: clumps of grass and reeds in dark ink, thicker toward the left corner
   for (let i = 0; i < 40; i++) {
     const x = Math.pow(r(), 1.4) * 640, y = 1075 + r() * 45;
@@ -60,6 +66,18 @@ export function path(c, upper, lower, notan) {
       const a = -Math.PI / 2 + (r() - .5) * 1.1, l = 8 + r() * 18;
       stroke(c.l, [[x + b * 2.5, y], [x + b * 2.5 + Math.cos(a) * l * .5, y + Math.sin(a) * l * .5], [x + b * 2.5 + Math.cos(a) * l, y + Math.sin(a) * l]], { wid: 1.6, fun: t => 1 - t, noi: .2, col: `rgba(26,28,18,${.45 + r() * .4})`, seed: 900 + i * 7 + b });
     }
+  }
+}
+
+// reed and bamboo clumps by the water: blades leaning one way, dark near the root, a few broken
+export function reeds(c, clumps, notan) {
+  if (notan) return;
+  const r = rng(31);
+  for (const [x, y, n] of clumps) for (let i = 0; i < n; i++) {
+    const bx = x + (r() - .5) * 60, a = -Math.PI / 2 + .15 + (r() - .5) * .5, l = 30 + r() * 60;
+    const tip = [bx + Math.cos(a) * l, y + Math.sin(a) * l], mid = [bx + Math.cos(a) * l * .5 + 4, y + Math.sin(a) * l * .5];
+    stroke(c.l, quad([bx, y], mid, tip, 10), { wid: 2.2 + r() * 1.5, fun: t => 1 - t * .9, noi: .3, col: `rgba(28,30,20,${.4 + r() * .45})`, seed: 1500 + i + x, dry: .3 });
+    c.d.save(); c.d.strokeStyle = grey(.06); c.d.lineWidth = 4; c.d.beginPath(); c.d.moveTo(bx, y); c.d.lineTo(...tip); c.d.stroke(); c.d.restore();
   }
 }
 
