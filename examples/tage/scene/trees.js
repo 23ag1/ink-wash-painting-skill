@@ -6,20 +6,24 @@ import { stroke, blob, div, quad, walk } from '../../../kit/brush/ink.js';
 import { hairyStroke } from '../../../kit/brush/hairy.js';
 import { glaze, grey, depthLine } from './layers.js';
 
-// one needle cluster (松针): a few overlapping irregular dark dabs, and fine needles fanning from its upper edge
-// and sides — at a distance only the dabs remain
+// a soft dark mass laid with one short wet stroke on the wash layer (the diffusion pass merges neighbours)
+function wetDab(c, x, y, w, h, ang, rgb, alpha, seed) {
+  const ca = Math.cos(ang), sa = Math.sin(ang);
+  const pts = quad([x - ca * w / 2, y - sa * w / 2], [x + sa * h * .25, y - ca * h * .25], [x + ca * w / 2, y + sa * w / 2], 10);
+  const p = { bristles: Math.max(6, Math.round(h * .6)), dryFrom: .5, dryness: .5, streak: w, edge: .3, fade: .3, tipSide: .5, close: 0, profile: t => Math.pow(Math.sin(t * Math.PI), .5) };
+  hairyStroke(c.w, pts, h, seed, { ...p, rgb, alpha });
+  hairyStroke(c.wet, pts, h * 1.2, seed, { ...p, rgb: '255,255,255', alpha: .85 });
+}
+
+// a needle cluster (松针): a soft dark wet mass, needles fanning only from its upper rim
 function pad(c, r, x, y, rad, tone, seed, fine) {
-  const k = 2 + Math.floor(r() * 3);
-  for (let i = 0; i < k; i++) {
-    const bx = x + (r() - .5) * rad * 1.2, by = y + (r() - .5) * rad * .4;
-    blob(c.l, bx, by, { len: rad * (1 + r() * .7), wid: rad * (.35 + r() * .25), ang: (r() - .5) * .5, col: `rgba(30,32,24,${(.25 + .45 * tone) * (fine ? .8 : 1)})`, noi: .7, seed: seed + i * 3 });
-  }
+  for (let i = 0; i < 3; i++) wetDab(c, x + (r() - .5) * rad * .9, y + (r() - .5) * rad * .25, rad * (1.6 + r() * .8), rad * (.55 + r() * .3), (r() - .5) * .25, '60,64,50', (.12 + .2 * tone) * (.7 + r() * .5), seed + i * 5);
   if (!fine) return;
-  const n = Math.round(8 + rad * 1.1);
+  const n = Math.round(5 + rad * .6);
   for (let i = 0; i < n; i++) {
-    const a = Math.PI + .1 + (i / (n - 1)) * (Math.PI - .2) + (r() - .5) * .3;
-    const l = rad * (.55 + r() * .6), ox = x + (r() - .5) * rad * .8, oy = y + rad * .1;
-    stroke(c.l, [[ox, oy], [ox + Math.cos(a) * l, oy + Math.sin(a) * l * .7]], { wid: .8 + .5 * tone, fun: t => 1 - t * .8, noi: .3, col: `rgba(22,24,16,${.4 + .45 * tone})`, seed: seed + 20 + i, dry: .3 });
+    const a = Math.PI + .25 + (i / (n - 1)) * (Math.PI - .5) + (r() - .5) * .3;
+    const l = rad * (.5 + r() * .5), ox = x + (r() - .5) * rad * 1.2, oy = y - rad * .15;
+    stroke(c.l, [[ox, oy], [ox + Math.cos(a) * l, oy + Math.sin(a) * l * .6]], { wid: .8 + .4 * tone, fun: t => 1 - t * .8, noi: .3, col: `rgba(22,24,16,${.3 + .4 * tone})`, seed: seed + 20 + i, dry: .3 });
   }
 }
 
@@ -37,7 +41,8 @@ export function pine(c, sp, notan) {
   const fine = sp.depth < .7;
   const crown = new Path2D(); crown.ellipse(top[0], sp.y - sp.h * .62, sp.h * .5, sp.h * .45, 0, 0, 7);
   c.d.save(); c.d.fillStyle = grey(sp.depth); c.d.fill(crown); c.d.restore();
-  stroke(c.l, trunk, { wid: sp.h * .045, fun: t => 1 - t * .7, noi: .5, col: `rgba(28,24,20,${.5 + .4 * sp.tone})`, seed: sp.seed, tip: .6, dry: .35 });
+  hairyStroke(c.l, trunk, sp.h * .05, sp.seed, { rgb: '28,24,20', alpha: .35 + .35 * sp.tone, bristles: 8, dryFrom: .2, dryness: .7, streak: sp.h * .4, edge: .8, fade: .3, tipSide: .5, close: 0, profile: t => 1 - t * .7 });
+  if (false) stroke(c.l, trunk, { wid: sp.h * .045, fun: t => 1 - t * .7, noi: .5, col: `rgba(28,24,20,${.5 + .4 * sp.tone})`, seed: sp.seed, tip: .6, dry: .35 });
   // branches from the upper trunk, alternating sides, nearly horizontal, pads at the ends and along
   const nb = 7 + Math.floor(r() * 5);
   for (let i = 0; i < nb; i++) {
@@ -46,10 +51,10 @@ export function pine(c, sp, notan) {
     const side = i % 2 ? 1 : -1, len = sp.h * (.18 + .3 * (1 - t) + r() * .1);
     const end = [bx + side * len, by + len * (.1 + r() * .3)];
     stroke(c.l, quad([bx, by], [bx + side * len * .5, by - len * .12], end, 8), { wid: sp.h * .016, fun: t => 1 - t * .6, noi: .5, col: `rgba(30,26,22,${.45 + .4 * sp.tone})`, seed: sp.seed + 10 + i, dry: .4 });
-    pad(c, r, end[0], end[1] - 2, sp.h * (.13 + r() * .07), sp.tone, sp.seed + 40 + i * 9, fine);
-    pad(c, r, bx + side * len * (.35 + r() * .3), by - len * .05 - 3, sp.h * (.1 + r() * .05), sp.tone, sp.seed + 80 + i * 9, fine);
+    // the crown along the branch: overlapping masses from its middle to beyond its tip, so masses join
+    for (let k = 0; k < 3; k++) pad(c, r, bx + side * len * (.4 + k * .3 + r() * .1), by + len * (.05 + k * .08) - 4, sp.h * (.1 + r() * .06), sp.tone, sp.seed + 40 + i * 9 + k * 3, fine);
   }
-  pad(c, r, top[0], top[1] + sp.h * .04, sp.h * .1, sp.tone, sp.seed + 99, fine);
+  pad(c, r, top[0], top[1] + sp.h * .06, sp.h * .12, sp.tone, sp.seed + 99, fine);
 }
 
 // spec: { base, path: trunk points base → crotch, boughs: [[points]], strands: n, seed }
@@ -65,11 +70,15 @@ export function willow(c, sp, notan) {
     const p = trunk[Math.floor(r() * trunk.length)];
     blob(c.l, p[0] + (r() - .5) * 14, p[1], { len: 10 + r() * 8, wid: 6 + r() * 4, ang: r() * 3, col: 'rgba(14,11,8,.85)', noi: .6, seed: sp.seed + 20 + i });
   }
+  // the broken top of the old trunk: a short thick stump with a torn end
+  const [tx, ty] = trunk[trunk.length - 1];
+  hairyStroke(c.l, [[tx, ty], [tx - 3, ty - 18], [tx + 2, ty - 34]], 26, sp.seed + 7, { rgb: '18,14,10', alpha: .8, bristles: 20, dryFrom: .3, dryness: 1, streak: 30, edge: 1, fade: .2, tipSide: .4, close: 0, profile: t => 1 - t * .3 });
+  for (let i = 0; i < 4; i++) stroke(c.l, [[tx - 8 + i * 5, ty - 32], [tx - 9 + i * 5 + (r() - .5) * 6, ty - 40 - r() * 8]], { wid: 3, fun: t => 1 - t, noi: .4, col: 'rgba(16,12,8,.8)', seed: sp.seed + 60 + i });
   // boughs reaching up, thinning; strands hanging from them
   sp.boughs.forEach((b, bi) => {
     const pts = smooth(b, 6);
     depthLine(c, pts, 5, .08);
-    hairyStroke(c.l, pts, 13 - bi * 2, sp.seed + 50 + bi, { rgb: '20,16,12', alpha: .75, bristles: 12, dryFrom: .3, dryness: .7, streak: 50, edge: .8, fade: .4, tipSide: 0, close: 0, profile: t => 1 - t * .85 });
+    hairyStroke(c.l, pts, 19 - bi * 3, sp.seed + 50 + bi, { rgb: '20,16,12', alpha: .75, bristles: 12, dryFrom: .3, dryness: .7, streak: 50, edge: .8, fade: .4, tipSide: 0, close: 0, profile: t => 1 - t * .85 });
     if (false) stroke(c.l, pts, { wid: 9, fun: t => 1 - t * .85, noi: .55, col: 'rgba(22,18,14,.85)', seed: sp.seed + 50 + bi, tip: .6, dry: .5 });
     for (let k = 0; k < sp.strands; k++) {
       const [x, y] = pts[Math.floor((.25 + r() * .75) * (pts.length - 1))];
@@ -111,13 +120,19 @@ export function bareTree(c, sp, notan) {
   if (notan) return;
   const r = rng(sp.seed);
   const grow = (x, y, ang, len, w, depth) => {
-    const pts = walk(r, x, y, ang, len, 5, .35);
-    depthLine(c, pts, 2.5, .1);
-    stroke(c.l, pts, { wid: w, fun: t => 1 - t * .6, noi: .5, col: 'rgba(24,20,16,.8)', seed: sp.seed + depth * 7 + x, dry: .5 });
-    if (depth < 3) for (let i = 0; i < 2 + (depth < 1 ? 1 : 0); i++) {
-      const p = pts[2 + Math.floor(r() * 3)];
-      grow(p[0], p[1], ang + (r() - .5) * 1.4, len * (.5 + r() * .25), w * .55, depth + 1);
+    const pts = walk(r, x, y, ang, len, 4, .55);                   // angular: few long segments, sharp turns
+    depthLine(c, pts, w, .1);
+    if (depth === 0) hairyStroke(c.l, div(pts, 4), w, sp.seed + 3, { rgb: '24,20,16', alpha: .7, bristles: 8, dryFrom: .2, dryness: .8, streak: len * .5, edge: .8, fade: .3, tipSide: .6, close: 0, profile: t => 1 - t * .6 });
+    else stroke(c.l, pts, { wid: w, fun: t => 1 - t * .7, noi: .5, col: 'rgba(24,20,16,.82)', seed: sp.seed + depth * 7 + x, tip: .5, dry: .5 });
+    if (depth >= 3) {                                              // 蟹爪 crab-claw tip: a short hooked twig
+      const [ex, ey] = pts[pts.length - 1], a = ang + (r() < .5 ? .9 : -.9);
+      stroke(c.l, quad([ex, ey], [ex + Math.cos(ang) * 4, ey + Math.sin(ang) * 4], [ex + Math.cos(a) * 6, ey + Math.sin(a) * 6], 5), { wid: w * .8, fun: t => 1 - t, noi: .3, col: 'rgba(24,20,16,.75)', seed: sp.seed + x });
+      return;
+    }
+    for (let i = 0; i < 2 + (depth < 1 ? 1 : 0); i++) {
+      const p = pts[1 + Math.floor(r() * 3)];
+      grow(p[0], p[1], ang + (r() < .5 ? 1 : -1) * (.4 + r() * .6), len * (.45 + r() * .25), w * .55, depth + 1);
     }
   };
-  grow(sp.x, sp.y, sp.ang, sp.len, 5, 0);
+  grow(sp.x, sp.y, sp.ang, sp.len, 9, 0);
 }

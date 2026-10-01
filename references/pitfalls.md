@@ -164,6 +164,12 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   neighbours; the contour stroke bridged them. *Rule:* after filtering a polyline, split it where consecutive
   points are not adjacent.
 
+- **Hats that look at you** — a brim stroke over a dark head dot reads as an eyebrow over an eye; a row of dancers
+  became a row of eyes. *Fix:* a hat is one solid low cone hiding the head. The same goes for any "line over a
+  dot" motif: check it for the eye reading.
+- **Pine crowns as umbrellas** — separate ink discs on sticks. *Fix:* crowns as soft dark masses from short wet
+  strokes on the wash layer that merge, needles only on the upper rim, masses overlapping along each branch.
+
 ## 8. Process lessons
 - **Research the canon before inventing.** Composition (Guo Xi, Xie He) and technique (MoXi, Curtis, Bousseau,
   Lingdong Huang's shan-shui-inf) answered questions that trial-and-error kept getting wrong.

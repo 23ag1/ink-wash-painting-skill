@@ -37,15 +37,16 @@ export function ground(c, upper, lower, notan) {
   const gr = g.createLinearGradient(0, 870, 0, 1120);
   gr.addColorStop(0, 'rgba(150,134,108,0)'); gr.addColorStop(.18, 'rgba(140,124,98,.55)'); gr.addColorStop(1, 'rgba(96,82,62,.9)');
   g.fillStyle = gr; g.fillRect(0, 860, 640, 260);
-  g.filter = `blur(${7 * c.S}px)`;
-  for (let i = 0; i < 46; i++) {                     // uneven ground: soft patches, darker and lighter
-    const x = r() * 640, y = 900 + r() * 220, p = new Path2D();
-    p.ellipse(x, y, 30 + r() * 70, 8 + r() * 16, (r() - .5) * .3, 0, 7);
-    const dark = r() < .65;
-    g.globalCompositeOperation = dark ? 'multiply' : 'source-over';
-    g.fillStyle = dark ? `rgba(90,78,58,${.15 + r() * .25})` : `rgba(255,250,236,${.1 + r() * .15})`;
-    g.fill(p);
+  g.restore();
+  // uneven ground: broad wet strokes lying along the land, darker and lighter, merged by the diffusion
+  for (let i = 0; i < 70; i++) {
+    const x = r() * 680 - 20, y = 900 + Math.pow(r(), .8) * 220, len = 60 + r() * 120, w = 14 + r() * 30, a = (r() - .5) * .25;
+    const pts = quad([x, y], [x + len * .5, y + (r() - .5) * 8], [x + len * Math.cos(a), y + len * Math.sin(a)], 10);
+    const p = { bristles: Math.round(w * .5), dryFrom: .4, dryness: .7, streak: len, edge: .3, fade: .4, tipSide: .4, close: 0, profile: t => Math.pow(Math.sin(t * Math.PI), .4) };
+    hairyStroke(c.w, pts, w, 4000 + i, { ...p, rgb: '96,82,60', alpha: (.04 + .08 * (y - 900) / 220) * (.6 + r() * .8) });
+    hairyStroke(c.wet, pts, w * 1.2, 4000 + i, { ...p, rgb: '255,255,255', alpha: .8 });
   }
+  g.save();
   g.restore();
   c.wet.save(); c.wet.globalCompositeOperation = 'lighten'; c.wet.fillStyle = 'rgb(120,120,120)'; c.wet.fill(field); c.wet.restore();
 
@@ -104,31 +105,37 @@ export function reeds(c, clumps, notan) {
   }
 }
 
-// a peasant dancing, as Ma Yuan draws them: a light robe flaring at the hem, outlined in a few brush strokes
-// of varying weight; a broad straw hat; sleeves swinging; one leg kicking; some lean on a staff
+// a peasant dancing, as Ma Yuan draws them: a robe that swings like a bell with the step, wide sleeves flung out,
+// a broad straw hat, the body leaning into the dance; a light robe outlined in a few broken brush lines
 export function figure(c, x, y, s, pose, seed) {
   const r = rng(seed);
   const ink = a => `rgba(30,24,18,${a})`;
-  const lean = pose.lean * 7 * s, neck = [x + lean, y - 25 * s];
-  const hemL = [x - 7 * s, y - 5 * s], hemR = [x + 8 * s, y - 6 * s];
-  const robe = poly([[neck[0] - 3.5 * s, neck[1] + 1], [neck[0] + 3.5 * s, neck[1] + 1], hemR, [x + 2 * s, y - 3 * s], hemL]);
-  c.w.save(); c.w.fillStyle = 'rgba(248,242,226,.95)'; c.w.fill(robe); c.w.restore();
+  const L = pose.lean, sw = pose.kick * 4 * s;                          // lean of the body, swing of the hem
+  const neck = [x + L * 9 * s, y - 27 * s];
+  const hem = [[x - 9 * s + sw, y - 4 * s], [x - 2 * s + sw * .5, y - 1 * s], [x + 6 * s + sw, y - 3 * s], [x + 11 * s + sw * 1.4, y - 6 * s]];
+  const left = quad([neck[0] - 3 * s, neck[1] + 2 * s], [x - 5 * s, y - 16 * s], hem[0], 6), right = quad([neck[0] + 3 * s, neck[1] + 2 * s], [x + 5 * s, y - 15 * s], hem[3], 6);
+  const robe = poly([...left, ...hem.slice(1, 3), ...right.slice().reverse()]);
+  c.w.save(); c.w.fillStyle = 'rgba(236,228,208,.92)'; c.w.fill(robe); c.w.restore();
   c.d.save(); c.d.fillStyle = grey(.05); c.d.fill(robe); c.d.restore();
-  const outline = (pts, w, a, sd) => stroke(c.l, div(pts, 4), { wid: w * s, fun: t => .45 + .55 * Math.sin(t * Math.PI), noi: .4, col: ink(a), seed: seed + sd, tip: .5, dry: .4 });
-  outline([[neck[0] - 3.5 * s, neck[1] + 1], [x - 4 * s, y - 15 * s], hemL], 1.6, .85, 1);
-  outline([[neck[0] + 3.5 * s, neck[1] + 1], [x + 5 * s, y - 15 * s], hemR], 1.4, .75, 2);
-  outline([hemL, [x + 1 * s, y - 3 * s], hemR], 1.1, .6, 3);
-  stroke(c.l, [[neck[0] - 3 * s, neck[1] + 9 * s], [neck[0] + 4 * s, neck[1] + 8 * s]], { wid: 1.6 * s, noi: .3, col: ink(.8), seed: seed + 4 });   // sash
-  blob(c.l, neck[0], neck[1] - 3.5 * s, { len: 4.5 * s, wid: 4 * s, ang: 1.5, col: ink(.9), noi: .3, seed });                                 // head
-  stroke(c.l, quad([neck[0] - 8 * s, neck[1] - 4 * s], [neck[0], neck[1] - 10 * s], [neck[0] + 8 * s, neck[1] - 5 * s], 8),
-    { wid: 2.2 * s, fun: t => .5 + .5 * Math.sin(t * Math.PI), noi: .3, col: ink(.85), seed: seed + 5 });                                       // straw hat
+  const line = (pts, w, a, sd) => stroke(c.l, pts, { wid: w * s, fun: t => .35 + .65 * Math.sin(t * Math.PI), noi: .5, col: ink(a), seed: seed + sd, tip: .6, dry: .45 });
+  line(left, 1.5, .85, 1); line(right.slice(0, 5), 1.3, .75, 2);
+  line(hem.slice(0, 3), 1, .55, 3);
+  // sleeves: wide light flaps thrown out, an outline on their lower side
   for (const [ax, ay] of pose.arms) {
-    const sh = [neck[0] + Math.sign(ax) * 3 * s, neck[1] + 4 * s], el = [sh[0] + ax * .55 * s, sh[1] + ay * .3 * s + 3 * s];
-    stroke(c.l, quad(sh, el, [sh[0] + ax * s, sh[1] + ay * s], 8), { wid: 2.4 * s, fun: t => 1 - t * .6, noi: .4, col: ink(.7), seed: seed + 6 + ax, dry: .4 });   // swinging sleeve
+    const sh = [neck[0] + Math.sign(ax) * 3 * s, neck[1] + 5 * s], hand = [sh[0] + ax * s, sh[1] + ay * s];
+    const flap = poly([sh, [sh[0] + ax * .5 * s, sh[1] + ay * .5 * s - 3 * s], hand, [hand[0] - Math.sign(ax) * 2 * s, hand[1] + 5 * s], [sh[0] + ax * .3 * s, sh[1] + 7 * s]]);
+    c.w.save(); c.w.fillStyle = 'rgba(236,228,208,.92)'; c.w.fill(flap); c.w.restore();
+    line([[sh[0], sh[1] + 2 * s], [sh[0] + ax * .4 * s, sh[1] + ay * .4 * s + 5 * s], [hand[0] - Math.sign(ax) * 2 * s, hand[1] + 5 * s]], 1.2, .75, 6 + ax);
+    line([sh, [sh[0] + ax * .5 * s, sh[1] + ay * .5 * s - 3 * s], hand], 1, .6, 9 + ax);
   }
-  stroke(c.l, [[x - 2 * s, y - 4 * s], [x - 3 * s + pose.kick * 2 * s, y + 2 * s]], { wid: 1.5 * s, noi: .3, col: ink(.8), seed: seed + 8 });
-  stroke(c.l, [[x + 3 * s, y - 4 * s], [x + 6 * s + pose.kick * 7 * s, y - 1 * s - pose.kick * 4 * s]], { wid: 1.5 * s, noi: .3, col: ink(.8), seed: seed + 9 });
-  if (pose.staff) stroke(c.l, [[x + 11 * s, y - 30 * s], [x + 15 * s, y + 2 * s]], { wid: 1.3 * s, noi: .2, col: ink(.75), seed: seed + 10 });
+  stroke(c.l, [[neck[0] - 3 * s, neck[1] + 10 * s], [neck[0] + 4 * s, neck[1] + 9 * s]], { wid: 1.4 * s, noi: .3, col: ink(.7), seed: seed + 4 });   // sash
+  // the straw hat: one solid low cone that hides the head (a brim line over a dot reads as an eye — never that)
+  const hat = poly([[neck[0] - 9 * s, neck[1] - 2 * s + L * 2 * s], [neck[0] - 1 * s, neck[1] - 9 * s], [neck[0] + 1.5 * s, neck[1] - 9.5 * s], [neck[0] + 9 * s, neck[1] - 3 * s - L * 2 * s], [neck[0], neck[1] - 1 * s]]);
+  c.l.save(); c.l.fillStyle = ink(.78); c.l.fill(hat); c.l.restore();
+  stroke(c.l, [[neck[0] - 9 * s, neck[1] - 2 * s + L * 2 * s], [neck[0] + 9 * s, neck[1] - 3 * s - L * 2 * s]], { wid: 1.4 * s, noi: .3, col: ink(.9), seed: seed + 5 });
+  stroke(c.l, [[x - 1 * s + sw * .4, y - 2 * s], [x - 3 * s + sw * .2, y + 3 * s]], { wid: 1.4 * s, noi: .3, col: ink(.75), seed: seed + 8 });   // feet under the hem
+  stroke(c.l, [[x + 5 * s + sw, y - 3 * s], [x + 9 * s + pose.kick * 6 * s, y - 1 * s - pose.kick * 5 * s]], { wid: 1.4 * s, noi: .3, col: ink(.75), seed: seed + 9 });
+  if (pose.staff) stroke(c.l, [[x + 12 * s, y - 32 * s], [x + 16 * s, y + 3 * s]], { wid: 1.3 * s, noi: .2, col: ink(.7), seed: seed + 10 });
 }
 
 // the poem: four columns read right to left, then the seal near the peak tops

@@ -88,9 +88,9 @@ export function paintScene(c, notan) {
   }, notan);
   if (!notan) {
     figure(c, 300, 1006, 1.6, { lean: .3, arms: [[12, -14], [-9, 4]], kick: .4 }, 101);
-    figure(c, 344, 1020, 1.55, { lean: -.25, arms: [[-12, -12], [8, 2]], kick: 1 }, 102);
-    figure(c, 394, 1030, 1.6, { lean: .15, arms: [[11, -8], [-10, -6]], kick: .2 }, 103);
-    figure(c, 440, 1034, 1.5, { lean: .4, arms: [[-6, 6]], kick: .1, staff: true }, 104);
+    figure(c, 352, 1024, 1.55, { lean: -.25, arms: [[-12, -12], [8, 2]], kick: 1 }, 102);
+    figure(c, 408, 1036, 1.6, { lean: .15, arms: [[11, -8], [-10, -6]], kick: .2 }, 103);
+    figure(c, 462, 1040, 1.5, { lean: .4, arms: [[-6, 6]], kick: .1, staff: true }, 104);
     figure(c, 46, 978, 1.4, { lean: .5, arms: [[-6, 6]], kick: .2, staff: true }, 105);
     poem(c, [
       { text: '宿雨清畿甸', x: 604, y: 46 }, { text: '朝阳丽帝城', x: 566, y: 46 },
