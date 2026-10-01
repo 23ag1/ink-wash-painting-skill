@@ -85,11 +85,10 @@ export function paintScene(c, notan) {
   pollardWillow(c, {
     // after Ma Yuan: the trunk leans in from the right edge with a crook, forks at a knot into two stems that
     // leave the frame upward, and one long branch arches out over the path
-    trunk: [[672, 968], [644, 930], [614, 884], [592, 834], [574, 792], [558, 752]], trunkW: [48, 30],
-    knot: [556, 754, 20],
+    trunk: [[672, 968], [644, 930], [614, 884], [592, 834], [574, 792], [564, 772]], trunkW: [48, 28],
     stems: [
-      { axis: [[548, 750], [543, 700], [546, 640], [540, 570], [535, 480], [532, 400]], w: [17, 3] },
-      { axis: [[566, 748], [575, 700], [580, 650], [589, 590], [596, 530]], w: [13, 2.5] },
+      { axis: [[568, 800], [554, 750], [545, 700], [546, 640], [540, 570], [535, 480], [532, 400]], w: [18, 3] },
+      { axis: [[572, 800], [567, 750], [574, 700], [580, 650], [589, 590], [596, 530]], w: [18, 2.5] },
     ],
     branches: [[544, 758, Math.PI + .38, 250, 5.5], [550, 772, Math.PI + .12, 150, 3.6]],
     seed: 91,

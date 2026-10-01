@@ -208,3 +208,6 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   side-brush stroke on the shadow edge), never a flat fill with dashes on top (= birch/bamboo/plastic tube).
   Joints: draw the trunk into the knot, stems over it; no pale ring or outlined scrape at a joint (= pipe, eye).
   A bare fork ending in two points reads as a slingshot — end stems in thin shoots.
+- **Forks:** a limb growing out of another must not occlude (paint paper under itself) and must paint only
+  *outside* its parent (clip with the parent path, even-odd). Otherwise its end cap lies across the parent as a
+  seam or step, and any "knot" dab blurred over the join reads as a smudge. The join is the parent's own edge.

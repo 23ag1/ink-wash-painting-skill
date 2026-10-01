@@ -136,7 +136,7 @@ export function bareTree(c, sp, notan) {
   grow(sp.x, sp.y, sp.ang, sp.len, 5.5, 0);
 }
 
-// Ma Yuan's willow (踏歌图): a long trunk leaning in from the edge with a crook, a knot where it forks into two
+// Ma Yuan's willow (踏歌图): a long trunk leaning in from the edge with a crook, a fork into two
 // stems that leave the frame upward, and one long branch arching out over the path, hung with fine strands.
 // Each limb is a tapered band: mid-dark wash, darker shadow side, dry bark grain, broken contours, a few pale
 // scrapes (small and unoutlined — an outlined oval reads as an eye).
@@ -150,10 +150,16 @@ function band(axis, widths) {
   return { L, R, path: poly([...L, ...R.slice().reverse()]) };
 }
 
-function limb(c, axis, widths, r, seed, shadow) {
+function limb(c, axis, widths, r, seed, shadow, parent = null) {
+  const grows = !!parent;
   const sm = smooth(axis, 4), wsm = sm.map((_, i) => widths[0] + (widths[widths.length - 1] - widths[0]) * i / (sm.length - 1));
   const b = band(sm, wsm);
-  occlude(c, b.path, .08);
+  // a limb growing out of another paints no paper under itself and nothing inside its parent: inside, the
+  // parent's own brushwork shows, so the join is the parent's edge, never the child's end cap lying across it
+  if (grows) {
+    c.d.save(); c.d.fillStyle = grey(.08); c.d.fill(b.path); c.d.restore();
+    for (const g of [c.w, c.wet, c.l]) { const P = new Path2D(); P.rect(-1e4, -1e4, 2e4, 2e4); P.addPath(parent); g.save(); g.clip(P, 'evenodd'); }
+  } else occlude(c, b.path, .08);
   // the body is brushed, not filled: a pale base, then long wet strokes laid along the limb side by side,
   // darker toward the shadow side, and one long dry side-brush stroke down the shadow edge
   glaze(c, b.path, '170,152,128', .5, .6);
@@ -184,6 +190,7 @@ function limb(c, axis, widths, r, seed, shadow) {
       stroke(c.l, edge.slice(i, i + 4 + Math.floor(r() * 5)), { wid: w * (.6 + r() * .7), fun: t => Math.sin(Math.max(.1, t) * Math.PI), noi: .6, col: 'rgba(14,10,8,.85)', seed: seed + 400 + i, tip: .7, dry: .5 });
     }
   }
+  if (grows) for (const g of [c.w, c.wet, c.l]) g.restore();
   return { sm, wsm, b };
 }
 
@@ -195,22 +202,15 @@ export function pollardWillow(c, sp, notan) {
   }
   const T = limb(c, sp.trunk, sp.trunkW, r, sp.seed, 1);
   for (const st of sp.stems) {
-    limb(c, st.axis, st.w, r, sp.seed + 900 + st.axis[0][0], 1);
+    limb(c, st.axis, st.w, r, sp.seed + 900 + st.axis[0][0], 1, T.b.path);
     // the stem does not stop blunt: it runs on as a thin shoot that thins to nothing
     const n = st.axis.length, [ax, ay] = st.axis[n - 2], [bx, by] = st.axis[n - 1];
     const tip = walk(rng(sp.seed + bx), bx, by, Math.atan2(by - ay, bx - ax), 70, 4, .12);
     depthLine(c, tip, 3, .08);
     stroke(c.l, tip, { wid: st.w[1] * 1.1, fun: t => 1 - t * .95, noi: .4, col: 'rgba(22,18,14,.85)', seed: sp.seed + bx, tip: .3, dry: .4 });
   }
-  // the knot where trunk, stems and branch meet: a darker swelling, pocked (no pale rings or scrapes: they read as a pipe joint or an eye)
-  const [kx, ky, kr] = sp.knot;
-  const rad = Array.from({ length: 7 }, () => kr * (.8 + r() * .4));
-  const kpts = smooth(Array.from({ length: 9 }, (_, i) => { const a = i / 7 * 6.283; return [kx + Math.cos(a) * rad[i % 7] * 1.15, ky + Math.sin(a) * rad[i % 7]]; }), 5);
-  const knot = poly(kpts);
-  c.d.save(); c.d.fillStyle = grey(.08); c.d.fill(knot); c.d.restore();
-  glaze(c, knot, '60,50,40', .6, .7, 3);
-  for (let i = 0; i < 4; i++) wetDab(c, kx + (r() - .2) * kr * .8, ky + (r() - .5) * kr * .9, kr * (.9 + r() * .6), kr * (.5 + r() * .4), r() * 3, '40,33,26', .45 + r() * .25, sp.seed + 660 + i);
-  for (let i = 0; i < 14; i++) blob(c.l, kx + (r() - .5) * kr * 1.6, ky + (r() - .5) * kr * 1.4, { len: 3 + r() * 6, wid: 2 + r() * 3, ang: r() * 3, noi: .9, col: `rgba(14,10,8,${.55 + r() * .35})`, seed: sp.seed + 600 + i });
+  // the fork itself is the stems overlapping as they leave the trunk; no extra crotch marks (in the gap between
+  // the stems they float as specks, and any fill there reads as a smudge or a pipe collar)
   // long branches arch out and droop, hung with many fine strands falling almost straight down
   const grow = (x, y, ang, len, w, depth, seed) => {
     const rr = rng(seed), pts = [[x, y]], dir = Math.sign(Math.cos(ang)) || 1;
