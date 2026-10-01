@@ -20,7 +20,7 @@ function axe(g, x, y, ang, len, wid, ink, seed) {
   const pts = div([[x, y], [x + Math.cos(ang) * len, y + Math.sin(ang) * len]], 16);
   hairyStroke(g, pts, wid, seed, {
     rgb: ink.rgb, alpha: ink.alpha, bristles: Math.max(8, Math.round(wid * 1.4)), dryFrom: .1, dryness: .85,
-    streak: len * .9, edge: .8, fade: .5, close: 0, profile: t => (t < .12 ? .7 + t * 2.5 : 1 - (t - .12) * .75),
+    streak: len * .9, edge: .8, fade: .5, tipSide: 0, close: 0, profile: t => (t < .12 ? .7 + t * 2.5 : 1 - (t - .12) * .75),
   });
 }
 

@@ -59,8 +59,8 @@ export function willow(c, sp, notan) {
   c.d.save(); c.d.strokeStyle = grey(.08); c.d.lineWidth = 52; c.d.beginPath(); trunk.forEach((p, i) => (i ? c.d.lineTo(...p) : c.d.moveTo(...p))); c.d.stroke(); c.d.restore();
   if (notan) { c.w.save(); c.w.globalCompositeOperation = 'multiply'; c.w.strokeStyle = 'rgb(60,52,44)'; c.w.lineWidth = 22; c.w.beginPath(); trunk.forEach((p, i) => (i ? c.w.lineTo(...p) : c.w.moveTo(...p))); c.w.stroke(); c.w.restore(); return; }
   // the trunk in dry brush, gnarled: two passes, the second narrower and offset
-  hairyStroke(c.l, trunk, 46, sp.seed, { rgb: '20,16,12', alpha: .82, bristles: 46, dryFrom: .2, dryness: .9, streak: 60, edge: 1, fade: .3, close: .3, profile: t => 1.15 - t * .45 + .12 * Math.sin(t * 19) });
-  hairyStroke(c.l, trunk.map(([x, y]) => [x + 10, y]), 22, sp.seed + 1, { rgb: '12,10,8', alpha: .8, bristles: 14, dryFrom: .1, dryness: .8, streak: 40, edge: .5, fade: .2, close: 0, profile: t => 1 - t * .5 });
+  hairyStroke(c.l, trunk, 46, sp.seed, { rgb: '20,16,12', alpha: .82, bristles: 46, dryFrom: .2, dryness: .9, streak: 60, edge: 1, fade: .3, tipSide: 0, close: .3, profile: t => 1.15 - t * .45 + .12 * Math.sin(t * 19) });
+  hairyStroke(c.l, trunk.map(([x, y]) => [x + 10, y]), 22, sp.seed + 1, { rgb: '12,10,8', alpha: .8, bristles: 14, dryFrom: .1, dryness: .8, streak: 40, edge: .5, fade: .2, tipSide: 0, close: 0, profile: t => 1 - t * .5 });
   for (let i = 0; i < 6; i++) {                                           // knots
     const p = trunk[Math.floor(r() * trunk.length)];
     blob(c.l, p[0] + (r() - .5) * 14, p[1], { len: 10 + r() * 8, wid: 6 + r() * 4, ang: r() * 3, col: 'rgba(14,11,8,.85)', noi: .6, seed: sp.seed + 20 + i });
@@ -69,7 +69,7 @@ export function willow(c, sp, notan) {
   sp.boughs.forEach((b, bi) => {
     const pts = smooth(b, 6);
     depthLine(c, pts, 5, .08);
-    hairyStroke(c.l, pts, 13 - bi * 2, sp.seed + 50 + bi, { rgb: '20,16,12', alpha: .75, bristles: 12, dryFrom: .3, dryness: .7, streak: 50, edge: .8, fade: .4, close: 0, profile: t => 1 - t * .85 });
+    hairyStroke(c.l, pts, 13 - bi * 2, sp.seed + 50 + bi, { rgb: '20,16,12', alpha: .75, bristles: 12, dryFrom: .3, dryness: .7, streak: 50, edge: .8, fade: .4, tipSide: 0, close: 0, profile: t => 1 - t * .85 });
     if (false) stroke(c.l, pts, { wid: 9, fun: t => 1 - t * .85, noi: .55, col: 'rgba(22,18,14,.85)', seed: sp.seed + 50 + bi, tip: .6, dry: .5 });
     for (let k = 0; k < sp.strands; k++) {
       const [x, y] = pts[Math.floor((.25 + r() * .75) * (pts.length - 1))];

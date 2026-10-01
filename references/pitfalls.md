@@ -154,6 +154,16 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   thumbnail size and the user's own viewport; never place a new element over the focal figures; depth marks
   exactly as wide as the mark.
 
+- **Rock planes, three more false words in the study** — random short chops = fish scales; tapered chops
+  hanging from a straight break = icicles / a thatched roof. *Fix:* build the tone of a plane from broad WET
+  strokes on the wash layer (the diffusion softens them; no canvas blur), starting at different heights and
+  running down the plane's fall; add only some dry side-brush chops (kit hairy brush, `tipSide` ±1) for grain;
+  mark the plane break with short broken touches, never a ruled lid line. A side-held brush has a dark crisp tip
+  edge and a dry heel — `hairyStroke` now models that with `tipSide`.
+- **A stroke through the whole rock** — filtering a closed outline (keep the upper points) made far-apart points
+  neighbours; the contour stroke bridged them. *Rule:* after filtering a polyline, split it where consecutive
+  points are not adjacent.
+
 ## 8. Process lessons
 - **Research the canon before inventing.** Composition (Guo Xi, Xie He) and technique (MoXi, Curtis, Bousseau,
   Lingdong Huang's shan-shui-inf) answered questions that trial-and-error kept getting wrong.

@@ -3,7 +3,7 @@
 // ?mode=notan renders only the masses as flat tones (the composition gate); ?s=2 renders sharper for zoom checks.
 import { createRuntime } from '../../kit/runtime.js';
 import { makeLayers, DW, DH } from './scene/layers.js';
-import { paintScene } from './scene/painting.js';
+import { paintScene, paintStudy } from './scene/painting.js';
 
 async function start() {
   const q = new URLSearchParams(location.search);
@@ -14,7 +14,7 @@ async function start() {
   canvas.width = Math.round(DW * S); canvas.height = Math.round(DH * S);
   await document.fonts.load('25px "Ma Shan Zheng"', '宿雨清畿甸朝阳丽帝城丰年人乐业垅上踏歌行马远').catch(() => []);
   const c = makeLayers(S);
-  paintScene(c, notan);
+  if (q.get('study') === 'rock') paintStudy(c); else paintScene(c, notan);
 
   const rt = await createRuntime(canvas, { preserveDrawingBuffer: true });
   if (!rt.float) throw new Error('EXT_color_buffer_float is not available');

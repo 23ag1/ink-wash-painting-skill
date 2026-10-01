@@ -4,12 +4,25 @@
 // left; guests: the pine grove and the far pinnacles right; void: the mist band and the sky upper right, ≈45%.
 // Darkest: the near boulders and the willow; palest: far pinnacles and mist. Only colour: the seal.
 import { slabPeak, farPinnacle } from './peaks.js';
-import { boulder, massRock } from './rocks.js';
+import { boulder, massRock, facetRock } from './rocks.js';
 import { pine, willow, bareTree } from './trees.js';
 import { palace, ground, figure, poem, reeds } from './details.js';
 import { poly, glaze, occlude, dissolve } from './layers.js';
 import { rng } from '../../../kit/brush/brush.js';
 import { blob } from '../../../kit/brush/ink.js';
+
+// study mode: one rock, large and alone, to compare with the master's at the same size
+export const STUDY_ROCK = {
+  outline: [[70, 540], [190, 452], [330, 440], [446, 482], [526, 574], [546, 712], [508, 830], [300, 866], [96, 856], [56, 712], [70, 540]],
+  faces: [
+    { poly: [[70, 540], [190, 452], [330, 440], [446, 482], [400, 528], [262, 552], [140, 584]], tone: .08, dir: .25, chop: [60, 16] },
+    { poly: [[70, 540], [140, 584], [262, 552], [306, 706], [292, 866], [96, 856], [56, 712]], tone: .9, dir: 1.3, chop: [70, 34] },
+    { poly: [[262, 552], [400, 528], [446, 482], [526, 574], [546, 712], [508, 830], [292, 866], [306, 706]], tone: .55, dir: 1.05, chop: [64, 30] },
+  ],
+  breaks: [[[140, 584], [262, 552], [400, 528], [446, 482]], [[262, 552], [290, 640], [306, 706], [298, 800]]],
+  depth: .1, seed: 77, base: 866,
+};
+export function paintStudy(c) { facetRock(c, STUDY_ROCK, false); }
 
 export function paintScene(c, notan) {
   // far pinnacles right, in the sky above the mist
@@ -49,10 +62,22 @@ export function paintScene(c, notan) {
   // near ground: the boulders bottom left, a bare tree on them, the path, the willow, the dancers
   ground(c, [[0, 962], [60, 958], [120, 950], [190, 962], [250, 978], [300, 994], [360, 1012], [420, 1022], [470, 1026], [560, 1018], [640, 1012]], [[0, 1004], [70, 998], [140, 994], [200, 1006], [262, 1022], [310, 1044], [362, 1062], [420, 1072], [480, 1078], [560, 1070], [640, 1064]], notan);
   // the near rocks: two great rounded boulders with a dark cleft between them, sunk in their ground shadow
-  massRock(c, { outline: [[0, 700], [56, 690], [130, 708], [196, 752], [244, 812], [258, 870], [236, 916], [150, 932], [0, 942]],
-    topFrac: .5, sweeps: 46, size: 1, depth: .12, seed: 69, flow: 1.0, clefts: [], base: [130, 940, 160] }, notan);
-  massRock(c, { outline: [[214, 870], [256, 840], [304, 842], [338, 874], [346, 914], [324, 944], [254, 950], [222, 926]],
-    topFrac: .45, sweeps: 20, size: .75, depth: .1, seed: 72, flow: 1.35, clefts: [[[216, 872], [234, 906], [238, 940]]], base: [280, 950, 80] }, notan);
+  facetRock(c, {
+    outline: [[0, 690], [60, 676], [160, 688], [244, 738], [290, 822], [282, 910], [180, 934], [0, 944], [0, 690]],
+    faces: [
+      { poly: [[0, 690], [60, 676], [160, 688], [244, 738], [196, 752], [104, 736], [0, 748]], tone: .08, dir: .35, chop: [50, 14] },
+      { poly: [[0, 748], [104, 736], [196, 752], [244, 738], [290, 822], [282, 910], [180, 934], [0, 944]], tone: .85, dir: 1.3, chop: [70, 30] },
+    ],
+    breaks: [[[0, 748], [104, 736], [196, 752], [244, 738]], [[150, 744], [166, 820], [160, 930]]], depth: .12, seed: 69, base: 938,
+  }, notan);
+  facetRock(c, {
+    outline: [[214, 874], [262, 846], [312, 850], [344, 882], [350, 920], [326, 948], [250, 952], [220, 926], [214, 874]],
+    faces: [
+      { poly: [[214, 874], [262, 846], [312, 850], [344, 882], [300, 880], [250, 888]], tone: .08, dir: .3, chop: [36, 12] },
+      { poly: [[214, 874], [250, 888], [300, 880], [344, 882], [350, 920], [326, 948], [250, 952], [220, 926]], tone: .7, dir: 1.4, chop: [50, 24] },
+    ],
+    breaks: [[[214, 874], [250, 888], [300, 880], [344, 882]]], depth: .1, seed: 72, base: 950,
+  }, notan);
   bareTree(c, { x: 90, y: 696, ang: -1.75, len: 80, seed: 81 }, notan);
   bareTree(c, { x: 168, y: 728, ang: -1.2, len: 64, seed: 82 }, notan);
   reeds(c, [[470, 1000, 22], [500, 992, 14], [40, 950, 16]], notan);

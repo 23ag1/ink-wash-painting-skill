@@ -70,7 +70,7 @@ function culm(c, pts, seg, wid, ink, dry, wetness, nodeInk, seed) {
     // one upward stroke of a hairy brush: solid at the entry, 飞白 streaks opening toward the node above
     hairyStroke(c.w, div(s, 4), w, seed + k * 13, {
       rgb: ink.rgb, alpha: ink.alpha, bristles: Math.round(w * .45), dryFrom: dry[0], dryness: dry[1],
-      streak: 130, edge: .45, fade: .2, close: .95, profile: flare,
+      streak: 130, edge: .45, fade: .2, tipSide: 0, close: .95, profile: flare,
     });
     c.wet.save(); c.wet.globalAlpha = wetness;     // fairly dry paper: the streaks must stay crisp
     stroke(c.wet, s, { wid: w, fun: flare, noi: 0, col: WHITE, seed });

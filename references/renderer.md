@@ -53,7 +53,9 @@ isotropic). Run with `rt.pingpong` ~30-40 times on `rgba16f` targets.
 `ink.js`: `stroke blob walk div quad press inkLine brokenLine ruledLine looseWash polyPath lantern noise`;
 `hairy.js`: `hairyStroke(g, pts, wid, seed, params)` — a stroke of many bristles with their own ink load (after
 Strassmann's hairy brushes): 飞白 dry streaks that open toward the exit, torn tapered hair ends, a broken pooled
-edge, a pressed entry, an optional closing turn (回锋); every look parameter required. Use it for culms, wood,
+edge, a pressed entry, an optional closing turn (回锋), and `tipSide` for a brush held upright (0, 中锋) or on its
+side (±1, 侧锋: dark crisp tip edge, dry heel — axe-cut strokes); every look parameter required. It can paint on
+the wash layer too (broad wet strokes that the diffusion softens) — the way to build tone without a blur. Use it for culms, wood,
 rock edges, fast calligraphy — anywhere the dry brush shows. `brush.js`: `rng smooth brush wash line`; `text.js`: `drawInscription(c, spec)` (brushed vertical title + seal;
 `c = { w: washCtx, l: inkCtx }`). See `brush.md` for what each parameter means.
 

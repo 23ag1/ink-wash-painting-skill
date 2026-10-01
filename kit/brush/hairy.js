@@ -13,12 +13,14 @@
 //   streak    length scale of the streaks along the stroke, in design units (~40-120; longer = straighter)
 //   edge      extra darkness at the outer bristles (0..1)
 //   fade      ink lost from entry to exit (0..1)
+//   tipSide   how the brush is held: 0 = upright (中锋, both edges alike); ±1 = laid on its side (侧锋): the tip
+//             edge (+1 = the v>0 side) dark and crisp, the heel edge pale and dry — the axe-cut stroke (斧劈)
 //   close     how much the brush closes again at the very end (回锋 turn at a node: 0 = stays frayed, 1 = solid)
 //   profile   t → width factor (entry press, flare at the ends, …)
 import { rng } from './brush.js';
 import { noise } from './ink.js';
 
-const REQUIRED = ['rgb', 'alpha', 'bristles', 'dryFrom', 'dryness', 'streak', 'edge', 'fade', 'close', 'profile'];
+const REQUIRED = ['rgb', 'alpha', 'bristles', 'dryFrom', 'dryness', 'streak', 'edge', 'fade', 'tipSide', 'close', 'profile'];
 const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 
 export function hairyStroke(g, pts, wid, seed, p) {
@@ -67,6 +69,8 @@ export function hairyStroke(g, pts, wid, seed, p) {
     const load = .5 + .5 * r();
     const dryAt = p.dryFrom + (1 - p.dryFrom) * (.15 + .85 * r()) * (.5 + .5 * load);   // weak hairs dry first
     const edgeV = Math.pow(Math.abs(v), 5);
+    const side = p.tipSide * v;                                  // +1 at the tip edge, -1 at the heel
+    const sideInk = 1 + .8 * side, sideDry = 1 - .7 * side;      // tip: more ink, stays wet; heel: less, dries first
     const sd = r() * 997;
     let run = [], startOpen = false;
     for (let i = 0; i < n; i++) {
@@ -75,7 +79,7 @@ export function hairyStroke(g, pts, wid, seed, p) {
       dryT *= 1 - p.close * smooth(.72, .96, t);                                  // the turn at the end closes it
       // streak field: long along the stroke, its ends torn by a finer noise
       const nv = noise(L[i] / p.streak, sd) * .85 + noise(L[i] / 16, sd + 11.3) * .15;
-      const thr = dryT * p.dryness * .8;
+      const thr = Math.min(.95, dryT * p.dryness * .8 * sideDry);
       if (nv < thr) {                                                           // this hair skips here: paper
         drawRun(run, startOpen, true); run = []; startOpen = true;
         continue;
@@ -83,7 +87,7 @@ export function hairyStroke(g, pts, wid, seed, p) {
       const half = nv < thr + .05 ? .45 : 1;                                    // half-dry rim of each streak
       const press = 1 + .35 * (1 - smooth(0, .1, t));                           // the entry is pressed, darker
       const edgeK = 1 + p.edge * edgeV * noise(L[i] / 25, sd + 5.1) * 2;        // pooled edge, broken along its length
-      const a = half * press * p.alpha * load * edgeK * (1 - p.fade * t) * (.92 + .16 * noise(L[i] / 30, sd + 3.7));
+      const a = half * press * p.alpha * Math.max(.1, sideInk) * load * edgeK * (1 - p.fade * t) * (.92 + .16 * noise(L[i] / 30, sd + 3.7));
       const prof = p.profile(t), off = v * wid * .5 * prof;
       run.push({ x: pts[i][0] + nor[i][0] * off, y: pts[i][1] + nor[i][1] * off, nx: nor[i][0], ny: nor[i][1], hw: bw * prof / 2, a });
     }

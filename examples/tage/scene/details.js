@@ -61,7 +61,7 @@ export function ground(c, upper, lower, notan) {
     for (let i = 0; i < pts.length - 6; i += 3 + Math.floor(r() * 4)) {
       if (r() < .3) continue;
       const run = pts.slice(i, i + 4 + Math.floor(r() * 6));
-      hairyStroke(c.l, run, w0 * (.6 + r() * .8), 600 + i, { rgb: '30,26,20', alpha: .35 + r() * .3, bristles: 6, dryFrom: .2, dryness: .8, streak: 30, edge: .5, fade: .4, close: 0, profile: t => Math.sin(Math.max(.05, t) * Math.PI) * .8 + .2 });
+      hairyStroke(c.l, run, w0 * (.6 + r() * .8), 600 + i, { rgb: '30,26,20', alpha: .35 + r() * .3, bristles: 6, dryFrom: .2, dryness: .8, streak: 30, edge: .5, fade: .4, tipSide: 0, close: 0, profile: t => Math.sin(Math.max(.05, t) * Math.PI) * .8 + .2 });
     }
   }
 
