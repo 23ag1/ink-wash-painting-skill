@@ -68,7 +68,9 @@ choose a mark from this table instead.
   hands are where it turns cartoonish — hide them in cloth, boats, grass.
 - **Animals and birds** — 没骨 body in one or two wet strokes (dark on the back, pale on the belly by the brush's
   loading), dry accents for claws, eyes, beak. Qi Baishi: the paper around is the water/air.
-- **Plants** — 四君子 grammar: bamboo (segmented culms, 个/介 leaf clusters), orchid (long swelling blades),
+- **Plants** — 四君子 grammar: bamboo (culms ≈ 8-10% of the sheet width, painted as wide grey dry-brush segments
+  that meet at dark uneven node touches; twigs leave from the culm edge at a node with a knot; leaves long, one
+  stroke each, nearly flat dark ink, in finger-splayed 个/介 groups; see `examples/minimal-bamboo`), orchid (long swelling blades),
   plum (angular wood, round blossoms), chrysanthemum (outlined petals, wash leaves). Trees: trunk in 勾 + 皴,
   crown in dots/washes, never a lollipop.
 - **Water** — paper, plus a few tapered lines or a graded wash; reflections are pale, soft, broken. Waves in

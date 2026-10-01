@@ -68,6 +68,9 @@ moves, how to run it, and honestly what is still weak, ordered by level.
 - **Decide the dials from the mood.** Void, density, darkness, wetness are choices, not constants.
 - **Composition first, detail last.** A bad thumbnail cannot be saved by good brushwork.
 - **Structure right, rendering loose.** "Unnatural" usually means wrong construction, not loose brushwork.
+  Check scale against the sheet first, then how parts join (edges, joints), then the stroke.
+- **Model the brush, not the mark.** Dry brush is many bristles running dry (`kit/brush/hairy.js`), not white
+  lines cut out of a fill.
 - **Nothing identical, nothing evenly spaced, nothing symmetric** — repetition and regularity are what reveal
   the computer (`judgement.md` §5).
 - **Paper is the light; tone follows depth; sharp and soft together; a brush, not a pen or a fill.**

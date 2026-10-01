@@ -38,6 +38,11 @@ Improving details never fixes a broken composition.
 - Is the darkest dark near the focal point or in the near plane, and the palest in the distance?
 - Colour limited to the planned accents?
 ### 3. Structure
+- ✗ Is the subject at the wrong scale for the sheet? Measure against a master work: main motif's width and
+  length as a fraction of the sheet (e.g. a bamboo culm ≈ 8-10% of the width). Wrong scale cannot be fixed by
+  better strokes — check it first.
+- ✗ Do parts join wrongly — gaps of paper where parts should meet, a branch starting from the middle of a stem and
+  crossing it, a joint drawn as a closed ring? Parts grow from edges and joints, the way the real thing does.
 - Is every object built correctly (roofs have walls under them, things have weight and stand on something,
   one consistent projection)? Compare with the structure note.
 - ✗ Anything floating, pasted on, or cut off unnaturally?
@@ -48,6 +53,8 @@ Improving details never fixes a broken composition.
 - ✗ Every element at the same level of finish?
 - Seed test passed?
 ### 5. Material and marks (at zoom)
+- Dry brush (飞白) made by a bristle model (`kit/brush/hairy.js`), not by cutting white lines out of a fill;
+  streaks long and parallel, ends torn and tapered, no stair-step ends, no bands across.
 - Strokes have tone inside, pressed entry, thinning exit; no flat fills, no uniform vector outlines, no beads,
   no stitched dashes, no uniform hatching ("barcode").
 - Wet washes have fibrous edges and pooled rims; dry strokes stay sharp; not uniformly soft or blurred.
