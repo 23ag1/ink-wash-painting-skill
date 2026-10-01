@@ -4,9 +4,12 @@
 // left; guests: the pine grove and the far pinnacles right; void: the mist band and the sky upper right, ≈45%.
 // Darkest: the near boulders and the willow; palest: far pinnacles and mist. Only colour: the seal.
 import { slabPeak, farPinnacle } from './peaks.js';
-import { boulder } from './rocks.js';
+import { boulder, massRock } from './rocks.js';
 import { pine, willow, bareTree } from './trees.js';
 import { palace, path, figure, poem, reeds } from './details.js';
+import { poly, glaze, occlude, dissolve } from './layers.js';
+import { rng } from '../../../kit/brush/brush.js';
+import { blob } from '../../../kit/brush/ink.js';
 
 export function paintScene(c, notan) {
   // far pinnacles right, in the sky above the mist
@@ -26,29 +29,38 @@ export function paintScene(c, notan) {
   palace(c, [[512, 418, 64, 22, .7], [470, 440, 46, 16, .72], [560, 440, 40, 14, .74]], notan);
 
   // the grove rising out of the mist band: tall pines in front of the palace, smaller ones to the left
+  // the hill the grove stands on: a soft rise whose top meets the trunks, dissolving down into the mist band,
+  // with undergrowth at the roots — nothing stands on air
+  const hill = poly([[200, 640], [240, 618], [300, 606], [360, 598], [420, 600], [480, 606], [540, 616], [580, 640], [580, 700], [200, 700]]);
+  occlude(c, hill, .6);
+  glaze(c, hill, notan ? '110,100,86' : '168,152,126', notan ? .4 : .6, .8, 3);
+  if (!notan) {
+    const r = rng(33);
+    for (const [bx, by] of [[232, 622], [268, 614], [306, 608], [338, 610], [360, 600], [404, 598], [446, 602], [478, 610], [508, 614]]) {
+      for (let i = 0; i < 14; i++) {
+        const x = bx + (r() - .5) * 34, y = by + 4 - r() * 14;
+        blob(c.l, x, y, { len: 8 + r() * 10, wid: 5 + r() * 5, ang: (r() - .5) * .8, col: `rgba(34,36,26,${.3 + r() * .35})`, noi: .7, seed: 3300 + bx + i });
+      }
+    }
+  }
+  dissolve(c, hill, 612, 668);
   const grove = [[352, 600, 150, .06, 51, .58], [398, 590, 190, -.03, 52, .55], [440, 600, 160, .08, 53, .56], [470, 610, 120, -.05, 54, .6],
     [300, 610, 110, .05, 55, .62], [262, 616, 86, -.06, 56, .66], [228, 620, 70, .04, 57, .68], [330, 612, 92, -.02, 58, .64], [420, 606, 120, .02, 59, .6], [372, 606, 100, -.07, 60, .62], [500, 616, 90, .05, 61, .64]];
   for (const [x, y, h, lean, s, d] of grove) pine(c, { x, y, h, lean, depth: d, tone: 1.35 - d, bare: .35, seed: s }, notan);
 
   // near ground: the boulders bottom left, a bare tree on them, the path, the willow, the dancers
-  boulder(c, {    // a big dark mass behind the slab, rising toward the mist — the weight of the lower half
-    outline: [[0, 610], [60, 600], [140, 628], [230, 690], [300, 760], [330, 820], [300, 860], [0, 860]], topN: 3,
-    face: [[0, 660], [80, 652], [170, 690], [250, 740], [320, 800], [330, 820], [300, 860], [0, 860]],
-    clefts: [[80, 655, 70, 800], [170, 694, 160, 840]], strokes: 26, size: 1.1, depth: .14, seed: 69, slope: Math.atan2(160, 230),
-  }, notan);
-  boulder(c, {    // a tilted slab: one long straight slope down to the right, a steep chopped face under it
-    outline: [[0, 688], [44, 680], [300, 876], [292, 910], [200, 918], [100, 926], [0, 934]], topN: 3,
-    face: [[0, 742], [40, 736], [120, 790], [226, 848], [300, 876], [292, 910], [200, 918], [100, 926], [0, 934]],
-    clefts: [[40, 738, 34, 860], [120, 792, 112, 900], [226, 850, 220, 912]], strokes: 30, size: 1.15, depth: .1, seed: 71, slope: Math.atan2(196, 256),
-  }, notan);
-  boulder(c, {
-    outline: [[214, 900], [262, 886], [330, 896], [350, 930], [300, 950], [226, 948]], topN: 3,
-    face: [[226, 906], [330, 908], [350, 930], [300, 950], [226, 948]],
-    clefts: [], strokes: 6, size: .8, depth: .08, seed: 72, slope: .15,
-  }, notan);
-  bareTree(c, { x: 70, y: 604, ang: -1.8, len: 80, seed: 81 }, notan);
-  bareTree(c, { x: 150, y: 634, ang: -1.2, len: 70, seed: 82 }, notan);
-  reeds(c, [[350, 960, 40], [420, 948, 30], [300, 975, 24]], notan);
+  // the near rocks: two great rounded boulders with a dark cleft between them, sunk in their ground shadow
+  massRock(c, { outline: [[0, 598], [70, 588], [160, 616], [236, 682], [292, 766], [306, 846], [276, 912], [180, 934], [0, 944]],
+    topFrac: .5, sweeps: 62, size: 1.2, depth: .12, seed: 69, flow: 1.0, clefts: [], base: [150, 940, 190] }, notan);
+  massRock(c, { outline: [[236, 836], [292, 790], [356, 794], [404, 838], [418, 900], [392, 944], [300, 952], [248, 920]],
+    topFrac: .45, sweeps: 28, size: .9, depth: .1, seed: 72, flow: 1.35, clefts: [[[236, 838], [258, 880], [262, 930]]], base: [330, 950, 110] }, notan);
+  bareTree(c, { x: 120, y: 600, ang: -1.75, len: 90, seed: 81 }, notan);
+  bareTree(c, { x: 196, y: 652, ang: -1.1, len: 80, seed: 82 }, notan);
+  // the bank between the rocks and the path: ground the reeds grow from
+  const bank = poly([[250, 944], [330, 936], [430, 930], [500, 944], [520, 972], [470, 1000], [360, 1008], [250, 984]]);
+  occlude(c, bank, .07);
+  glaze(c, bank, notan ? '60,52,44' : '150,134,106', notan ? .6 : .7, .6, 3);
+  reeds(c, [[360, 978, 36], [430, 970, 26], [300, 974, 18], [480, 968, 16]], notan);
   path(c, [[0, 962], [60, 958], [120, 950], [190, 962], [250, 978], [300, 994], [360, 1012], [420, 1022], [470, 1026], [560, 1018], [640, 1012]], [[0, 1004], [70, 998], [140, 994], [200, 1006], [262, 1022], [310, 1044], [362, 1062], [420, 1072], [480, 1078], [560, 1070], [640, 1064]], notan);
   willow(c, {
     trunk: [[572, 1080], [556, 990], [530, 905], [516, 825], [508, 770]],

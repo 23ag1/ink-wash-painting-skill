@@ -139,6 +139,15 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
 - **Base dissolved but depth kept** — the mist drew rectangles under the peaks. *Fix:* dissolving a form also
   fades its depth back to air.
 
+- **Near rocks, four failed constructions before the study** — stacked cardboard slabs with stamps; then
+  Catmull-Rom over 8 points = smooth eggs; then strokes radiating inward from the top = a scallop shell. *Fix
+  (from a crop of Ma Yuan's own rocks):* faceted silhouette with only the corners softened; the form written
+  by LONG dry-brush sweeps that start at the upper contour and all run the SAME way down the slope, dark at the
+  root, covering the whole face; a soft dark rim inside the contour; a dark cleft; the base sunk in a ground
+  shadow. Compare crops at the same size — full-frame comparison hid all of this.
+- **Floating trees and grass** — a grove whose trunks end in mist, reeds growing out of bare paper. *Fix:* a hill
+  under the grove dissolving into the mist with undergrowth at the roots; a bank from the rocks to the path.
+
 ## 8. Process lessons
 - **Research the canon before inventing.** Composition (Guo Xi, Xie He) and technique (MoXi, Curtis, Bousseau,
   Lingdong Huang's shan-shui-inf) answered questions that trial-and-error kept getting wrong.
