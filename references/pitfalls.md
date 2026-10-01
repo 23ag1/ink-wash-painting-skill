@@ -196,3 +196,15 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
 - **Keep what the user likes.** When fixing A, don't move B they praised.
 - **Painting over tooling.** Deliver the picture; no export/UI unless asked; keep the project in a real folder
   under git from the start.
+
+### Trees built from a remembered idea instead of the reference crop
+- **Symptom:** the near willow went through plank, black blob "pollard head" (read as smiley, heart, lollipop,
+  pipe joint), then a pale star — each fix tuned the wrong construction.
+- **Cause:** the motif was built from a verbal idea ("pollarded willow") and compared at full-frame scale. A crop
+  of the master at 3× showed a different structure: a long trunk leaning in from the edge with a crook, a knot
+  where it forks into two stems leaving the frame, one long arching branch hung with fine strands.
+- **Fix:** crop the master's motif large (`sips -c` works without PIL) before building it, and copy its
+  *construction*, not its silhouette. Limbs are brushed (pale base + long wet strokes along the limb, one dry
+  side-brush stroke on the shadow edge), never a flat fill with dashes on top (= birch/bamboo/plastic tube).
+  Joints: draw the trunk into the knot, stems over it; no pale ring or outlined scrape at a joint (= pipe, eye).
+  A bare fork ending in two points reads as a slingshot — end stems in thin shoots.

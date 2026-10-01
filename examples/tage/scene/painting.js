@@ -5,7 +5,7 @@
 // Darkest: the near boulders and the willow; palest: far pinnacles and mist. Only colour: the seal.
 import { slabPeak, farPinnacle } from './peaks.js';
 import { boulder, massRock, facetRock } from './rocks.js';
-import { pine, willow, bareTree } from './trees.js';
+import { pine, willow, bareTree, pollardWillow } from './trees.js';
 import { palace, ground, figure, poem, reeds } from './details.js';
 import { poly, glaze, occlude, dissolve } from './layers.js';
 import { rng } from '../../../kit/brush/brush.js';
@@ -82,11 +82,17 @@ export function paintScene(c, notan) {
   bareTree(c, { x: 90, y: 696, ang: -1.75, len: 80, seed: 81 }, notan);
   bareTree(c, { x: 168, y: 728, ang: -1.2, len: 64, seed: 82 }, notan);
   reeds(c, [[470, 1000, 22], [500, 992, 14], [40, 950, 16]], notan);
-  willow(c, {
-    trunk: [[572, 1080], [556, 990], [530, 905], [516, 825], [506, 762], [500, 728]],
-    // old willow boughs spring from below the broken top, rise a little and arch over, twigs hanging from them
-    boughs: [[[500, 804], [488, 782], [472, 770], [456, 772], [444, 784]], [[526, 782], [544, 748], [566, 712], [604, 690], [640, 686], [680, 694]], [[540, 870], [566, 852], [594, 840], [622, 838], [646, 846]], [[504, 760], [502, 718], [512, 688], [530, 666], [552, 656]]],
-    strands: 22, masses: [[600, 830, 46, 160], [560, 905, 38, 110], [626, 740, 34, 90], [520, 790, 26, 60]], leaves: [[575, 840, 200], [615, 760, 150], [530, 900, 120], [470, 960, 60], [620, 900, 120]], seed: 91,
+  pollardWillow(c, {
+    // after Ma Yuan: the trunk leans in from the right edge with a crook, forks at a knot into two stems that
+    // leave the frame upward, and one long branch arches out over the path
+    trunk: [[672, 968], [644, 930], [614, 884], [592, 834], [574, 792], [558, 752]], trunkW: [48, 30],
+    knot: [556, 754, 20],
+    stems: [
+      { axis: [[548, 750], [543, 700], [546, 640], [540, 570], [535, 480], [532, 400]], w: [17, 3] },
+      { axis: [[566, 748], [575, 700], [580, 650], [589, 590], [596, 530]], w: [13, 2.5] },
+    ],
+    branches: [[544, 758, Math.PI + .38, 250, 5.5], [550, 772, Math.PI + .12, 150, 3.6]],
+    seed: 91,
   }, notan);
   if (!notan) {
     figure(c, 300, 1006, 1.6, { lean: .3, arms: [[12, -14], [-9, 4]], kick: .4 }, 101);

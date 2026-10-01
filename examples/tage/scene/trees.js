@@ -4,7 +4,7 @@
 import { rng, smooth } from '../../../kit/brush/brush.js';
 import { stroke, blob, div, quad, walk } from '../../../kit/brush/ink.js';
 import { hairyStroke } from '../../../kit/brush/hairy.js';
-import { glaze, grey, depthLine } from './layers.js';
+import { glaze, grey, depthLine, poly, occlude } from './layers.js';
 
 // a soft dark mass laid with one short wet stroke on the wash layer (the diffusion pass merges neighbours)
 function wetDab(c, x, y, w, h, ang, rgb, alpha, seed) {
@@ -134,4 +134,109 @@ export function bareTree(c, sp, notan) {
     }
   };
   grow(sp.x, sp.y, sp.ang, sp.len, 5.5, 0);
+}
+
+// Ma Yuan's willow (踏歌图): a long trunk leaning in from the edge with a crook, a knot where it forks into two
+// stems that leave the frame upward, and one long branch arching out over the path, hung with fine strands.
+// Each limb is a tapered band: mid-dark wash, darker shadow side, dry bark grain, broken contours, a few pale
+// scrapes (small and unoutlined — an outlined oval reads as an eye).
+function band(axis, widths) {
+  const L = [], R = [];
+  axis.forEach(([x, y], i) => {
+    const [px, py] = axis[Math.max(0, i - 1)], [nx, ny] = axis[Math.min(axis.length - 1, i + 1)];
+    const a = Math.atan2(ny - py, nx - px), w = widths[i] / 2;
+    L.push([x + Math.sin(a) * w, y - Math.cos(a) * w]); R.push([x - Math.sin(a) * w, y + Math.cos(a) * w]);
+  });
+  return { L, R, path: poly([...L, ...R.slice().reverse()]) };
+}
+
+function limb(c, axis, widths, r, seed, shadow) {
+  const sm = smooth(axis, 4), wsm = sm.map((_, i) => widths[0] + (widths[widths.length - 1] - widths[0]) * i / (sm.length - 1));
+  const b = band(sm, wsm);
+  occlude(c, b.path, .08);
+  // the body is brushed, not filled: a pale base, then long wet strokes laid along the limb side by side,
+  // darker toward the shadow side, and one long dry side-brush stroke down the shadow edge
+  glaze(c, b.path, '170,152,128', .5, .6);
+  const off = (k) => sm.map(([x, y], i) => {
+    const [px, py] = sm[Math.max(0, i - 1)], [nx, ny] = sm[Math.min(sm.length - 1, i + 1)], a = Math.atan2(ny - py, nx - px);
+    return [x - Math.sin(a) * wsm[i] * k * shadow, y + Math.cos(a) * wsm[i] * k * shadow];
+  });
+  const W0 = wsm[0];
+  c.w.save(); c.w.clip(b.path); c.w.globalCompositeOperation = 'multiply';
+  for (let i = 0; i < 6; i++) {
+    const k = -.35 + i * .16 + (r() - .5) * .06;                // across the limb, lit side (k<0) to shadow (k>0)
+    hairyStroke(c.w, off(k), W0 * .42, seed + 20 + i, { rgb: '58,48,38', alpha: .22 + .5 * Math.max(0, k + .2), bristles: 14, dryFrom: .55, dryness: .5, streak: 80, edge: .3, fade: .2, tipSide: .4, close: .3, profile: t => 1 - t * (1 - wsm[wsm.length - 1] / W0) });
+  }
+  c.w.restore();
+  hairyStroke(c.l, off(.28), W0 * .45, seed + 30, { rgb: '16,12,9', alpha: .7, bristles: 22, dryFrom: .15, dryness: .75, streak: 120, edge: .8, fade: .25, tipSide: .9 * shadow, close: 0, profile: t => .9 - t * (.9 - wsm[wsm.length - 1] / W0) });
+  c.l.save(); c.l.clip(b.path);
+  for (let i = 0; i < sm.length * 1.2; i++) {                      // bark grain along the limb
+    const j = Math.min(sm.length - 2, Math.floor(r() * (sm.length - 1))), [ax, ay] = sm[j], [bx, by] = sm[j + 1];
+    const a = Math.atan2(by - ay, bx - ax) + (r() - .5) * .3, off = (r() - .5) * wsm[j] * .8, len = 16 + r() * 34;
+    const x = ax - Math.sin(a) * off, y = ay + Math.cos(a) * off;
+    hairyStroke(c.l, [[x, y], [x + Math.cos(a) * len / 2, y + Math.sin(a) * len / 2], [x + Math.cos(a) * len, y + Math.sin(a) * len]], 3 + r() * 5, seed + 100 + i,
+      { rgb: '18,14,10', alpha: .35 + r() * .4, bristles: 5, dryFrom: .2, dryness: .8, streak: len, edge: .4, fade: .3, tipSide: .7, close: 0, profile: t => Math.sin(Math.max(.12, t) * Math.PI) });
+  }
+  c.l.restore();
+  for (const [edge, w] of [[shadow > 0 ? b.R : b.L, 3.6], [shadow > 0 ? b.L : b.R, 2.4]]) {   // broken contours
+    for (let i = 0; i < edge.length - 3; i += 3 + Math.floor(r() * 4)) {
+      if (r() < .2) continue;
+      stroke(c.l, edge.slice(i, i + 4 + Math.floor(r() * 5)), { wid: w * (.6 + r() * .7), fun: t => Math.sin(Math.max(.1, t) * Math.PI), noi: .6, col: 'rgba(14,10,8,.85)', seed: seed + 400 + i, tip: .7, dry: .5 });
+    }
+  }
+  return { sm, wsm, b };
+}
+
+export function pollardWillow(c, sp, notan) {
+  const r = rng(sp.seed);
+  if (notan) {
+    for (const [ax, w] of [[sp.trunk, sp.trunkW], ...sp.stems.map(s => [s.axis, s.w])]) glaze(c, band(smooth(ax, 4), smooth(ax, 4).map((_, i, A) => w[0] + (w[1] - w[0]) * i / (A.length - 1))).path, '40,34,28', .9, 0);
+    return;
+  }
+  const T = limb(c, sp.trunk, sp.trunkW, r, sp.seed, 1);
+  for (const st of sp.stems) {
+    limb(c, st.axis, st.w, r, sp.seed + 900 + st.axis[0][0], 1);
+    // the stem does not stop blunt: it runs on as a thin shoot that thins to nothing
+    const n = st.axis.length, [ax, ay] = st.axis[n - 2], [bx, by] = st.axis[n - 1];
+    const tip = walk(rng(sp.seed + bx), bx, by, Math.atan2(by - ay, bx - ax), 70, 4, .12);
+    depthLine(c, tip, 3, .08);
+    stroke(c.l, tip, { wid: st.w[1] * 1.1, fun: t => 1 - t * .95, noi: .4, col: 'rgba(22,18,14,.85)', seed: sp.seed + bx, tip: .3, dry: .4 });
+  }
+  // the knot where trunk, stems and branch meet: a darker swelling, pocked (no pale rings or scrapes: they read as a pipe joint or an eye)
+  const [kx, ky, kr] = sp.knot;
+  const rad = Array.from({ length: 7 }, () => kr * (.8 + r() * .4));
+  const kpts = smooth(Array.from({ length: 9 }, (_, i) => { const a = i / 7 * 6.283; return [kx + Math.cos(a) * rad[i % 7] * 1.15, ky + Math.sin(a) * rad[i % 7]]; }), 5);
+  const knot = poly(kpts);
+  c.d.save(); c.d.fillStyle = grey(.08); c.d.fill(knot); c.d.restore();
+  glaze(c, knot, '60,50,40', .6, .7, 3);
+  for (let i = 0; i < 4; i++) wetDab(c, kx + (r() - .2) * kr * .8, ky + (r() - .5) * kr * .9, kr * (.9 + r() * .6), kr * (.5 + r() * .4), r() * 3, '40,33,26', .45 + r() * .25, sp.seed + 660 + i);
+  for (let i = 0; i < 14; i++) blob(c.l, kx + (r() - .5) * kr * 1.6, ky + (r() - .5) * kr * 1.4, { len: 3 + r() * 6, wid: 2 + r() * 3, ang: r() * 3, noi: .9, col: `rgba(14,10,8,${.55 + r() * .35})`, seed: sp.seed + 600 + i });
+  // long branches arch out and droop, hung with many fine strands falling almost straight down
+  const grow = (x, y, ang, len, w, depth, seed) => {
+    const rr = rng(seed), pts = [[x, y]], dir = Math.sign(Math.cos(ang)) || 1;
+    let a = ang;
+    for (let k = 1; k <= 9; k++) {
+      a += dir * (k < 3 ? -.02 : .07 + k * .012) + (rr() - .5) * (rr() < .3 ? .4 : .12);
+      pts.push([pts[k - 1][0] + Math.cos(a) * len / 9, pts[k - 1][1] + Math.sin(a) * len / 9]);
+    }
+    depthLine(c, pts, Math.max(2, w), .08);
+    hairyStroke(c.l, smooth(pts, 5), w, seed, { rgb: '20,16,12', alpha: .8, bristles: 6, dryFrom: .3, dryness: .6, streak: len * .4, edge: .7, fade: .3, tipSide: .3, close: 0, profile: t => 1 - t * .85 });
+    if (depth === 0) for (const k of [3, 6]) grow(pts[k][0], pts[k][1], a - dir * (.35 + rr() * .3), len * .45, w * .55, 1, seed + k);
+    const n = depth ? 10 : 22;
+    for (let k = 0; k < n; k++) {
+      const t = 2.5 + rr() * 6.5, i = Math.floor(t), u = t - i, q = pts[Math.min(9, i + 1)];
+      const p = [pts[i][0] + (q[0] - pts[i][0]) * u, pts[i][1] + (q[1] - pts[i][1]) * u];
+      const l = 26 + Math.pow(rr(), 1.2) * 90, s = (rr() - .5) * 12 - dir * 5;
+      const tw = [[p[0], p[1]], [p[0] - dir * 3, p[1] + l * .2], [p[0] + s * .5, p[1] + l * .6], [p[0] + s, p[1] + l]];
+      depthLine(c, tw, 1.5, .08);
+      stroke(c.l, smooth(tw, 4), { wid: .55 + rr() * .5, fun: t => 1 - t * .8, noi: .3, col: `rgba(34,30,24,${.16 + rr() * .3})`, seed: seed + 50 + k, dry: .4 });
+    }
+  };
+  sp.branches.forEach(([x, y, ang, len, w], i) => grow(x, y, ang, len, w, 0, sp.seed + 700 + i * 31));
+  // the stems end in young shoots (a bare fork reads as a slingshot): two thin arching rods with strands
+  sp.stems.forEach((st, i) => {
+    const [x, y] = st.axis[Math.max(1, st.axis.length - 2)];
+    grow(x, y, -Math.PI / 2 - .9 + i * .4, 70, 1.6, 1, sp.seed + 950 + i);
+    grow(x, y, -Math.PI / 2 + .7 + i * .3, 55, 1.4, 1, sp.seed + 970 + i);
+  });
 }
