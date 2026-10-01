@@ -10,6 +10,7 @@ import { palace, ground, figure, poem, reeds } from './details.js';
 import { poly, glaze, occlude, dissolve } from './layers.js';
 import { rng } from '../../../kit/brush/brush.js';
 import { blob } from '../../../kit/brush/ink.js';
+import { hairyStroke } from '../../../kit/brush/hairy.js';
 
 // study mode: one rock, large and alone, to compare with the master's at the same size
 export const STUDY_ROCK = {
@@ -42,22 +43,15 @@ export function paintScene(c, notan) {
   palace(c, [[520, 410, 84, 30, .66], [462, 436, 58, 22, .7], [578, 444, 50, 18, .74]], notan);
 
   // the grove rising out of the mist band: tall pines in front of the palace, smaller ones to the left
-  // the hill the grove stands on: a soft rise whose top meets the trunks, dissolving down into the mist band,
-  // with undergrowth at the roots — nothing stands on air
-  const hill = poly([[200, 640], [240, 618], [300, 606], [360, 598], [420, 600], [480, 606], [540, 616], [580, 640], [580, 700], [200, 700]]);
-  occlude(c, hill, .6);
-  glaze(c, hill, notan ? '110,100,86' : '168,152,126', notan ? .4 : .6, .8, 3);
-  if (!notan) {
-    const r = rng(33);
-    for (const [bx, by] of [[232, 624], [300, 610], [360, 602], [430, 600], [500, 612]]) {
-      const p = new Path2D(); p.ellipse(bx, by + 2, 34 + r() * 20, 9 + r() * 5, (r() - .5) * .2, 0, 7);
-      glaze(c, p, '96,96,76', .45 + r() * .2, .8, 4);
-    }
-  }
-  dissolve(c, hill, 612, 668);
   const grove = [[352, 600, 150, .06, 51, .58], [398, 590, 190, -.03, 52, .55], [440, 600, 160, .08, 53, .56], [470, 610, 120, -.05, 54, .6],
     [300, 610, 110, .05, 55, .62], [262, 616, 86, -.06, 56, .66], [228, 620, 70, .04, 57, .68], [330, 612, 92, -.02, 58, .64], [420, 606, 120, .02, 59, .6], [372, 606, 100, -.07, 60, .62], [500, 616, 90, .05, 61, .64]];
   for (const [x, y, h, lean, s, d] of grove) pine(c, { x, y, h, lean, depth: d, tone: 1.35 - d, bare: .35, seed: s }, notan);
+  if (!notan) {
+    // the grove rises OUT of the mist: nothing under it, its lower trunks simply fade into the mist band
+    c.l.save(); c.l.globalCompositeOperation = 'destination-out';
+    const fade = c.l.createLinearGradient(0, 548, 0, 600); fade.addColorStop(0, 'rgba(0,0,0,0)'); fade.addColorStop(1, 'rgba(0,0,0,1)');
+    c.l.fillStyle = fade; c.l.fillRect(190, 548, 420, 80); c.l.restore();
+  }
 
   // near ground: the boulders bottom left, a bare tree on them, the path, the willow, the dancers
   ground(c, [[0, 962], [60, 958], [120, 950], [190, 962], [250, 978], [300, 994], [360, 1012], [420, 1022], [470, 1026], [560, 1018], [640, 1012]], [[0, 1004], [70, 998], [140, 994], [200, 1006], [262, 1022], [310, 1044], [362, 1062], [420, 1072], [480, 1078], [560, 1070], [640, 1064]], notan);
@@ -84,7 +78,7 @@ export function paintScene(c, notan) {
   willow(c, {
     trunk: [[572, 1080], [556, 990], [530, 905], [516, 825], [508, 770]],
     // old willow boughs spring from below the broken top, rise a little and arch over, twigs hanging from them
-    boughs: [[[504, 790], [490, 772], [474, 762], [458, 762], [446, 772]], [[514, 752], [536, 712], [566, 684], [604, 668], [640, 664], [680, 672]], [[522, 862], [556, 846], [588, 832], [618, 830], [640, 836]], [[510, 740], [504, 704], [512, 674], [528, 652], [548, 644]]],
+    boughs: [[[504, 790], [490, 772], [474, 762], [458, 762], [446, 772]], [[514, 752], [536, 712], [566, 684], [604, 668], [640, 664], [680, 672]], [[540, 870], [566, 852], [594, 840], [622, 838], [646, 846]], [[510, 740], [504, 704], [512, 674], [528, 652], [548, 644]]],
     strands: 22, masses: [[600, 830, 46, 160], [560, 905, 38, 110], [626, 740, 34, 90], [520, 790, 26, 60]], leaves: [[575, 840, 200], [615, 760, 150], [530, 900, 120], [470, 960, 60], [620, 900, 120]], seed: 91,
   }, notan);
   if (!notan) {

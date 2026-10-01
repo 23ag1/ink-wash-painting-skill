@@ -64,16 +64,17 @@ export function willow(c, sp, notan) {
   c.d.save(); c.d.strokeStyle = grey(.08); c.d.lineWidth = 52; c.d.beginPath(); trunk.forEach((p, i) => (i ? c.d.lineTo(...p) : c.d.moveTo(...p))); c.d.stroke(); c.d.restore();
   if (notan) { c.w.save(); c.w.globalCompositeOperation = 'multiply'; c.w.strokeStyle = 'rgb(60,52,44)'; c.w.lineWidth = 22; c.w.beginPath(); trunk.forEach((p, i) => (i ? c.w.lineTo(...p) : c.w.moveTo(...p))); c.w.stroke(); c.w.restore(); return; }
   // the trunk in dry brush, gnarled: two passes, the second narrower and offset
-  hairyStroke(c.l, trunk, 46, sp.seed, { rgb: '20,16,12', alpha: .82, bristles: 46, dryFrom: .2, dryness: .9, streak: 60, edge: 1, fade: .3, tipSide: 0, close: .3, profile: t => 1.15 - t * .45 + .12 * Math.sin(t * 19) });
-  hairyStroke(c.l, trunk.map(([x, y]) => [x + 10, y]), 22, sp.seed + 1, { rgb: '12,10,8', alpha: .8, bristles: 14, dryFrom: .1, dryness: .8, streak: 40, edge: .5, fade: .2, tipSide: 0, close: 0, profile: t => 1 - t * .5 });
+  hairyStroke(c.l, trunk, 44, sp.seed, { rgb: '20,16,12', alpha: .62, bristles: 40, dryFrom: .35, dryness: .7, streak: 120, edge: .6, fade: .2, tipSide: .7, close: .3, profile: t => 1.12 - t * .4 + .06 * Math.sin(t * 13) });
+  // a darker wet under-tone so the trunk reads as one round, gnarled body, not as stripes
+  hairyStroke(c.w, trunk, 40, sp.seed + 1, { rgb: '60,50,38', alpha: .5, bristles: 20, dryFrom: .6, dryness: .3, streak: 120, edge: .3, fade: .1, tipSide: .5, close: .5, profile: t => 1.1 - t * .4 });
   for (let i = 0; i < 6; i++) {                                           // knots
     const p = trunk[Math.floor(r() * trunk.length)];
-    blob(c.l, p[0] + (r() - .5) * 14, p[1], { len: 10 + r() * 8, wid: 6 + r() * 4, ang: r() * 3, col: 'rgba(14,11,8,.85)', noi: .6, seed: sp.seed + 20 + i });
+    stroke(c.l, [[p[0] + (r() - .5) * 14, p[1]], [p[0] + (r() - .5) * 14 + 4, p[1] + 6 + r() * 6]], { wid: 3 + r() * 3, fun: t => Math.sin(t * Math.PI), noi: .6, col: 'rgba(14,11,8,.7)', seed: sp.seed + 20 + i, dry: .5 });   // knots: short dark cuts in the bark
   }
   // the broken top of the old trunk: a short thick stump with a torn end
   const [tx, ty] = trunk[trunk.length - 1];
-  hairyStroke(c.l, [[tx, ty], [tx - 3, ty - 18], [tx + 2, ty - 34]], 26, sp.seed + 7, { rgb: '18,14,10', alpha: .8, bristles: 20, dryFrom: .3, dryness: 1, streak: 30, edge: 1, fade: .2, tipSide: .4, close: 0, profile: t => 1 - t * .3 });
-  for (let i = 0; i < 4; i++) stroke(c.l, [[tx - 8 + i * 5, ty - 32], [tx - 9 + i * 5 + (r() - .5) * 6, ty - 40 - r() * 8]], { wid: 3, fun: t => 1 - t, noi: .4, col: 'rgba(16,12,8,.8)', seed: sp.seed + 60 + i });
+  hairyStroke(c.l, [[tx, ty], [tx - 3, ty - 14], [tx + 2, ty - 26]], 30, sp.seed + 7, { rgb: '18,14,10', alpha: .7, bristles: 22, dryFrom: .5, dryness: .6, streak: 30, edge: 1, fade: .2, tipSide: .4, close: 0, profile: t => 1 - t * .3 });
+  for (let i = 0; i < 2; i++) stroke(c.l, [[tx - 6 + i * 10, ty - 24], [tx - 8 + i * 12 + (r() - .5) * 6, ty - 34 - r() * 6]], { wid: 4, fun: t => 1 - t, noi: .5, col: 'rgba(16,12,8,.75)', seed: sp.seed + 60 + i });   // two torn splinters
   // boughs reaching up, thinning; strands hanging from them
   sp.boughs.forEach((b, bi) => {
     const pts = smooth(b, 6);

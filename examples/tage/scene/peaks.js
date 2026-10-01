@@ -50,47 +50,39 @@ export function slabPeak(c, sp, notan) {
   const shadowEdge = sp.shadow === 'left' ? left : right, litEdge = sp.shadow === 'left' ? right : left;
   glaze(c, path, '216,202,178', .9, .45, 1);
 
-  // 渲染 tonal modelling: band by band, a gradient from the shadow edge (near black) into the lit face
-  const H = sp.left[0][1] - sp.left[sp.left.length - 1][1], bands = Math.max(12, Math.round(H / 10));
-  c.w.save(); c.w.globalCompositeOperation = 'multiply';
-  for (let b = 0; b < bands; b++) {
-    const t0 = Math.max(0, (b - .6) / bands), t1 = Math.min(1, (b + 1.6) / bands);
-    const s0 = at(shadowEdge, t0), s1 = at(shadowEdge, t1), l0 = at(litEdge, t0), l1 = at(litEdge, t1);
-    const sm = [(s0[0] + s1[0]) / 2, (s0[1] + s1[1]) / 2], lm = [(l0[0] + l1[0]) / 2, (l0[1] + l1[1]) / 2];
-    const a0 = (.5 + .45 * k) * (.75 + .5 * noise(b * .35, sp.seed + 2));
-    const gr = c.w.createLinearGradient(sm[0], sm[1], lm[0], lm[1]);
-    gr.addColorStop(0, `rgba(44,36,28,${a0})`);
-    gr.addColorStop(.1 + .08 * noise(b * .5, sp.seed + 3), `rgba(64,54,42,${a0 * .85})`);
-    gr.addColorStop(.38 + .14 * noise(b * .4, sp.seed + 4), `rgba(130,114,92,${a0 * .4})`);
-    gr.addColorStop(.75, 'rgba(200,186,160,.15)');
-    gr.addColorStop(1, 'rgba(255,255,255,0)');
-    c.w.fillStyle = gr;
-    c.w.save(); c.w.clip(path); c.w.filter = `blur(${2.2 * c.S}px)`; c.w.globalAlpha = .55; c.w.fill(poly([s0, s1, l1, l0])); c.w.restore();
+  // 渲染 the same way as the near rocks: many faint WET strokes running down the faces on the wash layer, merged by
+  // the diffusion pass — densest and darkest along the shadow edge, few and pale on the lit face; no blur, no bands
+  const H = sp.left[0][1] - sp.left[sp.left.length - 1][1];
+  const wetStroke = (x, y, len, wid, alpha, seed) => {
+    const pts = quad([x, y], [x + (r() - .5) * 4, y + len * .5], [x + (r() - .5) * 6, y + len], 10);
+    const p = { bristles: Math.max(6, Math.round(wid * .6)), dryFrom: .4, dryness: .6, streak: len, edge: .25, fade: .4, tipSide: sp.shadow === 'left' ? -.6 : .6, close: 0, profile: t => (t < .15 ? .3 + Math.sqrt(t / .15) * .7 : 1 - (t - .15) * .3) };
+    hairyStroke(c.w, pts, wid, seed, { ...p, rgb: '62,50,38', alpha });
+    hairyStroke(c.wet, pts, wid * 1.2, seed, { ...p, rgb: '255,255,255', alpha: .9 });
+  };
+  c.w.save(); c.w.clip(path); c.wet.save(); c.wet.clip(path);
+  const nw = Math.round(H / 5 * (1 + 1.5 * k));
+  for (let i = 0; i < nw; i++) {
+    const shadowSide = r() < .7, side = shadowSide ? r() * r() * .5 : .45 + r() * .5;
+    const t = .1 + Math.pow(r(), .7) * .9;
+    const [sx, sy] = at(shadowEdge, t), [lx, ly] = at(litEdge, t);
+    wetStroke(lerp(sx, lx, side), lerp(sy, ly, side), H * (.15 + r() * .4), (12 + r() * 16) * sp.size,
+      (shadowSide ? .1 + .26 * k : .025 + .04 * k) * (.7 + r() * .6), sp.seed + 900 + i * 13);
   }
-  c.w.restore();
+  c.w.restore(); c.wet.restore();
 
   c.l.save(); c.l.clip(path);
-  // the shadow face written densely in dry brush: its bristle gaps are the light streaks of the rock
-  const n = Math.round(14 + 22 * sp.size);
-  for (let i = 0; i < n; i++) {
-    const side = r() * r() * .4, t = .2 + r() * .78;
+  // grain: a few long faint dry streaks down the shadow face only
+  for (let i = 0; i < Math.round(6 + 8 * sp.size); i++) {
+    const side = r() * r() * .4, t = .25 + r() * .7;
     const [sx, sy] = at(shadowEdge, t), [lx, ly] = at(litEdge, t);
-    axe(c.l, lerp(sx, lx, side), lerp(sy, ly, side), Math.PI / 2 + (sp.shadow === 'left' ? -1 : 1) * (r() - .4) * .12,
-      H * (.2 + r() * .5), (10 + r() * 16) * sp.size, { rgb: '30,25,20', alpha: .22 + .38 * k }, sp.seed + i * 7);
+    axe(c.l, lerp(sx, lx, side), lerp(sy, ly, side), Math.PI / 2 + (r() - .5) * .08, H * (.2 + r() * .4), (5 + r() * 8) * sp.size, { rgb: '30,25,20', alpha: .1 + .16 * k }, sp.seed + i * 7);
   }
-  // the lit face: a few pale long strokes only
-  for (let i = 0; i < 4 + Math.round(4 * sp.size); i++) {
-    const side = .5 + r() * .45, t = .3 + r() * .65;
-    const [sx, sy] = at(shadowEdge, t), [lx, ly] = at(litEdge, t);
-    axe(c.l, lerp(sx, lx, side), lerp(sy, ly, side), Math.PI / 2 + (r() - .5) * .1, H * (.12 + r() * .25), (5 + r() * 8) * sp.size, { rgb: '60,50,40', alpha: .06 + .08 * k }, sp.seed + 300 + i);
-  }
-  // ledges: short dark chops across the face, each with a little shrub above it
-  for (let i = 0; i < 3 + Math.round(3 * sp.size); i++) {
-    const t = .25 + r() * .65, u = .2 + r() * .5;
+  // a few small dark ledges where the face steps back (no shrubs: at this size they read as little boats)
+  for (let i = 0; i < 2 + Math.round(2 * sp.size); i++) {
+    const t = .25 + r() * .65, u = .15 + r() * .4;
     const [sx, sy] = at(shadowEdge, t), [lx, ly] = at(litEdge, t);
     const x = lerp(sx, lx, u), y = lerp(sy, ly, u);
-    stroke(c.l, quad([x - 8 * sp.size, y], [x, y + 3], [x + 12 * sp.size, y + 1], 8), { wid: 3 * sp.size, noi: .5, col: `rgba(24,20,16,${.5 + .35 * k})`, seed: sp.seed + 90 + i, tip: .6, dry: .5 });
-    for (let j = 0; j < 5; j++) blob(c.l, x + (r() - .3) * 12 * sp.size, y - 2 - r() * 6 * sp.size, { len: 3 + r() * 4, wid: 2.2, ang: r() * 3, col: `rgba(26,28,20,${.5 + .3 * k})`, noi: .5, seed: sp.seed + 400 + i * 9 + j });
+    stroke(c.l, [[x - 5 * sp.size, y], [x + 2, y + 2], [x + 7 * sp.size, y + 1]], { wid: 2.4 * sp.size, noi: .6, col: `rgba(26,22,18,${.35 + .3 * k})`, seed: sp.seed + 90 + i, tip: .6, dry: .6 });
   }
   c.l.restore();
 

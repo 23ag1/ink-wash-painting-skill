@@ -170,6 +170,12 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
 - **Pine crowns as umbrellas** — separate ink discs on sticks. *Fix:* crowns as soft dark masses from short wet
   strokes on the wash layer that merge, needles only on the upper rim, masses overlapping along each branch.
 
+- **"The grove floats" — and each fix made it worse** — a pale hill under it (trees standing on a strip), then a
+  dark undergrowth band (a floating saucer: a hard depth edge printed a hard edge in the mist). *Fix (as Ma Yuan
+  does):* nothing under the mid-distance grove; its lower trunks fade out and the mist rises over its foot, so the
+  trees come up out of the mist. "Grounding" a thing seen across mist means hiding its base, not adding ground.
+  Depth edges must be soft — any hard edge in the depth map shows as a hard edge in the mist.
+
 ## 8. Process lessons
 - **Research the canon before inventing.** Composition (Guo Xi, Xie He) and technique (MoXi, Curtis, Bousseau,
   Lingdong Huang's shan-shui-inf) answered questions that trial-and-error kept getting wrong.

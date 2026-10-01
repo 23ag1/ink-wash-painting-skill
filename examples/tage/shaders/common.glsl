@@ -11,5 +11,7 @@ float mistAt(vec2 p) {
   float tongues = smoothstep(380., 560., p.y) * (1. - smoothstep(600., 640., p.y)) * smoothstep(.5, .7, fbm(vec2(p.x * .012, p.y * .004) + 9.));
   float sky = (1. - smoothstep(120., 520., p.y)) * smoothstep(250., 520., p.x) * .35;
   float rocksFoot = exp(-pow((p.y - 690.) / 50., 2.)) * (1. - smoothstep(280., 340., p.x)) * .7;
-  return clamp(max(max(band * mix(.55, 1., tear), tongues * .7), max(sky, rocksFoot)), 0., 1.);
+  // the mist rises over the foot of the grove, torn, so the trees come up out of it
+  float grove = smoothstep(540., 600., p.y) * (1. - smoothstep(640., 700., p.y)) * smoothstep(190., 260., p.x) * (1. - smoothstep(560., 620., p.x)) * mix(.75, 1., tear);
+  return clamp(max(max(max(band * mix(.55, 1., tear), tongues * .7), max(sky, rocksFoot)), grove), 0., 1.);
 }
