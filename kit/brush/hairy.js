@@ -71,8 +71,8 @@ export function hairyStroke(g, pts, wid, seed, p) {
     let run = [], startOpen = false;
     for (let i = 0; i < n; i++) {
       const t = L[i] / total;
-      let dryT = Math.max(0, (t - dryAt) / Math.max(1e-3, 1 - dryAt));
-      dryT *= 1 - p.close * smooth(.86, 1, t);                                  // the turn at the end closes it
+      let dryT = Math.min(1, Math.max(0, (t - dryAt) / Math.max(1e-3, (1 - dryAt) * .55)));   // dries over ~half the rest
+      dryT *= 1 - p.close * smooth(.72, .96, t);                                  // the turn at the end closes it
       // streak field: long along the stroke, its ends torn by a finer noise
       const nv = noise(L[i] / p.streak, sd) * .85 + noise(L[i] / 16, sd + 11.3) * .15;
       const thr = dryT * p.dryness * .8;

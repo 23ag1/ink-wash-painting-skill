@@ -123,6 +123,11 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   breaking at the end = a broom (only weak hairs dry, the turn at the node closes the stroke); hairs drawn in
   short pieces = pixel-stair ends (draw continuous tapered runs); runs split at equal lengths = horizontal bands
   (no splits, ink varies by a gradient along each hair).
+  Fourth round (user: "a hair sticks out, and that empty space"): the node was a white band of paper and the
+  twig started at the culm's axis and crossed it as a hairline. *Fix (real 墨竹):* segments meet; the node is two
+  uneven dark touches across the joint (never a closed ring — that reads as a pipe washer); the ends of each
+  segment are solid, the 飞白 lives in the middle; twigs leave from the culm's EDGE at a node, with a knot, thick at
+  the base, tapering — they never cross the culm.
 
 ## 8. Process lessons
 - **Research the canon before inventing.** Composition (Guo Xi, Xie He) and technique (MoXi, Curtis, Bousseau,

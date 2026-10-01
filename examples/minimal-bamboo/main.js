@@ -10,7 +10,7 @@
 // in one stroke of nearly flat dark ink and hung in fanned 个/介 groups; far leaves and culms are pale and wet.
 import { createRuntime } from '../../kit/runtime.js';
 import { rng } from '../../kit/brush/brush.js';
-import { stroke, quad, walk, div } from '../../kit/brush/ink.js';
+import { stroke, quad, walk, div, blob } from '../../kit/brush/ink.js';
 import { hairyStroke } from '../../kit/brush/hairy.js';
 import { drawInscription } from '../../kit/brush/text.js';
 
@@ -63,14 +63,14 @@ function culm(c, pts, seg, wid, ink, dry, wetness, nodeInk, seed) {
   }
   if (nodes[nodes.length - 1] !== pts.length - 1) nodes.push(pts.length - 1);
   for (let k = 0; k < nodes.length - 1; k++) {
-    const s = pts.slice(nodes[k] + 1, nodes[k + 1]);       // the gap of one point at each node stays paper
+    const s = pts.slice(nodes[k], nodes[k + 1] + 1);       // segments meet at the node; the node mark covers the joint
     if (s.length < 2) continue;
     const w = wid * (1 - k * .045);
-    const flare = t => .96 + .1 * Math.pow(Math.abs(2 * t - 1), 4);    // segments swell slightly at the nodes
+    const flare = t => .95 + .12 * Math.pow(Math.abs(2 * t - 1), 6);   // segments swell into rings at the nodes
     // one upward stroke of a hairy brush: solid at the entry, 飞白 streaks opening toward the node above
     hairyStroke(c.w, div(s, 4), w, seed + k * 13, {
       rgb: ink.rgb, alpha: ink.alpha, bristles: Math.round(w * .45), dryFrom: dry[0], dryness: dry[1],
-      streak: 130, edge: .45, fade: .2, close: .8, profile: flare,
+      streak: 130, edge: .45, fade: .2, close: .95, profile: flare,
     });
     c.wet.save(); c.wet.globalAlpha = wetness;     // fairly dry paper: the streaks must stay crisp
     stroke(c.wet, s, { wid: w, fun: flare, noi: 0, col: WHITE, seed });
@@ -80,21 +80,31 @@ function culm(c, pts, seg, wid, ink, dry, wetness, nodeInk, seed) {
     const l = Math.hypot(nx - px, ny - py), ux = (nx - px) / l, uy = (ny - py) / l, vx = -uy, vy = ux;
     const hw = w * .5;
     const at = (u, v) => [nx + ux * u + vx * v, ny + uy * u + vy * v];
-    // 节: one short dark stroke across the top of the lower segment, pressed in the middle, plus a tick at one end
-    stroke(c.l, quad(at(-4, -hw * .95), at(-7, 0), at(-4, hw * .8), 12), { wid: w * .09, fun: t => .5 + .5 * Math.sin(t * Math.PI), noi: .3, col: nodeInk, seed: seed + 60 + k, dry: .25 });
-    stroke(c.l, [at(-4, -hw * .95), at(-1, -hw * 1.12), at(3, -hw * 1.18)], { wid: w * .07, noi: .3, col: nodeInk, seed: seed + 70 + k });
+    // 节: two touches of the brush across the joint — a heavy one from one side, a lighter one finishing the
+    // other side a little lower — uneven, never a closed ring
+    const heavy = r() < .5 ? -1 : 1;
+    stroke(c.l, quad(at(-1, heavy * -hw * 1.15), at(-3.5, heavy * -hw * .3), at(-2, heavy * hw * .25), 12), {
+      wid: w * .26, fun: t => .45 + .55 * Math.pow(Math.sin(Math.min(1, t * 1.3) * Math.PI * .5 + .2), 1.4) * (1 - t * .5),
+      noi: .5, col: nodeInk, seed: seed + 60 + k, tip: .5, dry: .45,
+    });
+    stroke(c.l, quad(at(-1.5, heavy * -hw * 1.05), at(-3, heavy * -hw * .4), at(-2, heavy * hw * .1), 10), { wid: w * .14, noi: .5, col: nodeInk, seed: seed + 65 + k, dry: .3 });
+    stroke(c.l, quad(at(-2.5, heavy * hw * .05), at(-4.5, heavy * hw * .6), at(-2, heavy * hw * 1.08), 10), {
+      wid: w * .14, fun: t => Math.sin(t * Math.PI) * .7 + .3, noi: .5, col: nodeInk, seed: seed + 70 + k, dry: .5,
+    });
   }
   return nodes.map(i => pts[i]);
 }
 
 // a twig from a node: thin, long, with a joint where a side twig leaves; returns its end and joint
-function twig(g, r, [x, y], ang, len, col, seed) {
+function twig(g, r, [nx, ny], ang, len, col, seed, half) {
+  const side = Math.sign(Math.cos(ang)) || 1, x = nx + side * half * .92, y = ny - 3;
+  blob(g, x - side * 3, y, { len: 13, wid: 8, ang: ang, col, noi: .4, seed });          // the knot where it leaves the node
   const main = walk(rng(seed), x, y, ang, len, 8, .07);
-  stroke(g, main, { wid: 2.2, fun: t => 1 - t * .6, noi: .3, col, seed, dry: .3 });
+  stroke(g, main, { wid: 5.2, fun: t => 1 - t * .75, noi: .3, col, seed, dry: .3 });
   const j = main[4];
-  const side = walk(rng(seed + 1), j[0], j[1], ang + (r() < .5 ? .5 : -.45), len * .45, 5, .15);
-  stroke(g, side, { wid: 1.6, fun: t => 1 - t * .6, noi: .3, col, seed: seed + 1, dry: .3 });
-  return { end: main[main.length - 1], joint: j, side: side[side.length - 1] };
+  const sideTw = walk(rng(seed + 1), j[0], j[1], ang + (r() < .5 ? .5 : -.45), len * .45, 5, .15);
+  stroke(g, sideTw, { wid: 2.4, fun: t => 1 - t * .7, noi: .3, col, seed: seed + 1, dry: .3 });
+  return { end: main[main.length - 1], joint: j, side: sideTw[sideTw.length - 1] };
 }
 
 function paintMarks(S) {
@@ -103,24 +113,24 @@ function paintMarks(S) {
   const DARK = 'rgba(16,15,14,1)', MID = 'rgba(70,70,72,.88)', PALE = 'rgba(112,116,120,.5)';
 
   // far culm: pale and very wet, behind the leaves — depth by tone and softness, not by detail
-  culm(c, quad([585, 860], [590, 420], [625, -60], 90), [230, 260], 24, { rgb: '160,164,168', alpha: .22 }, [.5, .4], .95, null, 300);
+  culm(c, quad([585, 860], [590, 420], [625, -60], 300), [230, 260], 24, { rgb: '160,164,168', alpha: .22 }, [.5, .4], .95, null, 300);
 
   // two near culms, big enough to fill the leaf (≈8% of its width), cropped by the top and bottom edges
-  const nB = culm(c, quad([150, 860], [185, 430], [240, -60], 90), [205, 245, 255], 54, { rgb: '138,138,140', alpha: .45 }, [.2, .8], .1, 'rgba(70,68,66,.85)', 200);
-  const nA = culm(c, quad([330, 860], [345, 420], [400, -60], 90), [235, 250, 260], 64, { rgb: '108,108,110', alpha: .55 }, [.15, .9], .1, 'rgba(40,38,36,.9)', 100);
+  const nB = culm(c, quad([150, 860], [185, 430], [240, -60], 300), [205, 245, 255], 54, { rgb: '138,138,140', alpha: .45 }, [.2, .8], .1, 'rgba(70,68,66,.85)', 200);
+  const nA = culm(c, quad([330, 860], [345, 420], [400, -60], 300), [235, 250, 260], 64, { rgb: '108,108,110', alpha: .55 }, [.15, .9], .1, 'rgba(40,38,36,.9)', 100);
 
   // leaves: long, black, in wide groups; some hang, some reach sideways or up; a wet pale group lower right
-  const tA1 = twig(c.l, r, nA[3], -.55, 120, 'rgba(34,32,30,.85)', 390);
+  const tA1 = twig(c.l, r, nA[3], -.55, 120, 'rgba(34,32,30,.85)', 390, 32);
   group(c.l, r, ...tA1.end, .95, .42, 215, 4, DARK, 395, 2);
   group(c.l, r, ...tA1.joint, -.15, .5, 175, 3, DARK, 396, 2);
-  const tA0 = twig(c.l, r, nA[2], -.3, 170, 'rgba(34,32,30,.85)', 400);
+  const tA0 = twig(c.l, r, nA[2], -.3, 170, 'rgba(34,32,30,.85)', 400, 32);
   group(c.l, r, ...tA0.end, .75, .45, 200, 4, DARK, 410, 2);
   group(c.l, r, ...tA0.side, 1.5, .5, 150, 3, MID, 411);
-  const tB1 = twig(c.l, r, nB[2], -2.75, 90, 'rgba(34,32,30,.8)', 450);
+  const tB1 = twig(c.l, r, nB[2], -2.75, 90, 'rgba(34,32,30,.8)', 450, 26);
   group(c.l, r, ...tB1.end, 2.25, .5, 185, 4, DARK, 460, 2);
   group(c.l, r, ...tB1.joint, 1.75, .45, 130, 3, MID, 470);
   // lower right: a wet pale group that spreads (破墨), from a twig of the host culm
-  const tA2 = twig(c.l, r, nA[1], .25, 150, 'rgba(90,88,86,.7)', 480);
+  const tA2 = twig(c.l, r, nA[1], .25, 150, 'rgba(90,88,86,.7)', 480, 32);
   washMark(c, .85, (g, white) => group(g, rng(490), ...tA2.end, 1.05, .38, 190, 6, white || PALE, 490));
   washMark(c, .85, (g, white) => group(g, rng(491), ...tA2.joint, 1.6, .45, 140, 3, white || PALE, 491));
 
