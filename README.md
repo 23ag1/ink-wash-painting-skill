@@ -42,6 +42,7 @@ python3 kit/serve.py 8770          # from the repo root
 # → http://localhost:8770/reference/index.html               月满中秋, the Mid-Autumn river scene
 # → http://localhost:8770/examples/rain-market/index.html     雨市, a market street in rain (vertical scroll)
 # → http://localhost:8770/examples/minimal-bamboo/index.html  清风, the smallest complete build (album leaf)
+# → http://localhost:8770/examples/tage/index.html           踏歌, after Ma Yuan's Singing and Dancing (silk, axe-cut peaks)
 ```
 
 ## The kit — modules, not a pipeline
