@@ -174,7 +174,7 @@ export function facetRock(c, sp, notan) {
     // fibres — no blur), starting at different heights and running down the plane's fall, denser near its upper
     // edge; then a few dry strokes on the ink layer for the rock's grain
     const D = [Math.cos(f.dir), Math.sin(f.dir)];
-    const n = Math.round((x1 - x0) * (y1 - y0) / (f.chop[0] * f.chop[1]) * (.5 + 1.5 * f.tone));
+    const n = Math.round((x1 - x0) * (y1 - y0) / (f.chop[0] * f.chop[1]) * (.5 + 1.5 * f.tone) * 2.6);   // many faint strokes that merge
     c.w.save(); c.w.clip(outline); c.w.clip(P);
     c.wet.save(); c.wet.clip(outline); c.wet.clip(P);
     c.l.save(); c.l.clip(outline); c.l.clip(P);
@@ -182,12 +182,25 @@ export function facetRock(c, sp, notan) {
       const pt = [x0 + r() * (x1 - x0), y0 + Math.pow(r(), 1.6) * (y1 - y0)];   // biased toward the upper edge
       if (!inPoly(pt, f.poly)) continue;
       i++;
-      const ang = f.dir + (r() - .5) * .35, len = f.chop[0] * (.7 + r() * 1.1), wid = f.chop[1] * (1.2 + r() * .9);
+      const ang = f.dir + (r() - .5) * .35, len = f.chop[0] * (.8 + r() * 1.2), wid = f.chop[1] * (1.6 + r() * 1.1);
       const pts = quad(pt, [pt[0] + Math.cos(ang) * len * .5 + (r() - .5) * 8, pt[1] + Math.sin(ang) * len * .5], [pt[0] + Math.cos(ang) * len, pt[1] + Math.sin(ang) * len], 12);
       const p = { bristles: Math.max(8, Math.round(wid * .6)), dryFrom: .45, dryness: .6, streak: len, edge: .2, fade: .35, tipSide: .6, close: 0, profile: t => (t < .18 ? .25 + Math.sqrt(t / .18) * .75 : 1 - (t - .18) * .3) };
-      hairyStroke(c.w, pts, wid, sp.seed + i * 17, { ...p, rgb: '92,78,60', alpha: (.1 + .22 * f.tone) * (.7 + r() * .5) });
-      hairyStroke(c.wet, pts, wid, sp.seed + i * 17, { ...p, rgb: '255,255,255', alpha: .5 });
-      if (r() < .3 + .3 * f.tone) axeChop(c.l, pt[0], pt[1], ang, len * .8, wid * .6, (.12 + .25 * f.tone) * (.7 + r() * .5), 1, sp.seed + i * 29);
+      hairyStroke(c.w, pts, wid, sp.seed + i * 17, { ...p, rgb: '92,78,60', alpha: (.04 + .09 * f.tone) * (.7 + r() * .6) });
+      hairyStroke(c.wet, pts, wid * 1.2, sp.seed + i * 17, { ...p, rgb: '255,255,255', alpha: .9 });   // very wet: they bleed together
+      if (r() < .25) {                                  // grain: long thin dry streaks running with the plane, faint
+        hairyStroke(c.l, pts.map(([x, y]) => [x + (r() - .5) * 2, y]), wid * .35, sp.seed + i * 29, { ...p, rgb: '30,25,18', alpha: .05 + .07 * f.tone, dryFrom: .1, dryness: .9, tipSide: 0, profile: t => Math.min(1, t * 8) * (1 - t * .3) });
+      }
+    }
+    // tone gathers where the plane turns: extra wet strokes starting at its upper edge only
+    if (f.tone > .3) for (let i = 0, tries = 0; i < n * .5 && tries < n * 6; tries++) {
+      const pt = [x0 + r() * (x1 - x0), y0 + Math.pow(r(), 3) * (y1 - y0)];
+      if (!inPoly(pt, f.poly)) continue;
+      i++;
+      const ang = f.dir + (r() - .5) * .3, len = f.chop[0] * (.5 + r() * .8), wid = f.chop[1] * (1.4 + r());
+      const pts = quad(pt, [pt[0] + Math.cos(ang) * len * .5, pt[1] + Math.sin(ang) * len * .5], [pt[0] + Math.cos(ang) * len, pt[1] + Math.sin(ang) * len], 10);
+      const p = { bristles: Math.max(8, Math.round(wid * .6)), dryFrom: .4, dryness: .6, streak: len, edge: .2, fade: .6, tipSide: .6, close: 0, profile: t => (t < .18 ? .25 + Math.sqrt(t / .18) * .75 : 1 - (t - .18) * .3) };
+      hairyStroke(c.w, pts, wid, sp.seed + 5000 + i * 13, { ...p, rgb: '70,58,44', alpha: (.06 + .1 * f.tone) * (.7 + r() * .6) });
+      hairyStroke(c.wet, pts, wid * 1.2, sp.seed + 5000 + i * 13, { ...p, rgb: '255,255,255', alpha: .9 });
     }
     c.wet.restore(); c.w.restore();
     c.l.restore();
