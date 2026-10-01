@@ -108,6 +108,13 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
 - **Roofs without houses** — barcode hatching on rectangles, no walls. *Fix:* structure note; wall + roof + openings.
 - **Crowd as pebbles, umbrellas as pies** — one motif multiplied before it worked. *Fix:* motif study first.
 
+- **Bamboo as lens dabs and starbursts** (minimal example, first tries) — leaves drawn as symmetric short
+  blobs, then as needles radiating from one point, then as tight tassels. *Fix (from real 墨竹):* one stroke per
+  leaf, thin entry, widest near 15%, holding width then a long sharp tail, width ~15-19% of length, nearly flat
+  dark ink; groups of 3-4 splayed like fingers (~.5 rad apart) leaving the twig at slightly different points,
+  many groups along the twigs; culms as wide grey side-brush segments with pooled edges, 飞白 and paper gaps at
+  the nodes. Looking at three real paintings fixed in one round what parameter tweaking did not.
+
 ## 8. Process lessons
 - **Research the canon before inventing.** Composition (Guo Xi, Xie He) and technique (MoXi, Curtis, Bousseau,
   Lingdong Huang's shan-shui-inf) answered questions that trial-and-error kept getting wrong.

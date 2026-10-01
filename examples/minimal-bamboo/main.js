@@ -1,14 +1,20 @@
-// 清风 — the smallest complete build from the kit: an album leaf with one bamboo in the wind.
+// 清风 — the smallest complete build from the kit: an album leaf with bamboo.
 // Marks are painted once into three canvases (wash, wetness, ink); the kit runtime runs a scene field,
 // the diffusion pass, a paint pass assembled from kit modules, and a per-frame pass with drifting mist.
 // Deliberately different choices from the other examples: square format, cooler sheet, no palette muting,
 // stronger pooled edges, no water, no mountains.
+//
+// Studied from real bamboo paintings (墨竹): culms are wide single side-brush strokes, grey with darker pooled
+// edges and dry streaks (飞白), separated at the nodes by a gap of paper and short dark bracket marks; leaves are
+// long and narrow (7-10× longer than wide), thin at the start, widest near a third, with a long sharp tail, laid
+// in one stroke of nearly flat dark ink and hung in fanned 个/介 groups; far leaves and culms are pale and wet.
 import { createRuntime } from '../../kit/runtime.js';
 import { rng } from '../../kit/brush/brush.js';
-import { stroke, blob, walk, quad } from '../../kit/brush/ink.js';
+import { stroke, quad, walk } from '../../kit/brush/ink.js';
 import { drawInscription } from '../../kit/brush/text.js';
 
 const D = 800;                                   // design space: 800 × 800, y down
+const WHITE = 'rgba(255,255,255,1)';
 
 function layer(S, fill) {
   const c = document.createElement('canvas');
@@ -21,70 +27,117 @@ function layer(S, fill) {
 
 // a mark goes to the wash layer and records how wet it was (wet marks spread along the fibres, dry stay sharp)
 function washMark(c, wetness, paint) {
-  paint(c.w);
-  c.wet.save(); c.wet.globalAlpha = wetness; paint(c.wet, true); c.wet.restore();
+  paint(c.w, null);
+  c.wet.save(); c.wet.globalAlpha = wetness; paint(c.wet, WHITE); c.wet.restore();
 }
 
-// one leaf: a lens-shaped dab hanging from (x, y) along angle a
-function leaf(g, r, x, y, a, len, col, seed) {
-  blob(g, x + Math.cos(a) * len / 2, y + Math.sin(a) * len / 2,
-    { len, wid: len * (.13 + r() * .04), ang: a, col, noi: .35, seed });
+// one leaf in one stroke: thin entry from the stalk, widest near a third, long sharp tail; it droops a little
+const LEAF = t => (t < .14 ? Math.pow(t / .14, .6) : 1 - Math.pow((t - .14) / .86, 1.9));
+function leaf(g, r, x, y, a, len, col, seed, coats = 1) {
+  const droop = len * (.06 + r() * .1) * Math.sign(Math.cos(a) || 1);
+  const ex = x + Math.cos(a) * len, ey = y + Math.sin(a) * len;
+  const cx = x + Math.cos(a) * len * .5 - Math.sin(a) * droop, cy = y + Math.sin(a) * len * .5 + Math.cos(a) * droop;
+  const pts = quad([x, y], [cx, cy], [ex, ey], 24), wid = len * (.15 + r() * .04);
+  // a fully loaded brush: near leaves get a second coat so they read as nearly solid black
+  for (let k = 0; k < coats; k++) stroke(g, pts, { wid: wid * (1 - k * .08), fun: LEAF, noi: .12, col, seed, tip: .25, dry: .18 });
 }
 
-// a 个 / 介 cluster: 2-6 leaves fanning unevenly from one point (bigger clusters have more leaves)
-function cluster(g, r, x, y, base, size, col, seed) {
-  const n = Math.max(2, Math.min(6, Math.round(size / 22 + r() * 1.6)));
+// a group (个 = 3, 介 = 4) splayed like fingers from one point: step = angle between neighbouring leaves (~.5)
+function group(g, r, x, y, base, step, size, n, col, seed, coats = 1) {
   for (let i = 0; i < n; i++) {
-    const a = base + (i - (n - 1) / 2) * (.22 + r() * .22) + (r() - .5) * .16;
-    leaf(g, r, x, y, a, size * (.6 + r() * .55), col, seed + i * 3.1);
+    const a = base + (i - (n - 1) / 2) * step * (.8 + r() * .4) + (r() - .5) * .2;
+    // leaves leave the twig at slightly different points, so the group overlaps instead of radiating
+    leaf(g, r, x + (r() - .5) * 14, y + (r() - .5) * 10, a, size * (.7 + r() * .5), col, seed + i * 3.1, coats);
   }
+}
+
+// a culm: segments as wide side-brush strokes (wash layer, fairly dry so the edges pool), paper gaps at the
+// nodes, dark bracket marks and a short ring stroke on the ink layer; returns the node points for the twigs
+function culm(c, pts, seg, wid, col, wetness, nodeInk, seed) {
+  const r = rng(seed), nodes = [0];
+  for (let i = 0, acc = 0; i < pts.length - 1; i++) {
+    acc += Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
+    if (acc > seg[Math.min(nodes.length - 1, seg.length - 1)]) { nodes.push(i + 1); acc = 0; }
+  }
+  if (nodes[nodes.length - 1] !== pts.length - 1) nodes.push(pts.length - 1);
+  for (let k = 0; k < nodes.length - 1; k++) {
+    const s = pts.slice(nodes[k] + 1, nodes[k + 1]);       // the gap of one point at each node stays paper
+    if (s.length < 2) continue;
+    const w = wid * (1 - k * .045);
+    const flare = t => .96 + .1 * Math.pow(Math.abs(2 * t - 1), 4);    // segments swell slightly at the nodes
+    washMark(c, wetness, (g, white) => stroke(g, s, { wid: w, fun: flare, noi: .18, col: white || col, seed: seed + k, tip: .85, dry: .5 }));
+    // 飞白: a few dry streaks along the segment where the brush ran out
+    c.w.save(); c.w.globalCompositeOperation = 'destination-out';
+    for (let j = 0; j < 3; j++) {
+      const off = (r() - .5) * w * .7, from = Math.floor(r() * s.length * .5), to = Math.min(s.length, from + 3 + Math.floor(r() * s.length * .6));
+      const run = s.slice(from, to).map(([x, y], i, arr) => {
+        const [nx, ny] = arr[Math.min(i + 1, arr.length - 1)], [px, py] = arr[Math.max(i - 1, 0)];
+        const l = Math.hypot(nx - px, ny - py) || 1;
+        return [x - (ny - py) / l * off, y + (nx - px) / l * off];
+      });
+      if (run.length > 1) stroke(c.w, run, { wid: .8 + r() * 1.4, noi: .6, col: `rgba(0,0,0,${.35 + r() * .35})`, seed: seed + 40 + j, dry: .6 });
+    }
+    c.w.restore();
+    if (!nodeInk || k === nodes.length - 2) continue;
+    const [nx, ny] = pts[nodes[k + 1]], [px, py] = pts[nodes[k + 1] - 1];
+    const l = Math.hypot(nx - px, ny - py), ux = (nx - px) / l, uy = (ny - py) / l, vx = -uy, vy = ux;
+    const hw = w * .55;
+    const at = (u, v) => [nx + ux * u + vx * v, ny + uy * u + vy * v];
+    stroke(c.l, [at(-3, -hw), at(1, -hw * .3), at(2, hw * .2), at(-2, hw)], { wid: 2.6, noi: .4, col: nodeInk, seed: seed + 60 + k, dry: .3 });
+    stroke(c.l, [at(-6, -hw - 3), at(-1, -hw + 1)], { wid: 3, noi: .3, col: nodeInk, seed: seed + 70 + k });
+    stroke(c.l, [at(-1, hw - 1), at(-6, hw + 3)], { wid: 3, noi: .3, col: nodeInk, seed: seed + 80 + k });
+  }
+  return nodes.map(i => pts[i]);
+}
+
+// a twig from a node: thin, long, with a joint where a side twig leaves; returns its end and joint
+function twig(g, r, [x, y], ang, len, col, seed) {
+  const main = walk(rng(seed), x, y, ang, len, 8, .14);
+  stroke(g, main, { wid: 2.4, fun: t => 1 - t * .6, noi: .3, col, seed, dry: .3 });
+  const j = main[4];
+  const side = walk(rng(seed + 1), j[0], j[1], ang + (r() < .5 ? .5 : -.45), len * .45, 5, .15);
+  stroke(g, side, { wid: 1.6, fun: t => 1 - t * .6, noi: .3, col, seed: seed + 1, dry: .3 });
+  return { end: main[main.length - 1], joint: j, side: side[side.length - 1] };
 }
 
 function paintMarks(S) {
   const c = { w: layer(S), wet: layer(S, '#000'), l: layer(S) };
   const r = rng(11);
-  const white = 'rgba(255,255,255,1)';
+  const DARK = 'rgba(16,15,14,1)', MID = 'rgba(70,70,72,.88)', PALE = 'rgba(112,116,120,.5)';
 
-  // far culm and leaves: pale, wet, behind — depth by tone and softness, not by detail
-  washMark(c, 1, (g, w) => {
-    stroke(g, quad([600, 820], [640, 420], [700, 40], 30), { wid: 11, fun: () => 1, noi: .3, col: w ? white : 'rgba(118,124,128,.32)', seed: 4, dry: .2 });
-  });
-  for (let i = 0; i < 4; i++) {
-    const x = 560 + r() * 160, y = 120 + r() * 360, base = .9 + r() * .4;
-    washMark(c, .9, (g, w) => cluster(g, rng(30 + i), x, y, base, 70, w ? white : 'rgba(126,132,136,.3)', 30 + i));
-  }
+  // far culm and its leaves: pale, very wet — depth by tone and softness, not by detail
+  culm(c, quad([690, 830], [700, 420], [742, -20], 60), [140, 160], 15, 'rgba(150,154,158,.38)', .95, null, 300);
+  washMark(c, .9, (g, white) => group(g, rng(301), 712, 300, 1.6, .5, 95, 4, white || PALE, 301));
+  washMark(c, .9, (g, white) => group(g, rng(302), 705, 470, 1.0, .55, 80, 3, white || PALE, 302));
 
-  // host culm: segments with dark nodes, rising on a diagonal from the lower left (the void is upper left)
-  const P = quad([200, 830], [300, 470], [470, 40], 60);
-  const nodes = [0, 11, 22, 32, 41, 49, 56, 60];
-  for (let k = 0; k < nodes.length - 1; k++) {
-    const seg = P.slice(nodes[k] + 1, nodes[k + 1]);
-    if (seg.length < 2) continue;
-    stroke(c.l, seg, { wid: 21 - k * 1.6, fun: t => .92 + .08 * Math.sin(t * Math.PI), noi: .25, col: 'rgba(32,30,28,.9)', seed: k, tip: .7, dry: .45 });
-    const [nx, ny] = P[nodes[k + 1]];
-    stroke(c.l, [[nx - 10 + k, ny + 2], [nx, ny - 1.5], [nx + 10 - k, ny + 1]], { wid: 3.2, noi: .4, col: 'rgba(20,18,16,.9)', seed: 50 + k, dry: .2 });
-  }
+  // second culm, mid grey, partly behind the host
+  const nB = culm(c, quad([520, 830], [540, 450], [590, 60], 70), [120, 150, 165, 160, 150], 26, 'rgba(98,98,100,.72)', .4, 'rgba(60,58,56,.75)', 200);
 
-  // branchlets — each different (length, angle, how many clusters, where) so the eye never finds a ladder;
-  // leaves in three tones: charred dry ink, mid ink, and wet mid-tone washes that spread (破墨)
-  const TONE = { dark: 'rgba(22,20,18,.88)', mid: 'rgba(64,62,60,.7)', wet: 'rgba(70,72,74,.55)' };
-  const BRANCHES = [   // node, angle, length, clusters: [position along the twig 0..1, hang angle, size, tone]
-    [1, -2.5, 60, [[1, 1.9, 64, 'mid']]],
-    [2, -.25, 135, [[1, .7, 108, 'dark'], [.45, 1.3, 72, 'wet']]],
-    [3, -.05, 70, [[1, 1.05, 82, 'wet']]],
-    [4, -.42, 165, [[1, .5, 122, 'dark'], [.62, 1.35, 92, 'dark'], [.28, 2.05, 58, 'wet']]],
-    [6, -.75, 95, [[1, .95, 78, 'mid']]],
-  ];
-  BRANCHES.forEach(([k, a, len, clusters], i) => {
-    const [x, y] = P[nodes[k]];
-    const tw = walk(rng(70 + i), x, y, a, len, 8, .16);
-    stroke(c.l, tw, { wid: 3.4 - i * .2, fun: t => 1 - t * .65, noi: .3, col: 'rgba(30,28,26,.85)', seed: 70 + i, dry: .3 });
-    clusters.forEach(([at, hang, size, tone], j) => {
-      const [cx, cy] = tw[Math.round(at * (tw.length - 1))], seed = 90 + i * 7 + j;
-      if (tone === 'wet') washMark(c, .7, (g, w) => cluster(g, rng(seed), cx, cy, hang, size, w ? white : TONE.wet, seed));
-      else cluster(c.l, rng(seed), cx, cy, hang, size, TONE[tone], seed);
-    });
-  });
+  // host culm: dark grey, wide, on a diagonal from the lower left; the void and the title are upper left
+  const nA = culm(c, quad([250, 840], [330, 470], [460, -30], 80), [95, 125, 150, 160, 160, 150], 38, 'rgba(66,66,68,.86)', .3, 'rgba(26,24,22,.9)', 100);
+
+  // twigs and leaves — every group different: size, count, spread, tone; near ones charred and flat,
+  // a wet mid-tone group lower right, a light group from the second culm
+  // host culm: a heavy dark mass near the top (crossing the culm), groups along the twigs, one twig to the left
+  const tA5 = twig(c.l, r, nA[5], -.35, 130, 'rgba(34,32,30,.85)', 390);
+  group(c.l, r, ...tA5.end, 1.2, .5, 120, 4, DARK, 395, 2);
+  group(c.l, r, ...tA5.joint, 2.0, .55, 105, 3, DARK, 396, 2);
+  group(c.l, r, ...tA5.side, .55, .5, 95, 3, DARK, 397, 2);
+  const tA3 = twig(c.l, r, nA[3], -.45, 160, 'rgba(34,32,30,.85)', 400);
+  group(c.l, r, ...tA3.end, .85, .55, 118, 4, DARK, 410, 2);
+  group(c.l, r, ...tA3.joint, 1.75, .5, 100, 3, DARK, 411, 2);
+  group(c.l, r, ...tA3.side, 1.3, .45, 90, 3, MID, 420);
+  const tA2 = twig(c.l, r, nA[2], -2.6, 115, 'rgba(34,32,30,.8)', 450);
+  group(c.l, r, ...tA2.end, 2.3, .5, 108, 4, DARK, 460, 2);
+  group(c.l, r, ...tA2.joint, 1.7, .5, 75, 3, MID, 470);
+  // second culm: lighter groups, one of them wet so it spreads (破墨)
+  const tB2 = twig(c.l, r, nB[2], -.3, 165, 'rgba(70,68,66,.7)', 480);
+  washMark(c, .8, (g, white) => group(g, rng(490), ...tB2.end, 1.1, .5, 115, 4, white || 'rgba(96,98,102,.62)', 490));
+  washMark(c, .8, (g, white) => group(g, rng(491), ...tB2.joint, 1.9, .55, 95, 3, white || 'rgba(96,98,102,.62)', 491));
+  group(c.l, r, ...tB2.side, .7, .5, 85, 3, MID, 500);
+  const tB4 = twig(c.l, r, nB[4], -.6, 95, 'rgba(70,68,66,.7)', 510);
+  group(c.l, r, ...tB4.end, 1.0, .5, 92, 3, MID, 520);
+  group(c.l, r, ...tB4.joint, 2.1, .5, 70, 2, MID, 521);
 
   drawInscription(c, { text: '清风', x: 118, y: 150, size: 54, step: 56, seal: { x: 100, y: 268, size: 22, chars: ['竹', '影', '清', '风'] } });
   return c;
