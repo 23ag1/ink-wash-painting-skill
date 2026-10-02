@@ -83,18 +83,14 @@ export function paintScene(c, notan) {
   bareTree(c, { x: 168, y: 728, ang: -1.2, len: 64, seed: 82 }, notan);
   reeds(c, [[470, 1000, 22], [500, 992, 14], [40, 950, 16]], notan);
   pollardWillow(c, {
-    // measured on Ma Yuan's scroll: trunk enters the right edge ~y920, head at ~(558,742), wands up to ~y440,
+    // measured on Ma Yuan's scroll: trunk enters the right edge ~y920, head at ~(558,742),
     // the branch reaches left to ~x400 almost level
     trunk: [[676, 948], [646, 912], [616, 870], [594, 820], [576, 778], [564, 752]], trunkW: [42, 30],
     headAt: [560, 740, 24],
     head: [[560, 745, 19], [548, 734, 15], [570, 731, 14], [557, 721, 11], [576, 750, 12], [545, 752, 12]],
-    wands: [
-      [549, 728, -1.7, 220, 3.6], [557, 724, -1.63, 260, 4], [566, 726, -1.55, 200, 3.4], [574, 732, -1.4, 100, 2.6],
-    ],
-    branches: [
-      { pts: [[556, 742], [545, 742], [522, 746], [500, 737], [478, 742], [455, 732], [431, 735], [408, 726], [392, 728]], w: 8,
-        shoots: [[3, -2.2, 34], [5, -2.35, 40], [7, -2.0, 22]], strands: 24 },
-      { pts: [[554, 752], [546, 756], [524, 765], [503, 764], [482, 774], [462, 777], [444, 786]], w: 5, shoots: [[4, -2.4, 20]], strands: 12 },
+    // the crown, from willow paintings: limbs rise and arch over (bend = total turn), the low one nearly level
+    limbs: [
+      [548, 728, -2.0, 210, 11, -1.4], [560, 722, -1.65, 190, 9, -1.0], [574, 728, -1.2, 120, 7, 1.1], [545, 744, -2.9, 170, 8, -.5],
     ],
     seed: 91,
   }, notan);

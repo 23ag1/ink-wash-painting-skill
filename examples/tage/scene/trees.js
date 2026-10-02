@@ -139,7 +139,7 @@ export function bareTree(c, sp, notan) {
 // Ma Yuan's willow (踏歌图), a pollard, PAINTED: everything goes on the canvases and through the same diffusion
 // and paint pass as the rocks (a shape composited after the paint pass reads as a vector cut-out).
 // Painter's order: wet washes on the trunk and head (they bleed and merge), dry side-brush bark strokes (飞白),
-// the dark knotty head of short heavy strokes, then the thin wands and the crooked branch — their strokes start
+// the dark knotty head of short heavy strokes, then the arching limbs of the crown — their strokes start
 // INSIDE the dark head, so the joints are hidden in it, as on the scroll. Strands last.
 function offsetLine(axis, k, widths) {
   return axis.map(([x, y], i) => {
@@ -192,36 +192,49 @@ export function pollardWillow(c, sp, notan) {
     blob(c.l, x, y, { len: 5 + r() * 6, wid: 3 + r() * 3, ang: -1.1, noi: .8, col: `rgba(14,10,8,${.6 + r() * .3})`, seed: sp.seed + 60 + i });
   }
 
-  // 3. wands and branches: their strokes begin inside the head (the joint disappears in the dark mass)
-  sp.wands.forEach(([x, y, ang, len, w], i) => {
-    const rr = rng(sp.seed + 70 + i), pts = [[x, y]];
-    for (let k = 1; k <= 6; k++) { const a = ang + .03 * k + (rr() - .5) * .05; pts.push([pts[k - 1][0] + Math.cos(a) * len / 6, pts[k - 1][1] + Math.sin(a) * len / 6]); }
+  // 3. the crown, after real willow paintings (and the scroll): limbs RISE AND ARCH OVER, painted with a loaded
+  //    brush, uneven, with nodes; each carries many short angular branchlets, mostly upward (鹿角); the strands fall
+  //    from the twig tips in BUNCHES along a thrown-stone curve — out and a little up along the twig, then over and
+  //    down — never straight hairs stuck on a stick. Every limb starts inside the dark head (the joint hides there),
+  //    every branchlet starts pressed from its parent's stroke.
+  const bunch = (x, y, a, n, reach, seed) => {
+    const rr = rng(seed);
+    for (let k = 0; k < n; k++) {
+      const la = a + (rr() - .5) * .7, K = reach * (.3 + rr() * 1.1), L = 25 + Math.pow(rr(), 1.6) * 190;
+      const vx = Math.cos(la), vy = Math.min(.2, Math.sin(la)), drift = (rr() - .5) * 10;
+      const pts = Array.from({ length: 14 }, (_, i) => { const t = i / 13; return [x + vx * K * t * (1 - t * .55) + drift * t * t, y + vy * K * t + L * t * t]; });
+      depthLine(c, pts, 1.5, .08);
+      stroke(c.l, smooth(pts, 2), { wid: .45 + rr() * .35, fun: t => 1 - t * .85, noi: .25, col: `rgba(30,26,20,${.14 + Math.pow(rr(), .7) * .4})`, seed: seed + 30 + k, tip: .3, dry: .3 });
+    }
+  };
+  const limb = (x, y, ang, len, w, bend, d, seed) => {
+    const rr = rng(seed), steps = 7, pts = [[x, y]];
+    let a = ang;
+    for (let k = 1; k <= steps; k++) {
+      a += bend / steps * (.4 + 1.2 * k / steps) + (rr() - .5) * .3 + (rr() < .3 ? (rr() - .5) * .8 : 0);   // crooked, never a clean arc
+      pts.push([pts[k - 1][0] + Math.cos(a) * len / steps, pts[k - 1][1] + Math.sin(a) * len / steps]);
+    }
+    const w1 = Math.max(.6, w * .22), wAt = t => w + (w1 - w) * t;
     depthLine(c, pts, w + 2, .08);
-    stroke(c.l, smooth(pts, 3), { wid: w, fun: t => (t < .08 ? .7 + t * 3.7 : 1) * (1 - t * .8), noi: .35, col: 'rgba(26,22,17,.82)', seed: sp.seed + 70 + i, tip: .3, dry: .35 });
-    if (i === 1) for (const [k, da, l] of [[4, .5, 50], [5, -.4, 30], [3, .6, 26]]) {
-      const tw = walk(rng(sp.seed + 90 + k), pts[k][0], pts[k][1], ang + da, l, 3, .15);
-      depthLine(c, tw, 2, .08);
-      stroke(c.l, tw, { wid: w * .45, fun: t => 1 - t * .85, noi: .3, col: 'rgba(30,26,20,.75)', seed: sp.seed + 95 + k, tip: .3, dry: .4 });
+    const P = smooth(pts, 3);
+    if (w > 2.4) hairyStroke(c.l, P, w, seed, { rgb: '18,14,10', alpha: .85, bristles: Math.max(6, Math.round(w * 1.4)), dryFrom: .55, dryness: .3, streak: len * .6, edge: .7, fade: .2, tipSide: .3, close: 0, profile: t => (t < .05 ? 1.15 : 1) * (wAt(t) / w) });   // no width ripple, little dry: cross-bands read as bamboo
+    else stroke(c.l, P, { wid: w, fun: t => (t < .06 ? 1.15 : 1) * wAt(t) / w, noi: .45, col: 'rgba(20,16,12,.85)', seed, tip: .35, dry: .4 });
+    if (d < 2) {
+      const n = d === 0 ? 5 + Math.floor(rr() * 3) : 2 + Math.floor(rr() * 2);
+      let side = rr() < .5 ? 1 : -1;
+      for (let i = 0; i < n; i++) {
+        const t = .22 + (i + .15 + rr() * .7) / n * .74, k = Math.min(steps - 1, Math.floor(t * steps)), u = t * steps - k;
+        const bx = pts[k][0] + (pts[k + 1][0] - pts[k][0]) * u, by = pts[k][1] + (pts[k + 1][1] - pts[k][1]) * u;
+        const da = Math.atan2(pts[k + 1][1] - pts[k][1], pts[k + 1][0] - pts[k][0]);
+        let ca = da + side * (.55 + rr() * .5);
+        const up = -Math.PI / 2 - ca; ca += Math.atan2(Math.sin(up), Math.cos(up)) * .3;          // branchlets lean up
+        limb(bx, by, ca, len * (.24 + rr() * .18) * (d ? .8 : 1), wAt(t) * .6, side * .35, d + 1, seed + 17 * (i + 1));
+        side = -side;
+      }
     }
-  });
-  sp.branches.forEach((br, bi) => {
-    const P = smooth(br.pts, 3);
-    depthLine(c, P, br.w + 2, .08);
-    hairyStroke(c.l, P, br.w, sp.seed + 100 + bi, { rgb: '20,16,12', alpha: .82, bristles: 7, dryFrom: .35, dryness: .55, streak: 40, edge: .6, fade: .3, tipSide: .3, close: 0, profile: t => (t < .06 ? .8 : 1) * (1 - t * .78) });
-    for (const [k, ang, len] of br.shoots || []) {
-      const tw = walk(rng(sp.seed + 110 + bi * 10 + k), br.pts[k][0], br.pts[k][1], ang, len, 4, .25);
-      depthLine(c, tw, 2, .08);
-      stroke(c.l, smooth(tw, 2), { wid: br.w * .32, fun: t => 1 - t * .85, noi: .35, col: 'rgba(26,22,17,.8)', seed: sp.seed + 120 + bi * 10 + k, tip: .3, dry: .4 });
-    }
-    const S = smooth(br.pts, 4);
-    for (let k = 0; k < (br.strands || 0); k++) {
-      const p = S[Math.floor(S.length * (.3 + .7 * r()))];
-      const l = 22 + Math.pow(r(), 1.3) * 80, sx = (r() - .5) * 10 + 3;
-      const tw = [[p[0], p[1]], [p[0] + 2, p[1] + l * .25], [p[0] + sx * .5, p[1] + l * .6], [p[0] + sx, p[1] + l]];
-      depthLine(c, tw, 1.5, .08);
-      stroke(c.l, smooth(tw, 4), { wid: .5 + r() * .45, fun: t => 1 - t * .8, noi: .3, col: `rgba(34,30,24,${.14 + r() * .26})`, seed: sp.seed + 300 + bi * 50 + k, dry: .4 });
-    }
-  });
+    if (d >= 1 || rr() < .9) bunch(pts[steps][0], pts[steps][1], a, d === 0 ? 7 : d === 1 ? 5 : 3, 18 + len * .12, seed + 500);
+  };
+  sp.limbs.forEach(([x, y, ang, len, w, bend], i) => limb(x, y, ang, len, w, bend, 0, sp.seed + 1000 + i * 131));
 
   // 4. the head over the joints: a broken lumpy rim pressed with the side of the brush (heavier below and on the
   //    shadow side), dark crevices between the lumps, dry rubs on the lit top

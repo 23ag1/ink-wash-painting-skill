@@ -239,3 +239,15 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   paint pass, like every other mark. The willow is now brushwork again (washes + dry side-brush + a dark knotty head
   of fused lumps whose outer arcs only are pressed), and the joints are hidden the painter's way: limb strokes start
   inside the dark head. `kit/glsl/limbs.glsl` stays for silhouettes/masks that feed the layers, never as a final overlay.
+
+### Willow: a stick with three hairs
+- **Symptom:** straight bare wands and a few straight hanging hairs — "a stick with hairs, not a tree".
+- **Cause:** the crown was built from a description, not from how willows are painted; and the hairs were
+  straight lines dropped from points on a line.
+- **Fix (from willow paintings and photos):** limbs rise and ARCH OVER, crooked (never a clean arc), painted with a
+  loaded brush, tapering; each carries many short angular branchlets, mostly upward (鹿角); strands fall from twig
+  tips in BUNCHES along a thrown-stone curve (out and a little up along the twig, then over and down), lengths and
+  tones varied. Limbs start inside the dark head, branchlets with a press from their parent — joints hide in ink.
+  No width ripple or strong dry brush on thick limbs: cross-bands read as bamboo nodes.
+- **Also:** read a complaint with its screenshot carefully — the screenshot may be the GOOD example ("why are these
+  fine and that is bad"). Ask or re-read before rewriting what the user liked.
