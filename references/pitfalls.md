@@ -222,3 +222,15 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   silhouette from noise on the distance. Fine strands stay brush strokes on the canvas.
 - **Trap:** texture coordinates from `dot(p, dir)` make rings wherever the limb turns (the projection jumps by
   |p|·Δangle); store arc length in the skeleton and continue it from the parent at each joint.
+- **Skeleton field traps (limbs.glsl), each seen on the willow:**
+  - frame blending past a segment's end: a thick short segment's round cap contains points far beyond it and
+    gives them a wrong cross coordinate → spots at every joint. Weight a segment only alongside it.
+  - smooth union between consecutive segments of one chain swells every joint → bamboo nodes. Fuse only where a
+    limb grows out of another (the `fuse` flag); plain min along a chain.
+  - per-segment values (a dark knot) averaged with a thick neighbour wash out → take the max over containing segments.
+  - anything the shader draws must also write depth on the canvas, or the mist pass veils it as if it were far.
+  - shading a limb as a cylinder (smooth gradient across) reads as CG. Paint it: a wet dark stroke with a ragged
+    inner edge on the shadow side, silk with dry bristle streaks in the middle, a broken contour; thin limbs as
+    plain dark lines (texture on a thin limb reads as nodes).
+  - the structure came from a crop of the master at full height, not from memory: the first two willows (a Y fork,
+    a "head" ball) were both wrong constructions.

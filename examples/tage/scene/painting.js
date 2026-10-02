@@ -83,14 +83,18 @@ export function paintScene(c, notan) {
   bareTree(c, { x: 168, y: 728, ang: -1.2, len: 64, seed: 82 }, notan);
   reeds(c, [[470, 1000, 22], [500, 992, 14], [40, 950, 16]], notan);
   pollardWillow(c, {
-    // after Ma Yuan: the trunk leans in from the right edge with a crook, forks at a knot into two stems that
-    // leave the frame upward, and one long branch arches out over the path
-    trunk: [[672, 968], [644, 930], [614, 884], [592, 834], [574, 792], [564, 772]], trunkW: [48, 28],
-    stems: [
-      { axis: [[568, 800], [554, 750], [545, 700], [546, 640], [540, 570], [535, 480], [532, 400]], w: [18, 3] },
-      { axis: [[572, 800], [567, 750], [574, 700], [580, 650], [589, 590], [596, 530]], w: [18, 2.5] },
+    // measured on Ma Yuan's scroll: trunk enters the right edge ~y920, head at ~(558,742), wands up to ~y440,
+    // the branch reaches left to ~x400 almost level
+    trunk: [[676, 948], [646, 912], [616, 870], [594, 820], [576, 778], [564, 752]], trunkW: [42, 30],
+    head: [[560, 744, 19], [547, 733, 13], [571, 731, 12], [555, 722, 11], [574, 748, 11], [541, 749, 10], [565, 716, 8], [583, 738, 7]],
+    wands: [
+      [550, 724, -1.72, 250, 6.5], [557, 718, -1.66, 300, 7, true], [565, 719, -1.6, 225, 6], [574, 726, -1.45, 110, 4.5],
     ],
-    branches: [[552, 760, Math.PI + .38, 250, 6], [557, 774, Math.PI + .12, 150, 4.2]],
+    branches: [
+      { pts: [[545, 742], [522, 746], [500, 737], [478, 742], [455, 732], [431, 735], [408, 726], [392, 728]], w: 9,
+        shoots: [[2, -2.2, 34], [4, -2.35, 40], [6, -2.0, 22]], strands: 24 },
+      { pts: [[546, 756], [524, 765], [503, 764], [482, 774], [462, 777], [444, 786]], w: 5, shoots: [[3, -2.4, 20]], strands: 12 },
+    ],
     seed: 91,
   }, notan);
   if (!notan) {

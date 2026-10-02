@@ -20,26 +20,29 @@ void main() {
   vec2 perp = vec2(-f.dir.y, f.dir.x);
   float along = f.along, across = f.across * f.r;            // the limb's own frame (see kit/limbs.glsl)
   // ragged silhouette: the brush edge is never a clean offset curve
-  float d = f.d + (fbm(vec2(along * .12, across * .4) + 3.) - .5) * min(f.r * .3, 2.2);
+  float d = f.d + (fbm(vec2(along * .12, across * .4) + 3.) - .5) * (min(f.r * .3, 2.2) * smoothstep(2.5, 7., f.r) + .25);   // thin wands: smooth (bumps read as bamboo nodes)
   float cover = smoothstep(px, -px, d);
   if (cover <= 0.) { fragColor = vec4(0.); return; }
 
   float right = f.across * sign(perp.x + 1e-4);               // -1 lit (left) .. 1 shadow (right)
-  float thin = smoothstep(1.2, 4., f.r);                       // thin twigs are just dark lines
-  float shade = smoothstep(-.4, .9, right);
-  float tone = .4 + .42 * shade;
-  // wet tonal variation along the limb (strokes laid one beside another), then bark grain
-  tone += (fbm(vec2(along * .02, across * .08) + 11.) - .5) * .3;
-  float grain = fbm(vec2(along * .05, across * .5) + 5.);
-  tone += smoothstep(.55, .78, grain) * .35 * (.5 + .5 * shade);
-  // dry brush on the lit side: bristle gaps where the silk shows through
-  float dry = smoothstep(.6, .85, fbm(vec2(along * .03, across * .9) + 17.));
-  tone *= 1. - .5 * dry * (1. - shade);
-  // the contour: pressed, darker on the shadow side, broken here and there
-  float edgeW = clamp(f.r * .16, .7, 3.2) * mix(.7, 1.3, shade);
+  // painted, not shaded: no cylinder gradient. A broad wet stroke down the shadow side with a ragged inner
+  // edge; silk in the middle crossed by a few dry bristle streaks; dark knots; a broken contour.
+  float rag = fbm(vec2(along * .03, 1.7)) - .5;
+  float side = smoothstep(-.35 + .5 * rag, -.05 + .5 * rag, right);  // the wet stroke covers the shadow two-thirds
+  float bristle = fbm(vec2(along * .012, across * 1.4) + 5.);
+  float tone = .22 + f.ink;                                      // the silk with a thin warm wash
+  tone = max(tone, side * (.62 + .3 * bristle));
+  tone = max(tone, smoothstep(.6, .72, bristle) * .55 * (1. - side));   // dry streaks along the limb
+  float knot = smoothstep(.76, .84, noise(vec2(along * .035, across * .14) + 41.));
+  tone = max(tone, knot * .85);
+  // creases where the head's lumps fuse (only on the head: the trunk's own taper must not draw a rim)
+  tone = max(tone, smoothstep(.4, 2.5, f.crease) * smoothstep(.05, .2, f.ink) * .9);
+  // the contour: pressed, heavier on the shadow side, broken on the lit side
+  float edgeW = clamp(f.r * .14, .8, 3.) * mix(.8, 1.4, step(0., right));
   float edge = 1. - smoothstep(edgeW * .4, edgeW, -d);
-  edge *= smoothstep(.3, .45, noise(vec2(along * .04, right * 2.) + 23.));
-  tone = max(tone, edge * .92);
-  tone = mix(.85, clamp(tone, 0., .95), thin);
+  edge *= mix(smoothstep(.35, .5, noise(vec2(along * .05, 3.) + 23.)), 1., step(0., right));
+  tone = max(tone, edge * .9);
+  // thin wands and twigs are single dark lines: any texture on them reads as bamboo nodes
+  tone = mix(.82, clamp(tone, 0., .95), smoothstep(4.5, 8., f.r));
   fragColor = vec4(mix(SILK, INK, tone), cover);
 }

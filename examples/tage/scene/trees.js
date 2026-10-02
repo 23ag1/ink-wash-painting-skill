@@ -136,72 +136,63 @@ export function bareTree(c, sp, notan) {
   grow(sp.x, sp.y, sp.ang, sp.len, 5.5, 0);
 }
 
-// Ma Yuan's willow (踏歌图): a long trunk leaning in from the edge with a crook, a fork into two
-// stems that leave the frame upward, and one long branch arching out over the path, hung with fine strands.
-// Each limb is a tapered band: mid-dark wash, darker shadow side, dry bark grain, broken contours, a few pale
-// scrapes (small and unoutlined — an outlined oval reads as an eye).
-function band(axis, widths) {
-  const L = [], R = [];
-  axis.forEach(([x, y], i) => {
-    const [px, py] = axis[Math.max(0, i - 1)], [nx, ny] = axis[Math.min(axis.length - 1, i + 1)];
-    const a = Math.atan2(ny - py, nx - px), w = widths[i] / 2;
-    L.push([x + Math.sin(a) * w, y - Math.cos(a) * w]); R.push([x - Math.sin(a) * w, y + Math.cos(a) * w]);
-  });
-  return { L, R, path: poly([...L, ...R.slice().reverse()]) };
-}
-
+// Ma Yuan's willow (踏歌图), a pollard: a short thick trunk leaning in from the edge, a knobby swollen head wider
+// than the trunk, three or four thin straight wands rising from it toward the grove, and one crooked, nearly level
+// branch reaching left with short upward side shoots and a sparse fringe of hanging strands.
+// The wood is not painted here: every limb (and every lump of the head, as a circle) becomes part of ONE skeleton
+// that shaders/tree.frag renders as a single field — joints and lumps merge by construction, nothing floats.
+// Only depth and the fine strands are drawn on the canvases.
 export function pollardWillow(c, sp, notan) {
-  if (notan) {
-    for (const [ax, w] of [[sp.trunk, sp.trunkW], ...sp.stems.map(s => [s.axis, s.w])]) glaze(c, band(smooth(ax, 4), smooth(ax, 4).map((_, i, A) => w[0] + (w[1] - w[0]) * i / (A.length - 1))).path, '40,34,28', .9, 0);
-    return;
-  }
-  // the wood is not painted here: every limb becomes a tapered segment of one skeleton, and the shader
-  // (shaders/tree.frag) renders the skeleton as ONE field — joints merge by construction, nothing floats.
-  // Only depth and the fine hanging strands are drawn on the canvases.
   const segs = c.skeleton || (c.skeleton = []);
   const chain = (pts, w0, w1, s0 = 0) => {        // returns the arc length at its tip; a child starts where it leaves its parent
     const L = pts.length - 1;
     let s = s0;
     for (let i = 0; i < L; i++) {
       const s1 = s + Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
-      segs.push([...pts[i], (w0 + (w1 - w0) * i / L) / 2, s, ...pts[i + 1], (w0 + (w1 - w0) * (i + 1) / L) / 2, s1]);
+      segs.push([...pts[i], (w0 + (w1 - w0) * i / L) / 2, s, ...pts[i + 1], (w0 + (w1 - w0) * (i + 1) / L) / 2, s1, 0, i === 0 ? 1 : 0]);
       s = s1;
     }
     depthLine(c, pts, (w0 + w1) / 2 + 2, .08);
     return s;
   };
-  const sTop = chain(smooth(sp.trunk, 3), sp.trunkW[0], sp.trunkW[1]);
-  for (const st of sp.stems) {
-    const sEnd = chain(smooth(st.axis, 3), st.w[0], st.w[1], sTop - 20);
-    // the stem does not stop blunt: it runs on as a thin shoot that thins to nothing
-    const n = st.axis.length, [ax, ay] = st.axis[n - 2], [bx, by] = st.axis[n - 1];
-    chain(walk(rng(sp.seed + bx), bx, by, Math.atan2(by - ay, bx - ax), 70, 4, .12), st.w[1], .5, sEnd);
+  if (notan) {
+    const g = c.w; g.save(); g.globalCompositeOperation = 'multiply'; g.strokeStyle = 'rgba(40,34,28,.9)'; g.lineCap = 'round';
+    g.lineWidth = sp.trunkW[0]; g.beginPath(); sp.trunk.forEach((p, i) => (i ? g.lineTo(...p) : g.moveTo(...p))); g.stroke();
+    for (const [x, y, rr] of sp.head) { g.beginPath(); g.arc(x, y, rr, 0, 6.283); g.fillStyle = g.strokeStyle; g.fill(); }
+    g.restore(); return;
   }
-  // long branches arch out and droop, hung with many fine strands falling almost straight down
-  const grow = (x, y, ang, len, w, depth, seed, s0) => {
-    const rr = rng(seed), pts = [[x, y]], dir = Math.sign(Math.cos(ang)) || 1;
-    let a = ang;
-    for (let k = 1; k <= 9; k++) {
-      a += dir * (k < 3 ? -.02 : .07 + k * .012) + (rr() - .5) * (rr() < .3 ? .4 : .12);
-      pts.push([pts[k - 1][0] + Math.cos(a) * len / 9, pts[k - 1][1] + Math.sin(a) * len / 9]);
+  const sTop = chain(smooth(sp.trunk, 3), sp.trunkW[0], sp.trunkW[1]);
+  // the head: lumps of different sizes fused by the field's smooth union
+  const hr = rng(sp.seed + 3);                 // each lump its own darkness: a mottled, knotty mass, dark overall
+  for (const [x, y, rr] of sp.head) {
+    segs.push([x, y, rr, sTop, x + .5, y + .3, rr, sTop + .5, .38 + hr() * .14, 1]);
+    c.d.save(); c.d.fillStyle = grey(.08); c.d.beginPath(); c.d.arc(x, y, rr + 2, 0, 6.283); c.d.fill(); c.d.restore();   // near: no mist over it
+  }
+  // wands: thin, nearly straight, a slight bow; the longest forks near its top
+  sp.wands.forEach(([x, y, ang, len, w, fork], i) => {
+    const rr = rng(sp.seed + 40 + i), pts = [[x, y]];          // a slight bow to the right, a tiny wobble — never a ruled ray
+    for (let k = 1; k <= 6; k++) { const a = ang + .035 * k + (rr() - .5) * .04; pts.push([pts[k - 1][0] + Math.cos(a) * len / 6, pts[k - 1][1] + Math.sin(a) * len / 6]); }
+    const sEnd = chain(smooth(pts, 2), w, w * .3, sTop + 10);
+    if (fork) {
+      const [fx, fy] = pts[4];
+      chain(smooth(walk(rng(sp.seed + 60 + i), fx, fy, ang + .45, len * .3, 4, .1), 2), w * .45, w * .2, sEnd - len * .3);
     }
-    chain(smooth(pts, 2), w, w * .15, s0);
-    if (depth === 0) for (const k of [3, 6]) grow(pts[k][0], pts[k][1], a - dir * (.35 + rr() * .3), len * .45, w * .55, 1, seed + k, s0 + k * len / 9);
-    const n = depth ? 10 : 22;
+  });
+  // the crooked branch(es): explicit kinked polylines; short side shoots rise from the kinks; strands hang sparse
+  const r = rng(sp.seed + 7);
+  sp.branches.forEach((br, bi) => {
+    const sEnd = chain(smooth(br.pts, 2), br.w, br.w * .2, sTop + 5);
+    for (const [k, ang, len] of br.shoots || []) {
+      const [x, y] = br.pts[k];
+      chain(smooth(walk(rng(sp.seed + 80 + bi * 10 + k), x, y, ang, len, 4, .15), 2), br.w * .45, br.w * .12, sEnd * k / br.pts.length);
+    }
+    const n = br.strands || 0, P = smooth(br.pts, 4), dir = -1;
     for (let k = 0; k < n; k++) {
-      const t = 2.5 + rr() * 6.5, i = Math.floor(t), u = t - i, q = pts[Math.min(9, i + 1)];
-      const p = [pts[i][0] + (q[0] - pts[i][0]) * u, pts[i][1] + (q[1] - pts[i][1]) * u];
-      const l = 26 + Math.pow(rr(), 1.2) * 90, s = (rr() - .5) * 12 - dir * 5;
-      const tw = [[p[0], p[1]], [p[0] - dir * 3, p[1] + l * .2], [p[0] + s * .5, p[1] + l * .6], [p[0] + s, p[1] + l]];
+      const p = P[Math.floor(P.length * (.3 + .7 * r()))];
+      const l = 22 + Math.pow(r(), 1.3) * 80, sx = (r() - .5) * 10 - dir * 3;
+      const tw = [[p[0], p[1]], [p[0] - dir * 2, p[1] + l * .25], [p[0] + sx * .5, p[1] + l * .6], [p[0] + sx, p[1] + l]];
       depthLine(c, tw, 1.5, .08);
-      stroke(c.l, smooth(tw, 4), { wid: .55 + rr() * .5, fun: t => 1 - t * .8, noi: .3, col: `rgba(34,30,24,${.16 + rr() * .3})`, seed: seed + 50 + k, dry: .4 });
+      stroke(c.l, smooth(tw, 4), { wid: .5 + r() * .45, fun: t => 1 - t * .8, noi: .3, col: `rgba(34,30,24,${.14 + r() * .26})`, seed: sp.seed + 300 + bi * 50 + k, dry: .4 });
     }
-  };
-  sp.branches.forEach(([x, y, ang, len, w], i) => grow(x, y, ang, len, w, 0, sp.seed + 700 + i * 31, sTop + 10));
-  // the stems end in young shoots (a bare fork reads as a slingshot): two thin arching rods with strands
-  sp.stems.forEach((st, i) => {
-    const [x, y] = st.axis[Math.max(1, st.axis.length - 2)];
-    grow(x, y, -Math.PI / 2 - .9 + i * .4, 70, 1.6, 1, sp.seed + 950 + i, 0);
-    grow(x, y, -Math.PI / 2 + .7 + i * .3, 55, 1.4, 1, sp.seed + 970 + i, 0);
   });
 }

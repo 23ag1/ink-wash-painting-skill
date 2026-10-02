@@ -34,11 +34,11 @@ async function start() {
   const tree = rt.texture(...size);
   const segs = notan ? [] : (c.skeleton || []);
   if (segs.length) {
-    const data = new Float32Array(segs.length * 8);
-    segs.forEach(([ax, ay, ra, sa, bx, by, rb, sb], i) => data.set([ax, ay, ra, sa, bx, by, rb, sb], i * 8));
+    const data = new Float32Array(segs.length * 12);
+    segs.forEach(([ax, ay, ra, sa, bx, by, rb, sb, ink = 0, fuse = 0], i) => data.set([ax, ay, ra, sa, bx, by, rb, sb, ink, fuse, 0, 0], i * 12));
     const xs = segs.flatMap(s => [s[0] - s[2], s[4] - s[6], s[0] + s[2], s[4] + s[6]]), ys = segs.flatMap(s => [s[1] - s[2], s[5] - s[6], s[1] + s[2], s[5] + s[6]]);
     const box = [Math.min(...xs) - 6, Math.min(...ys) - 6, Math.max(...xs) + 6, Math.max(...ys) + 6];
-    rt.draw(treeP, { to: rt.target([tree]), size, tex: { uSkel: rt.texture(segs.length * 2, 1, { type: 'rgba32f', data }) }, u: { uN: segs.length, uBox: box } });
+    rt.draw(treeP, { to: rt.target([tree]), size, tex: { uSkel: rt.texture(segs.length * 3, 1, { type: 'rgba32f', data }) }, u: { uN: segs.length, uBox: box } });
   }
   const painted = rt.texture(...size), fb = rt.target([painted]);
   rt.draw(paint, { to: fb, size, tex: { uDiffused: diffused, uWet: wet, uLines: notan ? rt.fromCanvas(document.createElement('canvas')) : tex.ink, uDepth: tex.depth, uTree: tree } });
