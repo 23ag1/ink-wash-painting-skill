@@ -257,3 +257,11 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   ends (blunt starts mid-trunk read as steps), the shadow lanes darker, the lit lanes drier; its edge is the brush's
   own (paper under a band narrower than the strokes only hides what is behind); the pollard top is a few short thick
   strokes toward each limb, and the limbs start pressed inside them — ink over ink, no shape, no outline.
+- **A fork is written in one movement.** Separate joint pieces (blocks from one point to each limb) read as a
+  pinched neck or bandages; strokes that start mid-trunk show blunt tongues. Write the fork strokes DOWNWARD: they
+  enter each limb thin, run loaded through the joint and dry out down the trunk (fade + dryness), ending in
+  dissolving streaks; the outer limbs take the trunk's own contours. The trunk is thickest at the fork, its
+  silhouette uneven (swellings, a knot bulge), contours in pressed segments (heavy shadow side, broken lit side),
+  bark as SHORT dry strokes; a knot is a slanting scar (a ring with a dot is an eye).
+- **Depth caps show in the mist.** A thick `depthLine` with round caps sticking out past an object is drawn by the
+  mist pass as a dome; write depth as the object's exact shape. And no depth at all lets the mist wash it out.
