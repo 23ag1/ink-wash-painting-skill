@@ -234,3 +234,8 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
     plain dark lines (texture on a thin limb reads as nodes).
   - the structure came from a crop of the master at full height, not from memory: the first two willows (a Y fork,
     a "head" ball) were both wrong constructions.
+- **A shape composited AFTER the paint pass reads as a vector cut-out** (the willow from tree.frag: a "mask" head,
+  black pipes). Everything that should look painted must go into the wash/ink canvases BEFORE diffusion and the
+  paint pass, like every other mark. The willow is now brushwork again (washes + dry side-brush + a dark knotty head
+  of fused lumps whose outer arcs only are pressed), and the joints are hidden the painter's way: limb strokes start
+  inside the dark head. `kit/glsl/limbs.glsl` stays for silhouettes/masks that feed the layers, never as a final overlay.
