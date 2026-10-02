@@ -270,3 +270,8 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   trunk's width, small crooks and a gentle swell, one narrower stroke of the same recipe written downward from the
   fork (start buried, ending dry); the limbs' strokes start ~28 units inside the trunk. Depth must follow ALL the
   ink (including the hidden start of a limb) or the mist veils it into a white gap at the joint.
+- **A wide stroke on the crisp ink layer reads digital** at any recipe: one long stroke = rope/plank, short side
+  strokes = stacked boards or hexagon patches (square/pointed polygon ends, a pressed dark entry). The mass of a
+  thick trunk is WET INK ON THE WASH LAYER (several dark wet strokes side by side, merged by diffusion — the way
+  the rocks get their tone); the ink layer gets only NARROW strokes: a contour in soft-ended overlapping
+  segments (hard segment ends = saw teeth) and a few long dry streaks.

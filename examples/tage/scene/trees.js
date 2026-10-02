@@ -162,13 +162,32 @@ export function pollardWillow(c, sp, notan) {
   if (notan) { glaze(c, poly([...L, ...R.slice().reverse()]), '40,34,28', .9, 0); return; }
   occlude(c, poly([...offsetLine(ax, -1, W.map(w => w * .36)), ...offsetLine(ax, 1, W.map(w => w * .36)).reverse()]), .08);  // hides the bank behind
   c.d.save(); c.d.fillStyle = grey(.08); c.d.fill(poly([...L, ...R.slice().reverse()])); c.d.restore();
-  const len = ax.reduce((s, p, i) => s + (i ? Math.hypot(p[0] - ax[i - 1][0], p[1] - ax[i - 1][1]) : 0), 0);
-  const recipe = (wid, alpha, seed, prof) => ({ rgb: '18,14,10', alpha, bristles: Math.round(wid * 1.4), dryFrom: .55, dryness: .3, streak: len * .6, edge: .7, fade: .2, tipSide: .3, close: 0, profile: prof });
-  // the limbs' recipe, at the trunk's width; then a narrower stroke of the same recipe down the shadow side (the
-  // tonal play of strokes overlapping, as where limbs cross)
-  hairyStroke(c.l, ax, w0, sp.seed + 1, recipe(w0, .82, sp.seed + 1, t => (1 - (1 - w1 / w0) * t) * swell(t)));
-  // written downward from the fork (its start buried in the dark junction), drying out where it ends
-  hairyStroke(c.l, offsetLine(ax, 1, W.map(w => w * .2)).slice(Math.round(n * (.15 + r() * .15))).reverse(), w0 * .55, sp.seed + 2, { ...recipe(w0 * .55, .6, sp.seed + 2, t => .75 + .25 * Math.min(1, t / .2)), fade: .7, dryFrom: .3, dryness: .8 });
+  // The trunk's MASS is wet ink on the wash layer — several dark wet strokes side by side that the diffusion pass
+  // merges, exactly how the rocks get their tone (wide strokes on the crisp ink layer always read digital: a plank,
+  // a rope, boards, hexagon patches). On top only NARROW strokes, the brush of the limbs: a broken contour and a
+  // few long dry streaks.
+  const lane = (k, m) => offsetLine(ax, k, W).slice(0, n - m);
+  const Wat = t => W[Math.max(0, Math.min(n - 1, Math.round(t * (n - 1))))];
+  for (let j = 0; j < 4; j++) {
+    const k = -.3 + j * .2 + (r() - .5) * .04, shadow = k > 0;
+    hairyStroke(c.w, lane(k, Math.floor(r() * 2)), w0 * .42, sp.seed + 10 + j, { rgb: shadow ? '34,28,22' : '70,60,48', alpha: shadow ? .7 : .5, bristles: 18, dryFrom: .7, dryness: .25, streak: 90, edge: .4, fade: .1, tipSide: shadow ? .6 : -.4, close: .4, profile: t => Wat(t) / w0 });
+  }
+  hairyStroke(c.wet, ax, w0 * 1.05, sp.seed + 3, { rgb: '255,255,255', alpha: .8, bristles: 20, dryFrom: .95, dryness: .05, streak: 120, edge: 0, fade: 0, tipSide: 0, close: .5, profile: t => Wat(t) / w0 });
+  // narrow strokes on top: the shadow contour pressed in segments, the lit one thin and broken
+  for (const [side, wid, al, gapP] of [[.47, 4, .82, .1], [-.47, 2.4, .72, .3]]) {
+    const E = offsetLine(ax, side, W);
+    let i = 0;
+    while (i < n - 2) {
+      const l = 5 + Math.floor(r() * 7), seg = E.slice(i, Math.min(n, i + l + 1));
+      if (seg.length > 2 && r() > gapP) hairyStroke(c.l, seg, wid * (.8 + r() * .4), sp.seed + 40 + i + (side > 0 ? 0 : 500), { rgb: '14,11,8', alpha: al, bristles: 7, dryFrom: .3, dryness: .5, streak: 40, edge: .6, fade: .3, tipSide: side > 0 ? .5 : -.5, close: 0, profile: t => .15 + .85 * Math.sin(Math.max(.05, t) * Math.PI) });   // soft ends: no saw teeth
+      i += l - 3;
+    }
+  }
+  for (let j = 0; j < 4; j++) {                                        // long dry streaks along the wood
+    const k = -.25 + r() * .5, t0 = r() * .3, t1 = t0 + .4 + r() * .3;
+    const seg = offsetLine(ax, k, W).slice(Math.round(t0 * (n - 1)), Math.round(Math.min(1, t1) * (n - 1)) + 1);
+    if (seg.length > 2) hairyStroke(c.l, seg, 3 + r() * 3, sp.seed + 60 + j, { rgb: '18,14,10', alpha: .45 + r() * .2, bristles: 7, dryFrom: .1, dryness: .75, streak: 60, edge: .4, fade: .4, tipSide: .3, close: 0, profile: t => Math.sin(Math.max(.12, t) * Math.PI) });
+  }
 
   // 3. the crown, after real willow paintings (and the scroll): limbs RISE AND ARCH OVER, painted with a loaded
   //    brush, uneven, with nodes; each carries many short angular branchlets, mostly upward (鹿角); the strands fall
