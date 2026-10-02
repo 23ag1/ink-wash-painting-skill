@@ -265,3 +265,8 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   bark as SHORT dry strokes; a knot is a slanting scar (a ring with a dot is an eye).
 - **Depth caps show in the mist.** A thick `depthLine` with round caps sticking out past an object is drawn by the
   mist pass as a dome; write depth as the object's exact shape. And no depth at all lets the mist wash it out.
+- **Simplest wins: the trunk = the limb recipe, thicker.** Every elaborate trunk (contours + bark + knots + fork
+  pieces) read worse than the crown the user liked. What worked: the SAME hairyStroke recipe as the limbs at the
+  trunk's width, small crooks and a gentle swell, one narrower stroke of the same recipe written downward from the
+  fork (start buried, ending dry); the limbs' strokes start ~28 units inside the trunk. Depth must follow ALL the
+  ink (including the hidden start of a limb) or the mist veils it into a white gap at the joint.
