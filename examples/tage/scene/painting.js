@@ -85,9 +85,8 @@ export function paintScene(c, notan) {
   pollardWillow(c, {
     // measured on Ma Yuan's scroll: trunk enters the right edge ~y920, head at ~(558,742),
     // the branch reaches left to ~x400 almost level
-    trunk: [[676, 948], [646, 912], [616, 870], [594, 820], [576, 778], [564, 752]], trunkW: [42, 30],
+    trunk: [[676, 948], [646, 912], [616, 870], [594, 820], [576, 778], [562, 744]], trunkW: [42, 28],
     headAt: [560, 740, 24],
-    head: [[560, 745, 19], [548, 734, 15], [570, 731, 14], [557, 721, 11], [576, 750, 12], [545, 752, 12]],
     // the crown, from willow paintings: limbs rise and arch over (bend = total turn), the low one nearly level
     limbs: [
       [548, 728, -2.0, 210, 11, -1.4], [560, 722, -1.65, 190, 9, -1.0], [574, 728, -1.2, 120, 7, 1.1], [545, 744, -2.9, 170, 8, -.5],

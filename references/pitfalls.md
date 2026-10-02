@@ -251,3 +251,9 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   No width ripple or strong dry brush on thick limbs: cross-bands read as bamboo nodes.
 - **Also:** read a complaint with its screenshot carefully — the screenshot may be the GOOD example ("why are these
   fine and that is bad"). Ask or re-read before rewriting what the user liked.
+- **Trunk = the limbs' brush, thicker.** When the crown (brush strokes) looked right but the trunk (a filled
+  polygon + dashes) and the head (outlined circles) looked like a plank and a cartoon flower, the cause was two
+  languages in one tree. Fix: the trunk is several overlapping loaded strokes along its axis, full length with soft
+  ends (blunt starts mid-trunk read as steps), the shadow lanes darker, the lit lanes drier; its edge is the brush's
+  own (paper under a band narrower than the strokes only hides what is behind); the pollard top is a few short thick
+  strokes toward each limb, and the limbs start pressed inside them — ink over ink, no shape, no outline.

@@ -151,46 +151,43 @@ function offsetLine(axis, k, widths) {
 
 export function pollardWillow(c, sp, notan) {
   const r = rng(sp.seed);
-  const ax = smooth(sp.trunk, 4), n = ax.length;
-  const W = ax.map((_, i) => sp.trunkW[0] + (sp.trunkW[1] - sp.trunkW[0]) * i / (n - 1));
-  const half = W.map(w => w / 2);
-  const body = poly([...offsetLine(ax, -1, half), ...offsetLine(ax, 1, half).reverse()]);
-  const [hx, hy, hr] = sp.headAt;
-  if (notan) { glaze(c, body, '40,34,28', .9, 0); const h = new Path2D(); h.arc(hx, hy, hr, 0, 6.283); glaze(c, h, '40,34,28', .9, 0); return; }
-  // the head: knots of different sizes fused into one dark lumpy mass, wider than the trunk, over its top
-  const lumps = sp.head;
-  const head = new Path2D();
-  for (const [x, y, q] of lumps) { head.moveTo(x + q, y); head.arc(x, y, q, 0, 6.283); }
-  const inOther = (px, py, j) => lumps.some(([x, y, q], k) => k !== j && Math.hypot(px - x, py - y) < q - .5);
-  occlude(c, body, .08);                                    // the trunk and head hide the bank behind them
-  occlude(c, head, .08);
+  // the trunk is written with the SAME brush as the limbs, only thicker: several overlapping loaded strokes with
+  // flying white; its edge is the brush's own ragged edge (no filled shape with a clean edge — that reads as a
+  // plank), no circles or outlined lumps (a cartoon flower). 树无一寸直: the axis gets small crooks.
+  const raw = sp.trunk.map(([x, y], i) => (i && i < sp.trunk.length - 1 ? [x + (r() - .5) * 7, y + (r() - .5) * 4] : [x, y]));
+  const ax = smooth(raw, 4), n = ax.length;
+  const W = ax.map((_, i) => { const t = i / (n - 1); return sp.trunkW[0] + (sp.trunkW[1] - sp.trunkW[0]) * t + Math.max(0, t - .82) / .18 * 9; });  // swells into the pollard knuckle
+  const along = k => offsetLine(ax, k, W);
+  const [hx, hy] = sp.headAt;
+  if (notan) { hairyStroke(c.w, ax, sp.trunkW[0], sp.seed, { rgb: '40,34,28', alpha: .9, bristles: 20, dryFrom: 1, dryness: 0, streak: 100, edge: 0, fade: 0, tipSide: 0, close: 1, profile: t => 1 - t * .3 }); return; }
+  // the bank behind is hidden by paper under a band NARROWER than the brushwork (the edge stays the brush's)
+  occlude(c, poly([...offsetLine(ax, -1, W.map(w => w * .34)), ...offsetLine(ax, 1, W.map(w => w * .34)).reverse()]), .08);
+  depthLine(c, ax, sp.trunkW[0], .08);
 
-  // 1. washes, wet: a mid tone over the trunk, a darker band down the shadow (right) side; the head wet and dark
-  const along = (k, w) => offsetLine(ax, k, W.map(x => x * w));
-  hairyStroke(c.w, ax, sp.trunkW[0] * .95, sp.seed + 1, { rgb: '120,104,84', alpha: .42, bristles: 30, dryFrom: .8, dryness: .2, streak: 120, edge: .3, fade: .1, tipSide: 0, close: .5, profile: t => 1 - t * .3 });
-  hairyStroke(c.w, along(.22, 1), sp.trunkW[0] * .55, sp.seed + 2, { rgb: '60,50,40', alpha: .5, bristles: 22, dryFrom: .6, dryness: .35, streak: 90, edge: .5, fade: .15, tipSide: .6, close: .3, profile: t => 1 - t * .35 });
-  hairyStroke(c.wet, ax, sp.trunkW[0] * 1.05, sp.seed + 3, { rgb: '255,255,255', alpha: .6, bristles: 20, dryFrom: .9, dryness: .1, streak: 120, edge: 0, fade: 0, tipSide: 0, close: .5, profile: t => 1 - t * .3 });
-  glaze(c, head, '62,52,42', .8, .8);                       // the head's own wash, dark and wet: it bleeds a little at the rim
-  for (const [x, y, q] of lumps) wetDab(c, x + q * .2, y + q * .25, q * 1.4, q * .9, r() * 3, '30,25,20', .45 + r() * .3, sp.seed + 10 + Math.round(x));
-
-  // 2. bark, dry: the shadow edge one long side-brush stroke, the lit edge a broken pressed line, long dry
-  //    streaks between (flying white along the wood), a few dark knots
-  hairyStroke(c.l, along(.36, 1), sp.trunkW[0] * .34, sp.seed + 20, { rgb: '16,12,9', alpha: .75, bristles: 18, dryFrom: .15, dryness: .75, streak: 80, edge: .7, fade: .25, tipSide: .9, close: 0, profile: t => .9 - t * .3 });
-  const lit = along(-.47, 1);
-  for (const [i0, i1] of [[0, .38], [.45, .8], [.86, 1]].map(([u, v]) => [Math.round(u * (n - 1)), Math.round(v * (n - 1))])) {
-    if (i1 - i0 < 2) continue;
-    hairyStroke(c.l, lit.slice(i0, i1 + 1), 4.5, sp.seed + 30 + i0, { rgb: '16,12,9', alpha: .8, bristles: 7, dryFrom: .3, dryness: .6, streak: 50, edge: .6, fade: .3, tipSide: -.8, close: 0, profile: t => Math.sin(Math.max(.15, t) * Math.PI) });
+  // 1. one wet stroke under everything: the body tone, it bleeds a little at the edges
+  hairyStroke(c.w, ax, sp.trunkW[0] * .92, sp.seed + 1, { rgb: '96,82,66', alpha: .45, bristles: 28, dryFrom: .7, dryness: .25, streak: 120, edge: .4, fade: .1, tipSide: .3, close: .3, profile: t => W[Math.round(t * (n - 1))] / sp.trunkW[0] });
+  hairyStroke(c.wet, ax, sp.trunkW[0], sp.seed + 3, { rgb: '255,255,255', alpha: .6, bristles: 20, dryFrom: .9, dryness: .1, streak: 120, edge: 0, fade: 0, tipSide: 0, close: .5, profile: t => W[Math.round(t * (n - 1))] / sp.trunkW[0] });
+  // 2. the bark: overlapping loaded strokes side by side, each starting and ending at its own place (broken),
+  //    the shadow side (right) dark and fuller, the lit side drier with more flying white
+  const lanes = 4;
+  for (let j = 0; j < lanes; j++) {
+    const k = -.27 + j * (.54 / (lanes - 1)) + (r() - .5) * .05, shadow = k > 0;
+    const seg = along(k).slice(0, n - Math.floor(r() * 2));             // the full length: no blunt ends mid-trunk
+    hairyStroke(c.l, seg, sp.trunkW[0] * (.4 + r() * .1), sp.seed + 20 + j, { rgb: '16,12,9', alpha: shadow ? .78 + r() * .1 : .5 + r() * .12, bristles: 18, dryFrom: shadow ? .4 : .2, dryness: shadow ? .4 : .55, streak: 90, edge: .5, fade: .2, tipSide: shadow ? .8 : -.5, close: 0,
+      profile: t => Math.sqrt(Math.min(1, t / .08, (1 - t) / .1)) * (1 - t * .2) });   // soft at both ends, melting into the knuckle
   }
-  for (let i = 0; i < 7; i++) {
-    const k = -.3 + r() * .55, t0 = r() * .5, t1 = t0 + .25 + r() * .45;
-    const seg = along(k, 1).slice(Math.round(t0 * (n - 1)), Math.round(Math.min(1, t1) * (n - 1)) + 1);
-    if (seg.length < 2) continue;
-    hairyStroke(c.l, seg, 3 + r() * 5, sp.seed + 40 + i, { rgb: '22,18,14', alpha: .35 + r() * .3, bristles: 6, dryFrom: .1, dryness: .85, streak: 60, edge: .3, fade: .4, tipSide: .5, close: 0, profile: t => Math.sin(Math.max(.1, t) * Math.PI) });
+  // 3. scars: a few short dark strokes slanting across the grain (never round blobs)
+  for (let i = 0; i < 3; i++) {
+    const j = 3 + Math.floor(r() * (n - 8)), [x, y] = along(-.05 + r() * .3)[j], a = Math.atan2(ax[j + 1][1] - ax[j][1], ax[j + 1][0] - ax[j][0]) + 1.1 + (r() - .5) * .4, l = W[j] * (.25 + r() * .15);
+    hairyStroke(c.l, [[x - Math.cos(a) * l / 2, y - Math.sin(a) * l / 2], [x + Math.cos(a) * l / 2, y + Math.sin(a) * l / 2]], 3 + r() * 2, sp.seed + 60 + i, { rgb: '10,8,6', alpha: .8, bristles: 6, dryFrom: .3, dryness: .4, streak: 10, edge: .5, fade: .3, tipSide: .5, close: .5, profile: t => Math.sin(Math.max(.2, t) * Math.PI) });
   }
-  for (let i = 0; i < 4; i++) {
-    const j = 2 + Math.floor(r() * (n - 4)), [x, y] = along(-.1 + r() * .4, 1)[j];
-    blob(c.l, x, y, { len: 5 + r() * 6, wid: 3 + r() * 3, ang: -1.1, noi: .8, col: `rgba(14,10,8,${.6 + r() * .3})`, seed: sp.seed + 60 + i });
-  }
+  // 4. the pollard knuckle: short thick strokes out of the trunk's top toward each limb — the limbs then start
+  //    pressed inside them, so every joint is ink over ink
+  sp.limbs.forEach(([x, y, ang, , w], i) => {
+    const sx = hx + (r() - .5) * 6, sy = hy + 6 + r() * 4, l = Math.hypot(x - sx, y - sy) + 6, a = Math.atan2(y - sy, x - sx);
+    hairyStroke(c.l, [[sx, sy], [sx + Math.cos(a) * l * .55 + (r() - .5) * 3, sy + Math.sin(a) * l * .55], [sx + Math.cos(a) * l, sy + Math.sin(a) * l]], w * 1.5, sp.seed + 80 + i,
+      { rgb: '14,11,8', alpha: .85, bristles: 12, dryFrom: .4, dryness: .45, streak: 25, edge: .6, fade: .2, tipSide: .6, close: 0, profile: t => 1.1 - t * .35 });
+  });
 
   // 3. the crown, after real willow paintings (and the scroll): limbs RISE AND ARCH OVER, painted with a loaded
   //    brush, uneven, with nodes; each carries many short angular branchlets, mostly upward (鹿角); the strands fall
@@ -236,31 +233,4 @@ export function pollardWillow(c, sp, notan) {
   };
   sp.limbs.forEach(([x, y, ang, len, w, bend], i) => limb(x, y, ang, len, w, bend, 0, sp.seed + 1000 + i * 131));
 
-  // 4. the head over the joints: a broken lumpy rim pressed with the side of the brush (heavier below and on the
-  //    shadow side), dark crevices between the lumps, dry rubs on the lit top
-  lumps.forEach(([x, y, q], j) => {                          // each knot's outer arc only — where it is not inside another
-    const run = [];
-    const flush = () => {
-      if (run.length > 3 && r() > .3) {
-        const below = run[0][1] > hy || run[0][0] > hx;
-        hairyStroke(c.l, run.slice(), 2.5 + (below ? 2.5 : .8) + r() * 1.5, sp.seed + 200 + j * 7 + run.length, { rgb: '12,9,7', alpha: .8, bristles: 7, dryFrom: .3, dryness: .5, streak: 20, edge: .6, fade: .3, tipSide: .7, close: 0, profile: t => Math.sin(Math.max(.15, t) * Math.PI) });
-      }
-      run.length = 0;
-    };
-    for (let i = 0; i <= 28; i++) {
-      const a = i / 28 * 6.283, px = x + Math.cos(a) * q, py = y + Math.sin(a) * q;
-      if (inOther(px, py, j)) flush(); else run.push([px, py]);
-    }
-    flush();
-  });
-  for (let i = 0; i < 5; i++) {
-    const a = r() * 6.283, x = hx + Math.cos(a) * hr * .45, y = hy + Math.sin(a) * hr * .4, b = a + 1.3 + (r() - .5) * .6, l = hr * (.35 + r() * .3);
-    hairyStroke(c.l, [[x, y], [x + Math.cos(b) * l * .5 + (r() - .5) * 3, y + Math.sin(b) * l * .5], [x + Math.cos(b) * l, y + Math.sin(b) * l]], 2.5 + r() * 2.5, sp.seed + 240 + i,
-      { rgb: '12,9,7', alpha: .75, bristles: 6, dryFrom: .3, dryness: .5, streak: 15, edge: .5, fade: .3, tipSide: .5, close: 0, profile: t => Math.sin(Math.max(.15, t) * Math.PI) });
-  }
-  for (let i = 0; i < 4; i++) {
-    const x = hx - hr * .3 + r() * hr * .7, y = hy - hr * .55 + r() * hr * .3;
-    hairyStroke(c.l, [[x - 6, y], [x + 6, y - 1]], 4 + r() * 3, sp.seed + 260 + i, { rgb: '30,25,20', alpha: .35, bristles: 6, dryFrom: 0, dryness: .9, streak: 10, edge: .2, fade: .4, tipSide: .5, close: 0, profile: t => Math.sin(Math.max(.15, t) * Math.PI) });
-  }
-  for (let i = 0; i < 5; i++) blob(c.l, hx + (r() - .5) * hr * 1.2, hy + (r() - .5) * hr, { len: 3 + r() * 5, wid: 2.5 + r() * 3, ang: r() * 3, noi: .9, col: `rgba(10,8,6,${.6 + r() * .35})`, seed: sp.seed + 230 + i });
 }
