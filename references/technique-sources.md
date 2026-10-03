@@ -135,3 +135,11 @@ techniques (layered washes, structure-tensor flattening, fluid/curl fields) and 
   or shader-only, and defeat the purpose of a procedural skill.
 - Shadertoy generic "watercolor" shaders: mostly single-pass edge darkening and noise already covered by
   Bousseau-style paint.frag.
+
+## Branching thickness — "data trees" (Marius Ballot, YouTube Of-s4o0EhhI; demo procedural-growing-structure.netlify.app)
+OPENED (demo source read; the video itself not watched). Tree as a node graph; per node `branchSize` = longest
+path to a leaf, `weight = depth / branchSize`; radius = (1 − weight)·R, so thickness falls continuously from root
+to every tip. Decompose into chains: the child with the same branchSize CONTINUES the parent's chain (the trunk
+flows on into the longest limb as one stroke); every other child starts a new chain AT THE PARENT NODE with the
+parent's radius there, and thins faster over its shorter path. Chains are Catmull-Rom smoothed before drawing.
+Take: no thickness jump at any fork; one continuous stroke per chain. (Its Fresnel/pulse shading is not for ink.)

@@ -285,3 +285,7 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   (d² ≈ Σ dᵢ²): a 46-wide trunk gives limbs of ~18–26 at their base, which then thin gradually; the trunk does NOT
   narrow into the fork. Paint the thick stretch of a limb like the trunk (wet mass + narrow strokes), ending a
   little narrower than the limb's own stroke so there is no step. Check widths at every fork, at every scale.
+- **The whole tree in the limbs' language.** What finally worked for the willow: the trunk is the main limbs'
+  own strokes running down to the roots as a twisting bundle (no filled trunk), roots are limb strokes too, and
+  every child starts at ~.85 of its parent's width where it leaves, thinning to a fine tip (the data-tree rule,
+  technique-sources.md). Draw the bundle last so it covers the starts of other strokes on the trunk.

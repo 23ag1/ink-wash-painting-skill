@@ -149,63 +149,23 @@ function offsetLine(axis, k, widths) {
   });
 }
 
-// One piece of wood (trunk, side limb, stub, root), painted the way that works here: its MASS as wet ink on the
-// wash layer (dark wet strokes side by side, merged by diffusion, like the rocks), and on the ink layer only
-// narrow strokes — a contour in soft-ended overlapping segments (heavier on the shadow side) and long dry streaks.
-// widths: one value per axis point (uneven: a living trunk swells and narrows).
-function wood(c, axis, widths, seed, { dark = 1, occl = true } = {}) {
-  const r = rng(seed);
-  const ax = smooth(axis, 4), n = ax.length;
-  const ws = smooth(widths.map((w, i) => [i, w]), 4).map(p => p[1]);
-  const W = ax.map((_, i) => ws[Math.min(ws.length - 1, Math.round(i / (n - 1) * (ws.length - 1)))] * (1 + .07 * Math.sin(i * .9 + seed)));
-  const L = offsetLine(ax, -1, W.map(w => w / 2)), R = offsetLine(ax, 1, W.map(w => w / 2));
-  const shape = poly([...L, ...R.slice().reverse()]);
-  if (occl) occlude(c, poly([...offsetLine(ax, -1, W.map(w => w * .36)), ...offsetLine(ax, 1, W.map(w => w * .36)).reverse()]), .08);
-  c.d.save(); c.d.fillStyle = grey(.08); c.d.fill(shape); c.d.restore();
-  const maxW = Math.max(...W), Wat = t => W[Math.max(0, Math.min(n - 1, Math.round(t * (n - 1))))] / maxW;
-  const lanes = Math.max(2, Math.round(maxW / 11));
-  for (let j = 0; j < lanes; j++) {
-    const k = -.32 + j * (.64 / Math.max(1, lanes - 1)) + (r() - .5) * .04, shadow = k > 0;
-    hairyStroke(c.w, offsetLine(ax, k, W), maxW * .9 / lanes * 1.6, seed + 10 + j, { rgb: shadow ? '34,28,22' : '70,60,48', alpha: (shadow ? .7 : .5) * dark, bristles: 16, dryFrom: .7, dryness: .25, streak: 90, edge: .4, fade: .1, tipSide: shadow ? .6 : -.4, close: .4, profile: Wat });
-  }
-  hairyStroke(c.wet, ax, maxW * 1.05, seed + 3, { rgb: '255,255,255', alpha: .8, bristles: 16, dryFrom: .95, dryness: .05, streak: 120, edge: 0, fade: 0, tipSide: 0, close: .5, profile: Wat });
-  for (const [side, wid, al, gapP] of [[.47, Math.min(4, maxW * .1), .82, .1], [-.47, Math.min(2.4, maxW * .07), .72, .3]]) {
-    const E = offsetLine(ax, side, W);
-    let i = 0;
-    while (i < n - 2) {
-      const l = 5 + Math.floor(r() * 7), seg = E.slice(i, Math.min(n, i + l + 1));
-      if (seg.length > 2 && r() > gapP) hairyStroke(c.l, seg, Math.max(1.2, wid * (.8 + r() * .4)), seed + 40 + i + (side > 0 ? 0 : 500), { rgb: '14,11,8', alpha: al, bristles: 7, dryFrom: .4, dryness: .25, streak: 60, edge: .3, fade: .3, tipSide: side > 0 ? .5 : -.5, close: 0, profile: t => .15 + .85 * Math.sin(Math.max(.05, t) * Math.PI) });
-      i += l - 3;
-    }
-  }
-  for (let j = 0; j < Math.round(maxW / 12); j++) {
-    const k = -.25 + r() * .5, t0 = r() * .3, t1 = t0 + .4 + r() * .3;
-    const seg = offsetLine(ax, k, W).slice(Math.round(t0 * (n - 1)), Math.round(Math.min(1, t1) * (n - 1)) + 1);
-    if (seg.length > 2) hairyStroke(c.l, seg, 2.5 + r() * 3, seed + 60 + j, { rgb: '18,14,10', alpha: .45 + r() * .2, bristles: 7, dryFrom: .1, dryness: .75, streak: 60, edge: .4, fade: .4, tipSide: .3, close: 0, profile: t => Math.sin(Math.max(.12, t) * Math.PI) });
-  }
-  return { ax, W, shape };
-}
-
 export function pollardWillow(c, sp, notan) {
-  // NOT A POLE: the base stands on the bank with roots spreading over the ground; the trunk bends in an S;
-  // its width varies strongly (flared root, a waist, swelling again under the crown); a thick side limb leaves
-  // mid-trunk and a broken stub sticks out, so the silhouette is never a stick. The crown's limbs start inside
-  // the top (ink over ink).
-  if (notan) {
-    const ax = smooth(sp.trunk, 4);
-    glaze(c, poly([...offsetLine(ax, -1, ax.map(() => 22)), ...offsetLine(ax, 1, ax.map(() => 22)).reverse()]), '40,34,28', .9, 0);
-    return;
-  }
-  for (const [axis, widths, k] of sp.roots) wood(c, axis, widths, sp.seed + 400 + k, { dark: .9 });
-  for (const [axis, widths, k] of sp.sideLimbs) wood(c, axis, widths, sp.seed + 300 + k);
-  wood(c, sp.trunk, sp.trunkW, sp.seed + 1);
-  // the broken stub: wood that ends in a darker, ragged cut (a short slanting stroke, not a ring)
-  for (const [axis, widths, k] of sp.stubs) {
-    const { ax, W } = wood(c, axis, widths, sp.seed + 350 + k);
-    const e = ax[ax.length - 1], a = Math.atan2(e[1] - ax[ax.length - 2][1], e[0] - ax[ax.length - 2][0]) + Math.PI / 2, l = W[W.length - 1] * .5;
-    hairyStroke(c.l, [[e[0] - Math.cos(a) * l, e[1] - Math.sin(a) * l], [e[0] + Math.cos(a) * l, e[1] + Math.sin(a) * l]], 3.5, sp.seed + 360 + k, { rgb: '10,8,6', alpha: .85, bristles: 7, dryFrom: .3, dryness: .5, streak: 10, edge: .6, fade: .3, tipSide: .5, close: .3, profile: t => Math.sin(Math.max(.2, t) * Math.PI) });
-  }
-
+  // The whole tree is made of the LIMBS' strokes (the part that looks right): the trunk is the main limbs
+  // themselves running down to the ground — a bundle of limb strokes, each with its own crook, twisting gently
+  // and merging. The thickness at the fork comes from the bundle (Leonardo's rule by construction); roots and
+  // the side limb are limb strokes too. No filled trunk, no wood mass, no outline.
+  const r = rng(sp.seed);
+  const ax = smooth(sp.trunk, 5), n = ax.length;
+  const Wt = ax.map((_, i) => { const t = i / (n - 1), k = t * (sp.trunkW.length - 1), j = Math.min(sp.trunkW.length - 2, Math.floor(k)); return sp.trunkW[j] + (sp.trunkW[j + 1] - sp.trunkW[j]) * (k - j); });
+  const lim = (pts, w0, w1, seed, alpha = .85) => {                   // the crown limbs' exact brush recipe
+    const P = smooth(pts, 3), len = P.reduce((s, p, i) => s + (i ? Math.hypot(p[0] - P[i - 1][0], p[1] - P[i - 1][1]) : 0), 0);
+    depthLine(c, P, w0 + 2, .08);
+    hairyStroke(c.l, P, w0, seed, { rgb: '18,14,10', alpha, bristles: Math.max(6, Math.round(w0 * 1.4)), dryFrom: .55, dryness: .3, streak: len * .6, edge: .7, fade: .2, tipSide: .3, close: 0, profile: t => 1 - (1 - w1 / w0) * t });
+  };
+  if (notan) { glaze(c, poly([...offsetLine(ax, -1, Wt.map(w => w / 2)), ...offsetLine(ax, 1, Wt.map(w => w / 2)).reverse()]), '40,34,28', .9, 0); return; }
+  // hide the bank behind the bundle (narrow, so gaps between strokes stay ink-like), depth for the whole trunk
+  occlude(c, poly([...offsetLine(ax, -1, Wt.map(w => w * .3)), ...offsetLine(ax, 1, Wt.map(w => w * .3)).reverse()]), .08);
+  c.d.save(); c.d.fillStyle = grey(.08); c.d.fill(poly([...offsetLine(ax, -1, Wt.map(w => w / 2)), ...offsetLine(ax, 1, Wt.map(w => w / 2)).reverse()])); c.d.restore();
   // 3. the crown, after real willow paintings (and the scroll): limbs RISE AND ARCH OVER, painted with a loaded
   //    brush, uneven, with nodes; each carries many short angular branchlets, mostly upward (鹿角); the strands fall
   //    from the twig tips in BUNCHES along a thrown-stone curve — out and a little up along the twig, then over and
@@ -221,21 +181,17 @@ export function pollardWillow(c, sp, notan) {
       stroke(c.l, smooth(pts, 2), { wid: .45 + rr() * .35, fun: t => 1 - t * .85, noi: .25, col: `rgba(30,26,20,${.14 + Math.pow(rr(), .7) * .4})`, seed: seed + 30 + k, tip: .3, dry: .3 });
     }
   };
-  const limb = (x, y, ang, len, w, bend, d, seed, baseW = 0) => {
+  const limb = (x, y, ang, len, w, bend, d, seed) => {
     const rr = rng(seed), steps = 7, pts = [[x, y]];
     let a = ang;
     for (let k = 1; k <= steps; k++) {
       a += bend / steps * (.4 + 1.2 * k / steps) + (rr() - .5) * .3 + (rr() < .3 ? (rr() - .5) * .8 : 0);   // crooked, never a clean arc
       pts.push([pts[k - 1][0] + Math.cos(a) * len / steps, pts[k - 1][1] + Math.sin(a) * len / steps]);
     }
-    const w1 = Math.max(.6, w * .22), wAt = t => w + (w1 - w) * t;
+    const w1 = Math.max(.5, w * .15), wAt = t => w + (w1 - w) * Math.pow(t, .8);   // thins all the way to a fine tip
     // a main limb's stroke begins deep inside the trunk's dark ink: its square start is buried, no step at the joint
     const P = smooth(d === 0 ? [[x - Math.cos(ang) * 28, y - Math.sin(ang) * 28], ...pts] : pts, 3);
     depthLine(c, P, w + 2, .08);                                    // depth along ALL the ink, or the mist veils the hidden start
-    // a main limb carries its share of the trunk's thickness (Leonardo: the limbs' cross-sections add up to the
-    // trunk's): its first stretch is thick wood, painted like the trunk, thinning to the limb's own width — never
-    // a thin branch stuck straight into a thick trunk
-    if (d === 0 && baseW) wood(c, [P[0], pts[1], pts[2], pts[3]], [baseW, baseW * .72, (baseW * .35 + w * .65), w * .75]   /* ends narrower than the limb stroke: no step */, seed + 7, { occl: false });
     if (w > 2.4) hairyStroke(c.l, P, w, seed, { rgb: '18,14,10', alpha: .85, bristles: Math.max(6, Math.round(w * 1.4)), dryFrom: .55, dryness: .3, streak: len * .6, edge: .7, fade: .2, tipSide: .3, close: 0, profile: t => wAt(t) / w });   // no start step (it left pale chips at the joint), no width ripple, little dry: cross-bands read as bamboo
     else stroke(c.l, P, { wid: w, fun: t => (t < .06 ? 1.15 : 1) * wAt(t) / w, noi: .45, col: 'rgba(20,16,12,.85)', seed, tip: .35, dry: .4 });
     if (d < 2) {
@@ -247,12 +203,34 @@ export function pollardWillow(c, sp, notan) {
         const da = Math.atan2(pts[k + 1][1] - pts[k][1], pts[k + 1][0] - pts[k][0]);
         let ca = da + side * (.55 + rr() * .5);
         const up = -Math.PI / 2 - ca; ca += Math.atan2(Math.sin(up), Math.cos(up)) * .3;          // branchlets lean up
-        limb(bx, by, ca, len * (.24 + rr() * .18) * (d ? .8 : 1), wAt(t) * .6, side * .35, d + 1, seed + 17 * (i + 1));
+        // after the 'data tree' rule (Ballot): a child starts at (nearly) its parent's width WHERE it leaves and
+        // thins faster over its shorter path — no thickness jump at any fork
+        limb(bx, by, ca, len * (.24 + rr() * .18) * (d ? .8 : 1), wAt(t) * .85, side * .35, d + 1, seed + 17 * (i + 1));
         side = -side;
       }
     }
     if (d >= 1 || rr() < .9) bunch(pts[steps][0], pts[steps][1], a, d === 0 ? 7 : d === 1 ? 5 : 3, 18 + len * .12, seed + 500);
   };
-  sp.limbs.forEach(([x, y, ang, len, w, bend, baseW], i) => limb(x, y, ang, len, w, bend, 0, sp.seed + 1000 + i * 131, baseW));
+  sp.limbs.forEach(([x, y, ang, len, w, bend], i) => limb(x, y, ang, len, w, bend, 0, sp.seed + 1000 + i * 131));
+  (sp.sideLimbs || []).forEach(([x, y, ang, len, w, bend], i) => limb(x, y, ang, len, w, bend, 0, sp.seed + 2000 + i * 131));
+
+  // the bundle last: it covers the starts of the crown's and the side limb's strokes (no bars crossing the trunk)
+  // order the main limbs across the trunk's top so their strokes do not cross on the way down
+  const top = n - 1, [cx, cy] = ax[top], a = Math.atan2(ax[top][1] - ax[top - 1][1], ax[top][0] - ax[top - 1][0]), nx = -Math.sin(a), ny = Math.cos(a);
+  const order = sp.limbs.map((l, i) => ({ l, i, s: (l[0] - cx) * nx + (l[1] - cy) * ny })).sort((p, q) => p.s - q.s);
+  const m = order.length;
+  order.forEach(({ l: [x, y, ang, , w], i }, j) => {
+    const k0 = -.36 + .72 * (j / Math.max(1, m - 1)), ph = r() * 6, amp = .06 + r() * .05;
+    const lane = ax.slice(0, top - 3).map(([px, py], q) => {             // up the trunk, twisting gently
+      const t = q / (n - 1), k = k0 + amp * Math.sin(t * 5 + ph), ww = Wt[q];
+      return [px + nx * 0 + (-Math.sin(Math.atan2(ax[Math.min(n - 1, q + 1)][1] - ax[Math.max(0, q - 1)][1], ax[Math.min(n - 1, q + 1)][0] - ax[Math.max(0, q - 1)][0]))) * ww * k,
+              py + Math.cos(Math.atan2(ax[Math.min(n - 1, q + 1)][1] - ax[Math.max(0, q - 1)][1], ax[Math.min(n - 1, q + 1)][0] - ax[Math.max(0, q - 1)][0])) * ww * k];
+    });
+    const path = [...lane, [x, y], [x + Math.cos(ang) * 10, y + Math.sin(ang) * 10]];   // a short overlap into the limb: no stub sticking out
+    const wBase = Wt[0] / m * 1.25, wEnd = w * .8;
+    lim(path, wBase, wEnd, sp.seed + 20 + i, .82);
+  });
+  // roots: limb strokes running out from the base over the bank
+  for (const [rx, ry, ang, len, w] of sp.roots) lim([[rx, ry], [rx + Math.cos(ang) * len * .5, ry + Math.sin(ang) * len * .5 + 2], [rx + Math.cos(ang) * len, ry + Math.sin(ang) * len + 3]], w, w * .2, sp.seed + 60 + Math.round(rx));
 
 }
