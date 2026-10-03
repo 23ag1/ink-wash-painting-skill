@@ -295,3 +295,9 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   boneless ink, wet underneath, bristle texture and flying white clipped inside). A bundle of separate strokes reads
   as cables; branches only at the top read as a broom on a stick. A branch's starting width is min(parent width,
   ~.09 × its length): the data-tree rule alone gives short fat thorns.
+- **Branch physics, joints, base** (willow.js): grow every branch with gravity like a cantilever — the bend per
+  step ∝ distance from its base / (1 + thickness), so thick limbs hold their line and thin parts droop more toward
+  the tip (the willow's arch emerges; no hand-set curve). Departure 30–50°, narrower toward the parent's tip;
+  branches longer low on the parent; a branch that would cross a big limb takes the other side or is dropped.
+  Joints: a collar — the child's width flares over its first ~8%. Base: roots as chains spreading from the foot,
+  a soft wet ground shadow and grass over it — a tree grows out of the ground, a flat cut-off bottom never.

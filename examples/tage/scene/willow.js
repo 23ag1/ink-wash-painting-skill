@@ -15,15 +15,30 @@ import { grey, depthLine, occlude, glaze } from './layers.js';
 
 const arcLens = P => P.reduce((a, p, i) => (a.push(i ? a[i - 1] + Math.hypot(p[0] - P[i - 1][0], p[1] - P[i - 1][1]) : 0), a), []);
 
-// an arching run: starts at angle `ang`, turns by `bend` in total (more toward the tip), crooked
-function arch(r, x, y, ang, len, bend, steps = 8) {
+// a branch grown with gravity, like a cantilever: it bends down more the longer and thinner it is — thick limbs
+// hold their direction, thin parts droop more and more toward the tip (the willow's arch comes from this, not
+// from a hand-set curve). A little crookedness, an occasional kink.
+function grow(r, x, y, ang, len, w0, steps = 8, G = .34) {
   const pts = [[x, y]];
   let a = ang;
   for (let k = 1; k <= steps; k++) {
-    a += bend / steps * (.4 + 1.2 * k / steps) + (r() - .5) * .3 + (r() < .3 ? (r() - .5) * .7 : 0);
+    const t = k / steps, w = Math.max(.5, w0 * Math.pow(1 - t, .55));
+    const sag = G * t / (1 + w / 3.5);                                 // flexibility ~ 1 / thickness, load grows outward
+    const down = Math.PI / 2 - a, d = Math.atan2(Math.sin(down), Math.cos(down));
+    a += Math.sign(d) * Math.min(Math.abs(d), sag) + (r() - .5) * .14 + (r() < .2 ? (r() - .5) * .45 : 0);
     pts.push([pts[k - 1][0] + Math.cos(a) * len / steps, pts[k - 1][1] + Math.sin(a) * len / steps]);
   }
   return pts;
+}
+
+// does a polyline cross another chain (used so a branch never grows through a big limb)
+function crosses(pts, chains, skip) {
+  const hit = (a, b, c, d) => { const o = (p, q, r) => Math.sign((q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0])); return o(a, b, c) !== o(a, b, d) && o(c, d, a) !== o(c, d, b); };
+  for (const ch of chains) {
+    if (ch === skip || ch.depth > 1) continue;
+    for (let i = 2; i < pts.length - 1; i++) for (let j = 0; j < ch.P.length - 1; j += 2) if (hit(pts[i], pts[i + 1], ch.P[j], ch.P[Math.min(ch.P.length - 1, j + 2)])) return true;
+  }
+  return false;
 }
 
 export function willowTree(c, sp, notan) {
@@ -42,32 +57,42 @@ export function willowTree(c, sp, notan) {
     return { x, y, w: ch.W[i], a: Math.atan2(ny - y, nx - x) };
   };
   // branches of a chain: alternating sides, uneven spacing, mostly rising (鹿角), each with its own twigs
+  // branches of a chain: alternating sides, uneven spacing; they leave at 30-50° (narrower toward the parent's
+  // tip), lean a little to the light, longer low on the parent (a cone); gravity bends them; a branch that
+  // would grow through a big limb takes the other side or is not grown; its base flares into the parent (collar)
   const branch = (ch, from, to, count, lenK, depth, seed) => {
     const br = rng(seed);
     let side = br() < .5 ? 1 : -1;
     for (let i = 0; i < count; i++) {
       const u = from + (to - from) * (i + .2 + br() * .6) / count, p = at(ch, u);
-      let a = p.a + side * (.55 + br() * .5);
-      const up = -Math.PI / 2 - a; a += Math.atan2(Math.sin(up), Math.cos(up)) * .3;
-      const len = ch.L * lenK * (.7 + br() * .6) * (1.15 - u * .5);
-      // a branch's thickness belongs to its size: a short one is thin from the start even off a thick trunk
-      // (start at the parent's width only when the branch is big enough to carry it — else short fat thorns)
-      const kid = addChain(arch(br, p.x, p.y, a, len, side * .4, 5), Math.min(p.w * .85, len * .09), depth);
-      if (depth < 3 && len > 18) branch(kid, .25, .95, depth === 1 ? 3 : 2, .38, depth + 1, seed + 97 * (i + 1));
+      const len = ch.L * lenK * (.7 + br() * .6) * (1.2 - u * .6), w0 = Math.min(p.w * .85, len * .09);
+      let kidPts = null;
+      for (const sd of [side, -side]) {
+        let a = p.a + sd * (.85 - .4 * u + (br() - .5) * .2);
+        const up = -Math.PI / 2 - a; a += Math.atan2(Math.sin(up), Math.cos(up)) * .25;
+        const pts = grow(br, p.x, p.y, a, len, w0, 6);
+        if (!crosses(pts, chains, ch)) { kidPts = pts; break; }
+      }
       side = -side;
+      if (!kidPts) continue;
+      const kid = addChain(kidPts, w0, depth, .45);
+      if (depth < 3 && len > 18) branch(kid, .25, .95, depth === 1 ? 3 : 2, .38, depth + 1, seed + 97 * (i + 1));
     }
   };
 
   // 1. the trunk + main leader: one chain from the root, through the S of the trunk, arching out over the path
   const trunkPts = smooth(sp.trunk, 2);
   const [tx, ty] = trunkPts[trunkPts.length - 1], [px, py] = trunkPts[trunkPts.length - 2];
-  const lead = arch(r, tx, ty, sp.leader.ang ?? Math.atan2(ty - py, tx - px), sp.leader.len, sp.leader.bend);
+  const lead = grow(r, tx, ty, sp.leader.ang, sp.leader.len, sp.w0 * .55, 10, sp.leader.G);
   const main = addChain([...trunkPts, ...lead.slice(1)], sp.w0, 0, .3);
   const uTop = arcLens(trunkPts).at(-1) / main.L;                      // where the trunk ends and the crown begins
+  // roots: the base spreads and grips the ground — the tree grows out of the bank, it is not stood on it
+  const [bx, by] = sp.trunk[0];
+  for (const [ang, len, w] of sp.roots) { const rr = rng(sp.seed + 30 + Math.round(ang * 10)); const pts = [[bx, by - 8]]; let a = ang; for (let k = 1; k <= 4; k++) { a += (rr() - .5) * .3; pts.push([pts[k - 1][0] + Math.cos(a) * len / 4, pts[k - 1][1] + Math.sin(a) * len / 4]); } addChain(pts, w, -1); }
   // 2. the other limbs of the crown leave the trunk's top, each starting at the trunk's width there
-  sp.limbs.forEach(([ang, len, bend], i) => {
-    const p = at(main, uTop - .01 * i), lr = rng(sp.seed + 50 + i);
-    const kid = addChain(arch(lr, p.x, p.y, ang, len, bend), Math.min(p.w * .85, len * .1), 1);
+  sp.limbs.forEach(([ang, len, G], i) => {
+    const p = at(main, uTop - .01 * i), lr = rng(sp.seed + 50 + i), w0 = Math.min(p.w * .85, len * .1);
+    const kid = addChain(grow(lr, p.x, p.y, ang, len, w0, 10, G), w0, 1, .45);
     branch(kid, .15, .95, 7, .32, 2, sp.seed + 60 + i * 31);
   });
   // 3. branches along the trunk's whole height and along the leader
@@ -98,14 +123,25 @@ export function willowTree(c, sp, notan) {
     if (w > 14) for (let j = 0; j < 3; j++) {
       const i0 = Math.floor(r() * ch.P.length * .5), i1 = Math.min(ch.P.length, i0 + 6 + Math.floor(r() * 10)), off = -.15 - r() * .2;
       const P = ch.P.slice(i0, i1).map((p, i) => { const ii = i0 + i, q = ch.P[Math.min(ch.P.length - 1, ii + 1)], o = ch.P[Math.max(0, ii - 1)], a = Math.atan2(q[1] - o[1], q[0] - o[0]); return [p[0] - Math.sin(a) * ch.W[ii] * off, p[1] + Math.cos(a) * ch.W[ii] * off]; });
-      if (P.length > 2) { c.l.globalCompositeOperation = 'destination-out'; hairyStroke(c.l, P, w * .18, sp.seed + 300 + k * 5 + j, { rgb: '0,0,0', alpha: .35, bristles: 6, dryFrom: 0, dryness: .8, streak: 40, edge: 0, fade: .3, tipSide: 0, close: 0, profile: t => Math.sin(Math.max(.1, t) * Math.PI) }); c.l.globalCompositeOperation = 'source-over'; }
+      if (P.length > 2) { c.l.globalCompositeOperation = 'destination-out'; hairyStroke(c.l, P, w * .18, sp.seed + 300 + k * 5 + j, { rgb: '0,0,0', alpha: .22, bristles: 6, dryFrom: 0, dryness: .8, streak: 40, edge: 0, fade: .3, tipSide: 0, close: 0, profile: t => Math.sin(Math.max(.1, t) * Math.PI) }); c.l.globalCompositeOperation = 'source-over'; }
     }
   });
   c.l.restore();
 
+  // the base half hidden in the bank: a soft wet ground shadow and grass over the foot (no cut-off bottom)
+  {
+    const [bx, by] = sp.trunk[0], gr = rng(sp.seed + 900);
+    c.w.save(); c.w.globalCompositeOperation = 'multiply'; c.w.filter = `blur(${4 * c.S}px)`; c.w.fillStyle = 'rgba(70,60,46,.4)';
+    c.w.beginPath(); c.w.ellipse(bx - 4, by + 3, 56, 8, 0, 0, 6.283); c.w.fill(); c.w.restore();
+    for (let i = 0; i < 18; i++) {
+      const x = bx - 48 + gr() * 96, y = by + 2 + gr() * 6, h = 8 + gr() * 16, lean = (gr() - .5) * 8;
+      stroke(c.l, smooth([[x, y], [x + lean * .4, y - h * .55], [x + lean, y - h]], 3), { wid: .9 + gr() * .8, fun: t => 1 - t * .9, noi: .3, col: `rgba(22,18,14,${.55 + gr() * .3})`, seed: sp.seed + 910 + i, tip: .3, dry: .3 });
+    }
+  }
+
   // 5. strands: bunches from the tips of the outer twigs and limbs (none from the trunk's own branches low down)
   chains.forEach((ch, k) => {
-    if (ch.depth === 0) return;
+    if (ch.depth <= 0) return;
     const tip = ch.P[ch.P.length - 1], prev = ch.P[ch.P.length - 2], a = Math.atan2(tip[1] - prev[1], tip[0] - prev[0]);
     if (tip[1] > sp.strandsAbove) return;
     bunch(c, tip[0], tip[1], a, ch.depth === 1 ? 8 : ch.depth === 2 ? 5 : 3, 18 + ch.L * .12, sp.seed + 500 + k * 13);

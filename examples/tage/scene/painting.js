@@ -88,8 +88,9 @@ export function paintScene(c, notan) {
     // the other crown limbs leave its top; branches all along the trunk; strands from the twig tips
     trunk: [[606, 1010], [613, 976], [612, 940], [601, 902], [587, 862], [575, 822], [566, 786], [560, 742]],
     w0: 46,
-    leader: { ang: -2.0, len: 220, bend: -1.4 },
-    limbs: [[-1.65, 190, -1.0], [-1.2, 120, 1.1], [-2.9, 170, -.5]],
+    leader: { ang: -2.1, len: 220, G: .55 },
+    limbs: [[-1.75, 165, .5], [-1.15, 125, .45], [-2.75, 170, .3]],   // [angle, length, gravity]
+    roots: [[2.95, 40, 14], [.2, 34, 12], [2.45, 24, 10]],
     trunkBranches: 5,
     strandsAbove: 900,
     seed: 91,
