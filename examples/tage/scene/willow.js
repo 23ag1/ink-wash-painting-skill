@@ -65,18 +65,18 @@ export function willowTree(c, sp, notan) {
     let side = br() < .5 ? 1 : -1;
     for (let i = 0; i < count; i++) {
       const u = from + (to - from) * (i + .2 + br() * .6) / count, p = at(ch, u);
-      const len = ch.L * lenK * (.7 + br() * .6) * (1.2 - u * .6), w0 = Math.min(p.w * .85, len * .09);
+      const len = ch.L * lenK * (.7 + br() * .6) * (1.2 - u * .6), w0 = Math.min(p.w * .85, len * (depth >= 2 ? .055 : .08));   // willow whips are thin
       let kidPts = null;
       for (const sd of [side, -side]) {
         let a = p.a + sd * (.85 - .4 * u + (br() - .5) * .2);
-        const up = -Math.PI / 2 - a; a += Math.atan2(Math.sin(up), Math.cos(up)) * .25;
-        const pts = grow(br, p.x, p.y, a, len, w0, 6);
+        const up = -Math.PI / 2 - a; a += Math.atan2(Math.sin(up), Math.cos(up)) * (depth >= 2 ? .15 : .25);
+        const pts = grow(br, p.x, p.y, a, len, w0, 7, depth >= 2 ? .75 : .45);   // whips arch over and hang (柳条)
         if (!crosses(pts, chains, ch)) { kidPts = pts; break; }
       }
       side = -side;
       if (!kidPts) continue;
       const kid = addChain(kidPts, w0, depth, .45);
-      if (depth < 3 && len > 18) branch(kid, .25, .95, depth === 1 ? 3 : 2, .38, depth + 1, seed + 97 * (i + 1));
+      if (depth < 3 && len > 22) branch(kid, .3, .95, depth === 1 ? 4 : 2, .45, depth + 1, seed + 97 * (i + 1));
     }
   };
 
@@ -86,6 +86,8 @@ export function willowTree(c, sp, notan) {
   const lead = grow(r, tx, ty, sp.leader.ang, sp.leader.len, sp.w0 * .55, 10, sp.leader.G);
   const main = addChain([...trunkPts, ...lead.slice(1)], sp.w0, 0, .3);
   const uTop = arcLens(trunkPts).at(-1) / main.L;                      // where the trunk ends and the crown begins
+  // the pollard head (Ma Yuan's willow): the trunk swells into a knuckle where all the limbs leave together
+  main.W = main.W.map((w, i) => w * (1 + .38 * Math.exp(-Math.pow((main.S[i] / main.L - uTop) / .035, 2))));
   // roots: the base spreads and grips the ground — the tree grows out of the bank, it is not stood on it
   const [bx, by] = sp.trunk[0];
   for (const [ang, len, w] of sp.roots) { const rr = rng(sp.seed + 30 + Math.round(ang * 10)); const pts = [[bx, by - 8]]; let a = ang; for (let k = 1; k <= 4; k++) { a += (rr() - .5) * .3; pts.push([pts[k - 1][0] + Math.cos(a) * len / 4, pts[k - 1][1] + Math.sin(a) * len / 4]); } addChain(pts, w, -1); }
@@ -144,7 +146,11 @@ export function willowTree(c, sp, notan) {
     if (ch.depth <= 0) return;
     const tip = ch.P[ch.P.length - 1], prev = ch.P[ch.P.length - 2], a = Math.atan2(tip[1] - prev[1], tip[0] - prev[0]);
     if (tip[1] > sp.strandsAbove) return;
-    bunch(c, tip[0], tip[1], a, ch.depth === 1 ? 8 : ch.depth === 2 ? 5 : 3, 18 + ch.L * .12, sp.seed + 500 + k * 13);
+    bunch(c, tip[0], tip[1], a, ch.depth === 1 ? 10 : ch.depth === 2 ? 7 : 4, 18 + ch.L * .12, sp.seed + 500 + k * 13);
+    if (ch.depth <= 2) for (let j = 0; j < 3; j++) {                   // more hanging along the outer half: the curtain
+      const i = Math.floor(ch.P.length * (.45 + .5 * (j + .5) / 3)), q = ch.P[i], q2 = ch.P[Math.min(ch.P.length - 1, i + 1)];
+      if (q[1] < sp.strandsAbove) bunch(c, q[0], q[1], Math.atan2(q2[1] - q[1], q2[0] - q[0]), 3, 12, sp.seed + 700 + k * 17 + j);
+    }
   });
 }
 
@@ -167,7 +173,7 @@ function shape(ch, r) {
 function bunch(c, x, y, a, n, reach, seed) {
   const rr = rng(seed);
   for (let k = 0; k < n; k++) {
-    const la = a + (rr() - .5) * .7, K = reach * (.3 + rr() * 1.1), L = 25 + Math.pow(rr(), 1.6) * 190;
+    const la = a + (rr() - .5) * .7, K = reach * (.3 + rr() * 1.1), L = 50 + Math.pow(rr(), 1.3) * 230;   // willow strands hang long
     const vx = Math.cos(la), vy = Math.min(.2, Math.sin(la)), drift = (rr() - .5) * 10;
     const pts = Array.from({ length: 14 }, (_, i) => { const t = i / 13; return [x + vx * K * t * (1 - t * .55) + drift * t * t, y + vy * K * t + L * t * t]; });
     depthLine(c, pts, 1.5, .08);

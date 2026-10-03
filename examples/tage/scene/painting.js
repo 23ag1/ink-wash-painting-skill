@@ -91,7 +91,7 @@ export function paintScene(c, notan) {
     leader: { ang: -2.1, len: 220, G: .55 },
     limbs: [[-1.75, 165, .5], [-1.15, 125, .45], [-2.75, 170, .3]],   // [angle, length, gravity]
     roots: [[2.95, 40, 14], [.2, 34, 12], [2.45, 24, 10]],
-    trunkBranches: 5,
+    trunkBranches: 1,                                // a willow's trunk is nearly bare: one thin shoot
     strandsAbove: 900,
     seed: 91,
   }, notan);

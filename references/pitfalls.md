@@ -301,3 +301,8 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   branches longer low on the parent; a branch that would cross a big limb takes the other side or is dropped.
   Joints: a collar — the child's width flares over its first ~8%. Base: roots as chains spreading from the foot,
   a soft wet ground shadow and grass over it — a tree grows out of the ground, a flat cut-off bottom never.
+- **A tree vs a WILLOW.** Generic branching (branches all along the trunk, rising "deer-antler" twigs) reads as
+  an oak or elm. A willow: a short, nearly bare, leaning trunk (one thin shoot at most); a pollard knuckle where
+  the limbs leave together; twigs are thin whips (width ~.055 × length) that barely rise and droop hard
+  (high gravity); strands long (50–280) and dense, hanging from the tips AND along the outer half of the limbs as
+  curtains with gaps. The species' character beats generic tree rules.
