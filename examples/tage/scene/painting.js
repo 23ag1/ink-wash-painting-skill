@@ -5,7 +5,8 @@
 // Darkest: the near boulders and the willow; palest: far pinnacles and mist. Only colour: the seal.
 import { slabPeak, farPinnacle } from './peaks.js';
 import { boulder, massRock, facetRock } from './rocks.js';
-import { pine, willow, bareTree, pollardWillow } from './trees.js';
+import { pine, willow, bareTree } from './trees.js';
+import { willowTree } from './willow.js';
 import { palace, ground, figure, poem, reeds } from './details.js';
 import { poly, glaze, occlude, dissolve } from './layers.js';
 import { rng } from '../../../kit/brush/brush.js';
@@ -82,19 +83,15 @@ export function paintScene(c, notan) {
   bareTree(c, { x: 90, y: 696, ang: -1.75, len: 80, seed: 81 }, notan);
   bareTree(c, { x: 168, y: 728, ang: -1.2, len: 64, seed: 82 }, notan);
   reeds(c, [[470, 1000, 22], [500, 992, 14], [40, 950, 16]], notan);
-  pollardWillow(c, {
-    // measured on Ma Yuan's scroll: trunk enters the right edge ~y920, head at ~(558,742),
-    // the branch reaches left to ~x400 almost level
-    // the base on the bank, an S-bend, uneven width: flared root, a waist, swelling again under the crown
-    trunk: [[606, 1010], [613, 976], [612, 940], [601, 902], [587, 862], [575, 822], [566, 786], [560, 740]],
-    trunkW: [66, 50, 44, 38, 36, 40, 46, 50],
-    roots: [[598, 1006, 2.9, 40, 10], [616, 1006, .25, 30, 9], [606, 1008, 2.4, 22, 8]],
-    sideLimbs: [],
-    headAt: [560, 740, 24],
-    // the crown, from willow paintings: limbs rise and arch over (bend = total turn), the low one nearly level
-    limbs: [
-      [546, 732, -2.0, 210, 14, -1.4], [560, 724, -1.65, 190, 12, -1.0], [578, 734, -1.2, 120, 10, 1.1], [544, 750, -2.9, 170, 11, -.5],
-    ],
+  willowTree(c, {
+    // grown as one tree: the trunk from the bank (an S), flowing on into the main limb arching over the path;
+    // the other crown limbs leave its top; branches all along the trunk; strands from the twig tips
+    trunk: [[606, 1010], [613, 976], [612, 940], [601, 902], [587, 862], [575, 822], [566, 786], [560, 742]],
+    w0: 46,
+    leader: { ang: -2.0, len: 220, bend: -1.4 },
+    limbs: [[-1.65, 190, -1.0], [-1.2, 120, 1.1], [-2.9, 170, -.5]],
+    trunkBranches: 5,
+    strandsAbove: 900,
     seed: 91,
   }, notan);
   if (!notan) {

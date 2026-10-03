@@ -289,3 +289,9 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   own strokes running down to the roots as a twisting bundle (no filled trunk), roots are limb strokes too, and
   every child starts at ~.85 of its parent's width where it leaves, thinning to a fine tip (the data-tree rule,
   technique-sources.md). Draw the bundle last so it covers the starts of other strokes on the trunk.
+- **One tree, one body** (what finally read as a tree): grow the willow as ONE graph (`examples/tage/scene/willow.js`)
+  — the trunk flows into the main arching limb as one chain, branches leave along the WHOLE trunk and every limb,
+  twigs on branches; draw every chain as a tapered shape with an uneven edge and fill them all as ONE path (solid
+  boneless ink, wet underneath, bristle texture and flying white clipped inside). A bundle of separate strokes reads
+  as cables; branches only at the top read as a broom on a stick. A branch's starting width is min(parent width,
+  ~.09 × its length): the data-tree rule alone gives short fat thorns.
