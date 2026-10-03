@@ -87,10 +87,10 @@ export function paintScene(c, notan) {
     // grown as one tree: the trunk from the bank (an S), flowing on into the main limb arching over the path;
     // the other crown limbs leave its top; branches all along the trunk; strands from the twig tips
     trunk: [[606, 1010], [613, 976], [612, 940], [601, 902], [587, 862], [575, 822], [566, 786], [560, 742]],
-    w0: 46,
-    leader: { ang: -2.1, len: 220, G: .55 },
-    limbs: [[-1.75, 165, .5], [-1.15, 125, .45], [-2.75, 170, .3]],   // [angle, length, gravity]
-    roots: [[2.95, 40, 14], [.2, 34, 12], [2.45, 24, 10]],
+    w0: 34,
+    leader: { ang: -2.45, len: 270, G: .45 },
+    limbs: [[-1.8, 190, .5], [-1.0, 170, .45], [-2.75, 230, .3], [-2.45, 210, .4]],   // [angle, length, gravity]
+    roots: [[2.95, 32, 10], [.2, 26, 9], [2.45, 18, 7]],
     trunkBranches: 1,                                // a willow's trunk is nearly bare: one thin shoot
     strandsAbove: 900,
     seed: 91,

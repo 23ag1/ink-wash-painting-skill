@@ -84,7 +84,7 @@ export function willowTree(c, sp, notan) {
   const trunkPts = smooth(sp.trunk, 2);
   const [tx, ty] = trunkPts[trunkPts.length - 1], [px, py] = trunkPts[trunkPts.length - 2];
   const lead = grow(r, tx, ty, sp.leader.ang, sp.leader.len, sp.w0 * .55, 10, sp.leader.G);
-  const main = addChain([...trunkPts, ...lead.slice(1)], sp.w0, 0, .3);
+  const main = addChain([...trunkPts, ...lead.slice(1)], sp.w0, 0, .15);
   const uTop = arcLens(trunkPts).at(-1) / main.L;                      // where the trunk ends and the crown begins
   // the pollard head (Ma Yuan's willow): the trunk swells into a knuckle where all the limbs leave together
   main.W = main.W.map((w, i) => w * (1 + .38 * Math.exp(-Math.pow((main.S[i] / main.L - uTop) / .035, 2))));
