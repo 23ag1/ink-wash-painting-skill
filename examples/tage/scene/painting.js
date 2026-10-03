@@ -85,11 +85,16 @@ export function paintScene(c, notan) {
   pollardWillow(c, {
     // measured on Ma Yuan's scroll: trunk enters the right edge ~y920, head at ~(558,742),
     // the branch reaches left to ~x400 almost level
-    trunk: [[676, 948], [646, 912], [616, 870], [594, 820], [576, 778], [560, 738]], trunkW: [42, 30],
+    // the base on the bank, an S-bend, uneven width: flared root, a waist, swelling again under the crown
+    trunk: [[606, 1010], [613, 976], [612, 940], [601, 902], [587, 862], [575, 822], [566, 786], [560, 740]],
+    trunkW: [66, 50, 44, 38, 36, 40, 46, 30],
+    roots: [[[[596, 1004], [578, 1012], [556, 1016]], [18, 10, 3], 1], [[[618, 1004], [634, 1010], [646, 1012]], [16, 9, 4], 2]],
+    sideLimbs: [[[[604, 918], [626, 892], [650, 862], [668, 846]], [30, 26, 22, 20], 1]],
+    stubs: [],
     headAt: [560, 740, 24],
     // the crown, from willow paintings: limbs rise and arch over (bend = total turn), the low one nearly level
     limbs: [
-      [548, 728, -2.0, 210, 11, -1.4], [560, 722, -1.65, 190, 9, -1.0], [574, 728, -1.2, 120, 7, 1.1], [545, 744, -2.9, 170, 8, -.5],
+      [546, 732, -2.0, 210, 11, -1.4], [560, 724, -1.65, 190, 9, -1.0], [578, 734, -1.2, 120, 7, 1.1], [544, 750, -2.9, 170, 8, -.5],
     ],
     seed: 91,
   }, notan);

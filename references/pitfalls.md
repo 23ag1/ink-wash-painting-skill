@@ -275,3 +275,8 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   thick trunk is WET INK ON THE WASH LAYER (several dark wet strokes side by side, merged by diffusion — the way
   the rocks get their tone); the ink layer gets only NARROW strokes: a contour in soft-ended overlapping
   segments (hard segment ends = saw teeth) and a few long dry streaks.
+- **"The trunk is a stick" is about SHAPE, not texture.** A long even-width pole entering from the frame edge with
+  limbs only at its top reads as a stick whatever the brushwork. A living trunk: its base stands on the ground with
+  roots spreading; it bends (an S); its width varies strongly (flared root, a waist, swelling under the crown, a
+  rounded shoulder into the fork); a thick limb leaves mid-trunk (cropped by the frame is fine). Fix the shape first.
+  Small glued-on stubs read as labels — leave them out.
