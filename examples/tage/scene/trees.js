@@ -174,7 +174,7 @@ function wood(c, axis, widths, seed, { dark = 1, occl = true } = {}) {
     let i = 0;
     while (i < n - 2) {
       const l = 5 + Math.floor(r() * 7), seg = E.slice(i, Math.min(n, i + l + 1));
-      if (seg.length > 2 && r() > gapP) hairyStroke(c.l, seg, Math.max(1.2, wid * (.8 + r() * .4)), seed + 40 + i + (side > 0 ? 0 : 500), { rgb: '14,11,8', alpha: al, bristles: 7, dryFrom: .3, dryness: .5, streak: 40, edge: .6, fade: .3, tipSide: side > 0 ? .5 : -.5, close: 0, profile: t => .15 + .85 * Math.sin(Math.max(.05, t) * Math.PI) });
+      if (seg.length > 2 && r() > gapP) hairyStroke(c.l, seg, Math.max(1.2, wid * (.8 + r() * .4)), seed + 40 + i + (side > 0 ? 0 : 500), { rgb: '14,11,8', alpha: al, bristles: 7, dryFrom: .4, dryness: .25, streak: 60, edge: .3, fade: .3, tipSide: side > 0 ? .5 : -.5, close: 0, profile: t => .15 + .85 * Math.sin(Math.max(.05, t) * Math.PI) });
       i += l - 3;
     }
   }
@@ -221,7 +221,7 @@ export function pollardWillow(c, sp, notan) {
       stroke(c.l, smooth(pts, 2), { wid: .45 + rr() * .35, fun: t => 1 - t * .85, noi: .25, col: `rgba(30,26,20,${.14 + Math.pow(rr(), .7) * .4})`, seed: seed + 30 + k, tip: .3, dry: .3 });
     }
   };
-  const limb = (x, y, ang, len, w, bend, d, seed) => {
+  const limb = (x, y, ang, len, w, bend, d, seed, baseW = 0) => {
     const rr = rng(seed), steps = 7, pts = [[x, y]];
     let a = ang;
     for (let k = 1; k <= steps; k++) {
@@ -232,6 +232,10 @@ export function pollardWillow(c, sp, notan) {
     // a main limb's stroke begins deep inside the trunk's dark ink: its square start is buried, no step at the joint
     const P = smooth(d === 0 ? [[x - Math.cos(ang) * 28, y - Math.sin(ang) * 28], ...pts] : pts, 3);
     depthLine(c, P, w + 2, .08);                                    // depth along ALL the ink, or the mist veils the hidden start
+    // a main limb carries its share of the trunk's thickness (Leonardo: the limbs' cross-sections add up to the
+    // trunk's): its first stretch is thick wood, painted like the trunk, thinning to the limb's own width — never
+    // a thin branch stuck straight into a thick trunk
+    if (d === 0 && baseW) wood(c, [P[0], pts[1], pts[2], pts[3]], [baseW, baseW * .72, (baseW * .35 + w * .65), w * .75]   /* ends narrower than the limb stroke: no step */, seed + 7, { occl: false });
     if (w > 2.4) hairyStroke(c.l, P, w, seed, { rgb: '18,14,10', alpha: .85, bristles: Math.max(6, Math.round(w * 1.4)), dryFrom: .55, dryness: .3, streak: len * .6, edge: .7, fade: .2, tipSide: .3, close: 0, profile: t => wAt(t) / w });   // no start step (it left pale chips at the joint), no width ripple, little dry: cross-bands read as bamboo
     else stroke(c.l, P, { wid: w, fun: t => (t < .06 ? 1.15 : 1) * wAt(t) / w, noi: .45, col: 'rgba(20,16,12,.85)', seed, tip: .35, dry: .4 });
     if (d < 2) {
@@ -249,6 +253,6 @@ export function pollardWillow(c, sp, notan) {
     }
     if (d >= 1 || rr() < .9) bunch(pts[steps][0], pts[steps][1], a, d === 0 ? 7 : d === 1 ? 5 : 3, 18 + len * .12, seed + 500);
   };
-  sp.limbs.forEach(([x, y, ang, len, w, bend], i) => limb(x, y, ang, len, w, bend, 0, sp.seed + 1000 + i * 131));
+  sp.limbs.forEach(([x, y, ang, len, w, bend, baseW], i) => limb(x, y, ang, len, w, bend, 0, sp.seed + 1000 + i * 131, baseW));
 
 }

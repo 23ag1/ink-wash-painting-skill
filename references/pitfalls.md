@@ -280,3 +280,8 @@ Symptom → cause → fix. Grouped by area; the process lessons at the end matte
   roots spreading; it bends (an S); its width varies strongly (flared root, a waist, swelling under the crown, a
   rounded shoulder into the fork); a thick limb leaves mid-trunk (cropped by the frame is fine). Fix the shape first.
   Small glued-on stubs read as labels — leave them out.
+- **Leonardo's rule: limbs carry the trunk's thickness.** A thick trunk splitting straight into thin branches is
+  impossible (the user had to repeat this many times). The main limbs' cross-sections add up to the trunk's
+  (d² ≈ Σ dᵢ²): a 46-wide trunk gives limbs of ~18–26 at their base, which then thin gradually; the trunk does NOT
+  narrow into the fork. Paint the thick stretch of a limb like the trunk (wet mass + narrow strokes), ending a
+  little narrower than the limb's own stroke so there is no step. Check widths at every fork, at every scale.
