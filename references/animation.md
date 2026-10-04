@@ -4,7 +4,7 @@ The picture is painted once; animation is a per-frame pass over the finished res
 **the reveal** (the painting appearing on blank paper, once, ~7 s) and **quiet motion** after it (mist drift,
 rain, steam, water, a few geese/petals). Nothing else: no glows, specks, vignettes, camera moves, UI.
 
-## 1. The reveal (kit: `brush/inktime.js`, `glsl/reveal.glsl`, `rt.mipmap`; examples: `tage`, rain-market)
+## 1. The reveal (kit: `brush/inktime.js`, `glsl/reveal.glsl`, `rt.mipmap`; examples: `tage`, `reference/` (Mid-Autumn: shader-generated mountains — its bare-paper state is a `uBare` switch in scene.frag), rain-market)
 How it works:
 1. Before painting, `recordInkTimes(inkCtx, w, h, { seed, dur: .22 })` wraps the ink context's fill: every ink
    mark also writes WHEN it is drawn into a time map — each stroke a random start (dozens at once), time running

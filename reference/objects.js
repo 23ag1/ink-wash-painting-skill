@@ -1,6 +1,7 @@
 // Object layers, painted from the SCENE description: c.w goes through the watercolor pass (soft, bleeding),
 // c.l is brush ink laid on top. Paint order matters — whatever is drawn later occludes what is behind it.
 import { rng } from '../kit/brush/brush.js';
+import { recordInkTimes } from '../kit/brush/inktime.js';
 import { drawBroadleaf, drawPine, drawReeds } from './flora.js';
 import { drawPlumBranch } from './plum.js';
 import { drawHouse, HOUSE_LANTERNS } from './house.js';
@@ -55,7 +56,7 @@ function shoreFade(c, W) {
 
 // Layers at device scale S. Order: mountain brushwork (behind all) -> far plane -> banks -> trees & pavilion ->
 // reeds -> plum branch -> shore fade -> boat (on the water) -> near ground -> lamp washes -> title.
-export function buildObjects(W, H, S, ridges, layers) {
+export function buildObjects(W, H, S, ridges, layers, { record = false } = {}) {
   const mk = () => {
     const cv = document.createElement('canvas');
     cv.width = W * S; cv.height = H * S;
@@ -64,6 +65,8 @@ export function buildObjects(W, H, S, ridges, layers) {
   };
   const [wash, w] = mk(), [lines, l] = mk();
   const c = { w, l }, r = rng(42), sc = SCENE;
+  // the reveal: every ink mark records when it is drawn (kit/brush/inktime.js)
+  const timeI = record ? recordInkTimes(l, W * S, H * S, { seed: 31337, dur: .22 }) : null;
   drawMountainInk(c, ridges, layers);
   if (sc.distance) drawDistance(c, ridges, sc.distance);
   drawShore(c, sc.banks || []);
@@ -77,6 +80,10 @@ export function buildObjects(W, H, S, ridges, layers) {
   if (sc.boat) transformed(c, () => drawBoat(c, r), [sc.boat.dx, 0]);
   if (sc.foreground) drawForeground(c);
   lampWashes(c);
+  // the reveal's washes-only stage must not contain the title or the seal (they are written strictly last)
+  const washesStage = document.createElement('canvas');
+  washesStage.width = wash.width; washesStage.height = wash.height;
+  washesStage.getContext('2d').drawImage(wash, 0, 0);
   if (sc.title) drawInscription(c, sc.title);
-  return { wash, lines };
+  return { wash, lines, washesStage, timeI };
 }

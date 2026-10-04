@@ -21,7 +21,7 @@ function readRidges(rt, prog, layers, masses) {
 }
 
 // build(ridges) draws the object layers once the ridge lines are known and returns { wash, lines } canvases
-export async function createPainting(canvas, { width, height, layers, masses, moon, water = true, build }) {
+export async function createPainting(canvas, { width, height, layers, masses, moon, water = true, build, reveal = false }) {
   const moonU = moon ? [moon.x, moon.y, moon.r] : [0, 0, 0];
   const rt = await createRuntime(canvas);
   // half-float targets keep the many small diffusion increments from being lost to 8-bit rounding
@@ -30,26 +30,39 @@ export async function createPainting(canvas, { width, height, layers, masses, mo
     ['shaders/ridge.frag', 'shaders/scene.frag', '../kit/passes/diffuse.frag', 'shaders/paint.frag', 'shaders/final.frag'].map(rt.program));
 
   const ridges = rt.float ? readRidges(rt, ridge, layers, masses) : null;
-  const { wash: objects, lines } = build(ridges);
+  const built = build(ridges);
+  const { wash: objects, lines } = built;
 
   canvas.width = width; canvas.height = height;
   const size = [width, height];
-  const objTex = rt.fromCanvas(objects), lineTex = rt.fromCanvas(lines);
-  const sceneCol = rt.texture(width, height), sceneWet = rt.texture(width, height);   // [colour, wetness]
-  rt.draw(scene, {
-    to: rt.target([sceneCol, sceneWet]), size, tex: { uObjects: objTex },
-    u: { uLayer: layers.flat(), uMass: masses.flat(), uMoon: moonU, uWaterOn: water ? 1 : 0 },
-  });
+  // one pass of the whole material pipeline for one state of the painting (objects wash, ink lines)
+  const render = (objCv, linesCv, bare = 0) => {
+    const objTex = rt.fromCanvas(objCv), lineTex = rt.fromCanvas(linesCv);
+    const sceneCol = rt.texture(width, height), sceneWet = rt.texture(width, height);   // [colour, wetness]
+    rt.draw(scene, {
+      to: rt.target([sceneCol, sceneWet]), size, tex: { uObjects: objTex },
+      u: { uLayer: layers.flat(), uMass: masses.flat(), uMoon: moonU, uWaterOn: water ? 1 : 0, uBare: bare },
+    });
+    // ink creeping through wet paper, preferring the fibre direction
+    const diffused = rt.pingpong(diffuse, sceneCol, DIFFUSION_STEPS, {
+      size, type: work, tex: { uWet: sceneWet },
+      u: { uStep: width / DESIGN_W * .8, uDesignW: DESIGN_W, uRate: .11, uFibreScale: .018, uCross: .2 },
+    });
+    const painted = rt.texture(width, height), paintFb = rt.target([painted]);
+    rt.draw(paint, { to: paintFb, size, tex: { uLines: lineTex, uObjects: objTex, uDiffused: diffused, uWet: sceneWet } });
+    return { tex: rt.mipmap(painted), fb: paintFb };
+  };
+  const full = render(objects, lines);
+  if (new URLSearchParams(location.search).has('dump')) window.__painted = rt.read(full.fb, width, height);
+  const painted = full.tex;
+  // the reveal (kit/glsl/reveal.glsl): bare paper → washes bloom → ink strokes travel → title and seal last
+  let blank = painted, washes = painted, timeI = painted;
+  if (reveal) {
+    const empty = document.createElement('canvas'); empty.width = objects.width; empty.height = objects.height;
+    blank = render(empty, empty, 1).tex;
+    washes = render(built.washesStage, empty).tex;
+    timeI = rt.mipmap(rt.fromCanvas(built.timeI));
+  }
 
-  // ink creeping through wet paper, preferring the fibre direction
-  const diffused = rt.pingpong(diffuse, sceneCol, DIFFUSION_STEPS, {
-    size, type: work, tex: { uWet: sceneWet },
-    u: { uStep: width / DESIGN_W * .8, uDesignW: DESIGN_W, uRate: .11, uFibreScale: .018, uCross: .2 },
-  });
-
-  const painted = rt.texture(width, height), paintFb = rt.target([painted]);
-  rt.draw(paint, { to: paintFb, size, tex: { uLines: lineTex, uObjects: objTex, uDiffused: diffused, uWet: sceneWet } });
-  if (new URLSearchParams(location.search).has('dump')) window.__painted = rt.read(paintFb, width, height);
-
-  return t => rt.draw(fin, { size, tex: { uPaint: painted }, u: { uMoon: moonU, uWaterOn: water ? 1 : 0, uTime: t } });
+  return (t, progress, fx) => rt.draw(fin, { size, tex: { uPaint: painted, uWashes: washes, uBlank: blank, uTimeI: timeI }, u: { uMoon: moonU, uWaterOn: water ? 1 : 0, uTime: t, uProgress: progress, uFx: fx } });
 }

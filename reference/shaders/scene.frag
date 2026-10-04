@@ -7,6 +7,7 @@ uniform vec2 uRes;
 uniform sampler2D uObjects;
 uniform vec3 uMoon;        // x, y, radius (radius 0 = no moon)
 uniform float uWaterOn;    // 1 = river below the waterline, 0 = land/valley continues down
+uniform float uBare;       // 1 = bare paper only (the reveal's first state)
 layout(location = 0) out vec4 fragColor;   // rgb: painting
 layout(location = 1) out vec4 wetOut;      // r: how wet the paper was here (drives ink diffusion)
 
@@ -88,6 +89,7 @@ vec3 sky(vec2 p) {
 void main() {
   vec2 fc = gl_FragCoord.xy;
   vec2 p = designPos(fc, uRes);
+  if (uBare > .5) { fragColor = vec4(PAPER, 0.); wetOut = vec4(.3, 0., 0., 1.); return; }
   vec3 col = sky(p);
   for (int i = 0; i < NL - 1; i++) {
     col = drawLayer(i, p, col);
