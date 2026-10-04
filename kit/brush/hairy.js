@@ -57,13 +57,14 @@ export function hairyStroke(g, pts, wid, seed, p) {
       gr.addColorStop(d[i] / len, `rgba(${p.rgb},${Math.min(1, run[i].a)})`);
     }
     g.fillStyle = gr;
-    g.beginPath();
-    left.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y)));
-    for (let i = right.length - 1; i >= 0; i--) g.lineTo(...right[i]);
-    g.closePath();
-    g.fill();
+    const path = new Path2D();                       // a Path2D so a recorder sees each hair (kit/brush/inktime.js)
+    left.forEach(([x, y], i) => (i ? path.lineTo(x, y) : path.moveTo(x, y)));
+    for (let i = right.length - 1; i >= 0; i--) path.lineTo(...right[i]);
+    path.closePath();
+    g.fill(path);
   };
   g.save();
+  g.__seg = [pts[0][0], pts[0][1], pts[n - 1][0], pts[n - 1][1]];   // entry → exit of the whole stroke, for the reveal
   for (let k = 0; k < p.bristles; k++) {
     const v = ((k + .5) / p.bristles) * 2 - 1 + (r() - .5) * .6 / p.bristles;   // across the brush, -1..1
     const load = .5 + .5 * r();
@@ -93,5 +94,6 @@ export function hairyStroke(g, pts, wid, seed, p) {
     }
     drawRun(run, startOpen, false);
   }
+  g.__seg = null;
   g.restore();
 }

@@ -104,6 +104,15 @@ export async function createRuntime(canvas, glOptions = {}) {
     return t;
   }
 
+  // mip levels for a texture already drawn into (rgba8): smooth, stable blurs via textureLod (the reveal reads its
+  // states and the ink-time map this way — per-pixel random blur taps shimmer as sand)
+  function mipmap(t) {
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    return t;
+  }
+
   // a canvas (or image) as a straight-alpha texture, y flipped to GL convention
   const fromCanvas = c => texture(c.width, c.height, { source: c });
 
@@ -176,5 +185,5 @@ export async function createRuntime(canvas, glOptions = {}) {
     return px;
   }
 
-  return { gl, float, program, texture, fromCanvas, target, draw, pingpong, read };
+  return { gl, float, program, texture, fromCanvas, mipmap, target, draw, pingpong, read };
 }

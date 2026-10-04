@@ -101,6 +101,9 @@ export function paintScene(c, notan) {
     figure(c, 408, 1036, 1.6, { lean: .15, arms: [[11, -8], [-10, -6]], kick: .2 }, 103);
     figure(c, 462, 1040, 1.5, { lean: .4, arms: [[-6, 6]], kick: .1, staff: true }, 104);
     figure(c, 46, 978, 1.4, { lean: .5, arms: [[-6, 6]], kick: .2, staff: true }, 105);
+    // the reveal's washes-only stage must not contain the inscription or the seal (they come strictly last)
+    c.washesStage = Object.assign(document.createElement('canvas'), { width: c.canvases.wash.width, height: c.canvases.wash.height });
+    c.washesStage.getContext('2d').drawImage(c.canvases.wash, 0, 0);
     poem(c, [
       { text: '宿雨清畿甸', x: 604, y: 46 }, { text: '朝阳丽帝城', x: 566, y: 46 },
       { text: '丰年人乐业', x: 528, y: 46 }, { text: '垅上踏歌行', x: 490, y: 46 },

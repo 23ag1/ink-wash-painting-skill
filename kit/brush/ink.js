@@ -36,11 +36,14 @@ function parseRGBA(col) {
   return { rgb: v.slice(0, 3).join(','), a: v.length > 3 ? v[3] : 1 };
 }
 
+// a Path2D (not the context's current path) so a recorder can see each mark's shape: kit/brush/inktime.js
 function outlinePath(g, left, right) {
-  g.beginPath(); g.moveTo(...left[0]);
-  for (let i = 1; i < left.length; i++) g.lineTo(...left[i]);
-  for (let i = right.length - 1; i >= 0; i--) g.lineTo(...right[i]);
-  g.closePath();
+  const p = new Path2D();
+  p.moveTo(...left[0]);
+  for (let i = 1; i < left.length; i++) p.lineTo(...left[i]);
+  for (let i = right.length - 1; i >= 0; i--) p.lineTo(...right[i]);
+  p.closePath();
+  return p;
 }
 
 export function stroke(g, pts, { wid = 2, fun = t => Math.sin(t * Math.PI), noi = .5, col = 'rgba(20,18,16,.9)', seed = 0, tip = 0, dry = .35 } = {}) {
@@ -65,7 +68,9 @@ export function stroke(g, pts, { wid = 2, fun = t => Math.sin(t * Math.PI), noi 
   const [x0, y0] = pts[0], [x1, y1] = pts[n - 1];
   const chord = Math.hypot(x1 - x0, y1 - y0);
   if (!c || wid < 1.2 || chord < dist * .25) {           // hairlines and closed loops: flat ink is fine
-    g.fillStyle = col; outlinePath(g, left, right); g.fill();
+    g.__seg = [pts[0][0], pts[0][1], pts[n - 1][0], pts[n - 1][1]];   // entry → exit, for the reveal
+    g.fillStyle = col; g.fill(outlinePath(g, left, right));
+    g.__seg = null;
     return;
   }
   const ramp = k => {
@@ -75,8 +80,10 @@ export function stroke(g, pts, { wid = 2, fun = t => Math.sin(t * Math.PI), noi 
     gr.addColorStop(1, `rgba(${c.rgb},${c.a * k * (1 - dry * .6)})`);
     return gr;
   };
-  g.fillStyle = ramp(.6); outlinePath(g, left, right); g.fill();
-  g.fillStyle = ramp(.72); outlinePath(g, coreL, coreR); g.fill();
+  g.__seg = [x0, y0, x1, y1];                                         // entry → exit, for the reveal
+  g.fillStyle = ramp(.6); g.fill(outlinePath(g, left, right));
+  g.fillStyle = ramp(.72); g.fill(outlinePath(g, coreL, coreR));
+  g.__seg = null;
 }
 
 // Organic blob (petal, leaf, ink dab): lens-shaped profile, radius modulated by looped noise
@@ -85,16 +92,16 @@ export function blob(g, x, y, { len = 20, wid = 5, ang = 0, col = 'rgba(20,18,16
   const ns = Array.from({ length: reso + 1 }, (_, i) => noise(i * .12, seed + 7.3));
   const drift = (ns[reso] - ns[0]) / reso;
   g.fillStyle = col;
-  g.beginPath();
+  const path = new Path2D();
   for (let i = 0; i <= reso; i++) {
     const p = i / reso * 2;
     const xo = len / 2 - Math.abs(p - 1) * len, yo = fun(p) * wid / 2;
     const a = Math.atan2(yo, xo), l = Math.hypot(xo, yo);
     const k = (ns[i] - drift * i) * noi + (1 - noi);
     const px = x + Math.cos(a + ang) * l * k, py = y + Math.sin(a + ang) * l * k;
-    i ? g.lineTo(px, py) : g.moveTo(px, py);
+    i ? path.lineTo(px, py) : path.moveTo(px, py);
   }
-  g.closePath(); g.fill();
+  path.closePath(); g.fill(path);
 }
 
 // Accumulating random-walk path (branches, twigs): angles drift by up to ±ben per step
