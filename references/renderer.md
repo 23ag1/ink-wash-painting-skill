@@ -17,9 +17,10 @@ Start a project with `scripts/new-painting.sh <folder>` (copies `kit/`). Serve w
 from the project root. Shaders include modules with `#include "kit/<file>.glsl"`; local includes are relative.
 
 ### Runtime — `kit/runtime.js` (WebGL mechanics only)
-`createRuntime(canvas, glOptions)` → `{ gl, float, program, texture, fromCanvas, target, draw, pingpong, read }`
+`createRuntime(canvas, glOptions)` → `{ gl, float, program, texture, fromCanvas, mipmap, target, draw, pingpong, read }`
 - `program(url)` — fragment shader with includes expanded (each file once). Header (`#version 300 es`, highp) added.
-- `texture(w, h, { type: 'rgba8' | 'rgba16f' | 'rgba32f' })`, `fromCanvas(canvas)` — straight alpha, y flipped.
+- `texture(w, h, { type: 'rgba8' | 'rgba16f' | 'rgba32f', data })`, `fromCanvas(canvas)` — straight alpha, y flipped;
+  `data` = a typed array (e.g. a skeleton). `mipmap(tex)` — mip levels for smooth, stable `textureLod` blurs (the reveal).
 - `target([tex, …])` — framebuffer (several textures = MRT, write `layout(location = i) out`).
 - `draw(prog, { to, size, tex: {uName: texture}, u: {uName: value} })` — one full-screen pass; `uRes` automatic;
   **throws if any used uniform is missing**.
@@ -45,6 +46,8 @@ from the project root. Shaders include modules with `#include "kit/<file>.glsl"`
 | `atmos.glsl` | `rainStreaks(p,dir,t,…)` `plume(p,src,scale,lean,t)` `mistDrift(p,t,freq,speed)` | per-frame rain, steam/smoke, drifting mist (coverage 0..1; you choose colour, mask, amount) | still pictures |
 | `limbs.glsl` | `sdLimb(p,a,b,ra,rb,fr)` `sminLimb` `limbField(skel,n,p,k)` → `{d,r,dir,across,along,ink,crease}` | anything branching (trees, roots, antlers, coral, bamboo nodes) as ONE field from a skeleton of tapered segments in an rgba32f texture, 3 texels per segment (`rt.texture(3n,1,{type:"rgba32f",data})`; `ink` = per-segment tone, `crease` = where the union fills a concavity: crotches, knots); joints merge by smooth union — no seams, no end caps, no floating branch; texture it in the limb's own frame (`along` = arc length, `across` = radii), never by projecting world position | single strokes (use the brush); twigs thinner than ~1px; NEVER as an overlay after the paint pass (reads as vector) — feed it into the wash/ink layers |
 
+| `reveal.glsl` | `revealSoft(s,uv,r,res)` `revealPainting(blank,washes,full,timeI,uv,p,res,sc,progress,lastMask,poolScale)` | the painting appearing on blank paper as ink running into wet paper (big pools, damp band, tone deepening, ink following its wash, inscription last) — states mipmapped, timeI from `brush/inktime.js`; see `animation.md` | a picture that should simply be there |
+
 ### Pass — `kit/passes/diffuse.frag`
 Ink creeping along paper fibres where the paper is wet (simplified MoXi). Uniforms (all required): `uSrc`,
 `uWet`, `uStep` (device px), `uDesignW`, `uRate` (~.11), `uFibreScale` (match `paperFibres`), `uCross` (~.2; 1 =
@@ -59,6 +62,11 @@ side (±1, 侧锋: dark crisp tip edge, dry heel — axe-cut strokes); every loo
 the wash layer too (broad wet strokes that the diffusion softens) — the way to build tone without a blur. Use it for culms, wood,
 rock edges, fast calligraphy — anywhere the dry brush shows. `brush.js`: `rng smooth brush wash line`; `text.js`: `drawInscription(c, spec)` (brushed vertical title + seal;
 `c = { w: washCtx, l: inkCtx }`). See `brush.md` for what each parameter means.
+`tree.js`: `createTree()` → `{ chains, addChain, at, branch }`, `growLimb`, `crosses`, `chainShape`, `strandCurve`,
+`arcLens` — any branching plant as ONE growth graph (continuous thickness, gravity by thickness, departure angles,
+no crossings, collars) and its chains as tapered shapes to fill as ONE body; every option required, species
+choices are yours (`trees.md`). `inktime.js`: `recordInkTimes(inkCtx, w, h, { seed, dur })` — call before
+painting; returns the ink-time map for the reveal (brushes fill Path2D and set `g.__seg` entry → exit for it).
 
 ### What you always write yourself
 The scene field shader (background, masses, glazes), what goes into which layer and how wet, the depth model,

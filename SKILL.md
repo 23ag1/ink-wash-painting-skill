@@ -47,16 +47,27 @@ Permanent folder the user agreed to, `git init`, commit per step. First render t
 tones only (notan mode) and pass the composition checks at thumbnail size. Then the material sheet (paper,
 diffusion, filter, test strokes) at zoom. Organise everything by **depth**, not by screen bands.
 
-### 5. Motif studies, then assemble — `references/brush.md`
-Draw each new motif large and alone (study mode), from correct structure, compare with the references, iterate
-until it looks painted; then give it variation (size, tone, angle, completeness) and only then multiply it into
-the scene in clusters with gaps. Paint in the painter's order: washes → structure strokes → texture → dots →
-accents.
+### 5. Motif studies, then assemble — `references/brush.md` (trees: `references/trees.md`)
+Before building a motif, crop the master's version LARGE (3×) and write how it is constructed — a verbal idea
+("a pollarded willow") is not a construction. Draw each new motif large and alone (study mode), from correct
+structure, compare side by side with the crop, iterate until it looks painted; then give it variation (size,
+tone, angle, completeness) and only then multiply it into the scene in clusters with gaps. Paint in the
+painter's order: washes → structure strokes → texture → dots → accents. Structure gates, every motif:
+- **Shape before texture.** "It's a stick / plank / blob" is a construction problem; no brushwork fixes it.
+- **Joints.** No seams, rings, necks, gaps or blurred dabs where parts meet; grow parts out of each other or
+  fill them as one shape; thickness continuous at every fork (Leonardo); a collar where a branch leaves.
+- **Contact.** Things grow out of / rest in the ground (roots, grass, contact strokes, a soft shadow) — no flat cuts.
+- **Character.** The species/kind beats generic rules (a willow is not an oak; `trees.md` §3).
+- **Everything through the pipeline.** Marks go into the wash/ink canvases before diffusion and the paint pass;
+  an overlay after it reads as vector. Wide strokes on the crisp ink layer read digital — build mass as wet ink
+  on the wash layer, keep the ink layer for narrow strokes. Write depth along ALL ink.
 
 ### 6. Critique top-down, at least two full rounds — `references/critique.md`
 Composition → tone/void → structure → anti-CG → marks → motion. Thumbnail, blur, one-second and side-by-side
-tests; zoom for marks. Never polish details while a higher level fails. If an element fails twice, go back to
-research instead of tweaking numbers.
+tests; zoom for marks; run the false-word test (`pitfalls.md` §8: eye, slingshot, rope, plank, broom, nodes…).
+Never polish details while a higher level fails. If an element fails twice, rebuild it from research instead of
+tweaking numbers. When the user critiques with a screenshot, check whether the screenshot is the BAD part or the
+good example before changing anything; change one thing, then look.
 
 ### 7. Deliver
 What was painted and why (in painting terms, citing what you took from which master), the dials you chose, what
@@ -75,7 +86,8 @@ moves, how to run it, and honestly what is still weak, ordered by level.
   the computer (`judgement.md` §5).
 - **Paper is the light; tone follows depth; sharp and soft together; a brush, not a pen or a fill.**
 - **Nothing floats, nothing stands out; the host gets the most considered marks, the rest is summarised.**
-- **Animation obeys the painting.** Slow, few, painted; no glows, specks, vignettes, camera moves or UI unless asked.
+- **Animation obeys the painting.** A reveal from blank paper (ink running into wet paper, inscription last), then
+  slow, few, painted motion; no glows, specks, vignettes, camera moves or UI unless asked (`references/animation.md`).
 
 ## Honest limits — tell the user when they apply
 - Photographic detail, cast shadows, exact perspective and heavy full colour are outside the style (full colour
@@ -100,6 +112,8 @@ moves, how to run it, and honestly what is still weak, ordered by level.
 - `references/brush.md` — the stroke atom and stroke families as algorithms; structure → strokes.
 - `references/renderer.md` — pipeline design, depth organisation, layers/occlusion, reusable files, gated build order (notan, material sheet, motif studies), GLSL gotchas.
 - `references/critique.md` — top-down critique with gates and concrete questions.
-- `references/pitfalls.md` — mistakes made building the reference, symptom → cause → fix.
+- `references/trees.md` — trees of any species: study, universal structure (one growth graph, continuous thickness, gravity, joints, base), species character table, painting as one body, checks. `kit/brush/tree.js` is the mechanics.
+- `references/animation.md` — the reveal (kit `inktime.js` + `reveal.glsl`) with every lesson from building it; quiet motion after it (mist, rain, steam); how to verify frames.
+- `references/pitfalls.md` — rules learned from every real failure (process, composition, depth, trees, joints, brush, false words, reveal animation, tooling).
 - `references/reference-implementation.md`, `reference-internals.md` — how `reference/` paints its one scene.
 - `kit/` — runtime, GLSL modules, diffusion pass, brush library (catalogue: `renderer.md` §1).
