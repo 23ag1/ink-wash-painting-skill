@@ -11,74 +11,25 @@
 import { rng, smooth } from '../../../kit/brush/brush.js';
 import { stroke } from '../../../kit/brush/ink.js';
 import { hairyStroke } from '../../../kit/brush/hairy.js';
+import { createTree, growLimb, arcLens, chainShape, strandCurve } from '../../../kit/brush/tree.js';
 import { grey, depthLine, occlude, glaze } from './layers.js';
 
-const arcLens = P => P.reduce((a, p, i) => (a.push(i ? a[i - 1] + Math.hypot(p[0] - P[i - 1][0], p[1] - P[i - 1][1]) : 0), a), []);
-
-// a branch grown with gravity, like a cantilever: it bends down more the longer and thinner it is — thick limbs
-// hold their direction, thin parts droop more and more toward the tip (the willow's arch comes from this, not
-// from a hand-set curve). A little crookedness, an occasional kink.
-function grow(r, x, y, ang, len, w0, steps = 8, G = .34) {
-  const pts = [[x, y]];
-  let a = ang;
-  for (let k = 1; k <= steps; k++) {
-    const t = k / steps, w = Math.max(.5, w0 * Math.pow(1 - t, .55));
-    const sag = G * t / (1 + w / 3.5);                                 // flexibility ~ 1 / thickness, load grows outward
-    const down = Math.PI / 2 - a, d = Math.atan2(Math.sin(down), Math.cos(down));
-    a += Math.sign(d) * Math.min(Math.abs(d), sag) + (r() - .5) * .14 + (r() < .2 ? (r() - .5) * .45 : 0);
-    pts.push([pts[k - 1][0] + Math.cos(a) * len / steps, pts[k - 1][1] + Math.sin(a) * len / steps]);
-  }
-  return pts;
-}
-
-// does a polyline cross another chain (used so a branch never grows through a big limb)
-function crosses(pts, chains, skip) {
-  const hit = (a, b, c, d) => { const o = (p, q, r) => Math.sign((q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0])); return o(a, b, c) !== o(a, b, d) && o(c, d, a) !== o(c, d, b); };
-  for (const ch of chains) {
-    if (ch === skip || ch.depth > 1) continue;
-    for (let i = 2; i < pts.length - 1; i++) for (let j = 0; j < ch.P.length - 1; j += 2) if (hit(pts[i], pts[i + 1], ch.P[j], ch.P[Math.min(ch.P.length - 1, j + 2)])) return true;
-  }
-  return false;
-}
+// the willow's choices for the kit's tree mechanics (references/trees.md: species character)
+const LIMB = { jitter: .14, kink: .45, stiffness: 3.5, hold: .55 };
+const shape = (ch, r) => chainShape(ch, r, .08);
 
 export function willowTree(c, sp, notan) {
   const r = rng(sp.seed);
-  const chains = [];                                                  // { P (smoothed points), W (widths), depth }
-  const addChain = (pts, w0, depth, flare = 0) => {
-    const P = smooth(pts, 3), S = arcLens(P), L = S[S.length - 1] || 1;
-    const W = S.map(s => Math.max(.5, w0 * Math.pow(1 - s / L, .55) * (1 + flare * Math.max(0, 1 - s / L * 12))));   // holds its width, thins at the end
-    const ch = { P, W, S, L, depth };
-    chains.push(ch);
-    return ch;
-  };
-  const at = (ch, u) => {                                             // point, width, direction at fraction u
-    const i = Math.max(0, Math.min(ch.P.length - 2, Math.round(u * (ch.P.length - 1))));
-    const [x, y] = ch.P[i], [nx, ny] = ch.P[i + 1];
-    return { x, y, w: ch.W[i], a: Math.atan2(ny - y, nx - x) };
-  };
-  // branches of a chain: alternating sides, uneven spacing, mostly rising (鹿角), each with its own twigs
-  // branches of a chain: alternating sides, uneven spacing; they leave at 30-50° (narrower toward the parent's
-  // tip), lean a little to the light, longer low on the parent (a cone); gravity bends them; a branch that
-  // would grow through a big limb takes the other side or is not grown; its base flares into the parent (collar)
-  const branch = (ch, from, to, count, lenK, depth, seed) => {
-    const br = rng(seed);
-    let side = br() < .5 ? 1 : -1;
-    for (let i = 0; i < count; i++) {
-      const u = from + (to - from) * (i + .2 + br() * .6) / count, p = at(ch, u);
-      const len = ch.L * lenK * (.7 + br() * .6) * (1.2 - u * .6), w0 = Math.min(p.w * .85, len * (depth >= 2 ? .055 : .08));   // willow whips are thin
-      let kidPts = null;
-      for (const sd of [side, -side]) {
-        let a = p.a + sd * (.85 - .4 * u + (br() - .5) * .2);
-        const up = -Math.PI / 2 - a; a += Math.atan2(Math.sin(up), Math.cos(up)) * (depth >= 2 ? .15 : .25);
-        const pts = grow(br, p.x, p.y, a, len, w0, 7, depth >= 2 ? .75 : .45);   // whips arch over and hang (柳条)
-        if (!crosses(pts, chains, ch)) { kidPts = pts; break; }
-      }
-      side = -side;
-      if (!kidPts) continue;
-      const kid = addChain(kidPts, w0, depth, .45);
-      if (depth < 3 && len > 22) branch(kid, .3, .95, depth === 1 ? 4 : 2, .45, depth + 1, seed + 97 * (i + 1));
-    }
-  };
+  const T = createTree(), chains = T.chains, addChain = (pts, w0, depth, flare = 0) => T.addChain(pts, w0, depth, { flare });
+  const at = T.at;
+  // willow branching: thin whips (width ~.055 × length on twigs) that barely rise and hang (柳条); trunk branches
+  // few; twigs on whips one level deep
+  const branch = (ch, from, to, count, lenK, depth, seed) => T.branch(ch, {
+    from, to, count, lenK, widthPerLen: depth >= 2 ? .055 : .08, spread: .85, narrow: .4, lean: depth >= 2 ? .15 : .25,
+    gravity: depth >= 2 ? .75 : .45, steps: 7, collar: .45, depth, seed, limb: LIMB,
+    then: (kid, i, len) => { if (depth < 3 && len > 22) branch(kid, .3, .95, depth === 1 ? 4 : 2, .45, depth + 1, seed + 97 * (i + 1)); },
+  }, rng);
+  const grow = (rr, x, y, ang, len, w0, steps, G) => growLimb(rr, x, y, ang, len, w0, { ...LIMB, steps, gravity: G });
 
   // 1. the trunk + main leader: one chain from the root, through the S of the trunk, arching out over the path
   const trunkPts = smooth(sp.trunk, 2);
@@ -154,28 +105,11 @@ export function willowTree(c, sp, notan) {
   });
 }
 
-// a chain's tapered shape, its edge uneven (a brush edge is never a clean offset curve)
-function shape(ch, r) {
-  const { P, W } = ch, n = P.length, L = [], R = [];
-  const ph = r() * 6;
-  for (let i = 0; i < n; i++) {
-    const q = P[Math.min(n - 1, i + 1)], o = P[Math.max(0, i - 1)], a = Math.atan2(q[1] - o[1], q[0] - o[0]);
-    const wl = W[i] / 2 * (1 + .08 * Math.sin(i * .7 + ph)), wr = W[i] / 2 * (1 + .08 * Math.sin(i * .9 + ph * 1.7));
-    L.push([P[i][0] + Math.sin(a) * wl, P[i][1] - Math.cos(a) * wl]);
-    R.push([P[i][0] - Math.sin(a) * wr, P[i][1] + Math.cos(a) * wr]);
-  }
-  const g = new Path2D();
-  [...L, ...R.reverse()].forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y)));
-  g.closePath();
-  return g;
-}
-
 function bunch(c, x, y, a, n, reach, seed) {
   const rr = rng(seed);
   for (let k = 0; k < n; k++) {
     const la = a + (rr() - .5) * .7, K = reach * (.3 + rr() * 1.1), L = 50 + Math.pow(rr(), 1.3) * 230;   // willow strands hang long
-    const vx = Math.cos(la), vy = Math.min(.2, Math.sin(la)), drift = (rr() - .5) * 10;
-    const pts = Array.from({ length: 14 }, (_, i) => { const t = i / 13; return [x + vx * K * t * (1 - t * .55) + drift * t * t, y + vy * K * t + L * t * t]; });
+    const pts = strandCurve(x, y, la, K, L, (rr() - .5) * 10);
     depthLine(c, pts, 1.5, .08);
     stroke(c.l, smooth(pts, 2), { wid: .45 + rr() * .35, fun: t => 1 - t * .85, noi: .25, col: `rgba(30,26,20,${.14 + Math.pow(rr(), .7) * .4})`, seed: seed + 30 + k, tip: .3, dry: .3 });
   }
